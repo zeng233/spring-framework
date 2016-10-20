@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+
+	<bean id="myBean" class="mytest.editor.MyBean">
+		<property name="foo" value="abc"/>
+	</bean>
+
+	<!-- list方式需要注入registrar，并且在自定义的registrar里面登记editor -->
+	<bean id="listCustomEditorConfigurer"
+		class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+		<property name="propertyEditorRegistrars">
+			<list>
+				<bean class="mytest.editor.CustomerEditorRegistrar" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- map方式直接保存转换类型对应的editor -->
+	<!-- <bean id="mapCustomerEditorConfigurer" class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+		<property name="customEditors">
+			<map>
+				<entry key="java.lang.String" value="mytest.editor.CustomerUpperCaseEditor" />
+			</map>
+		</property>
+	</bean> -->
+</beans>

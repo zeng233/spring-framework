@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd"
+	default-autowire="default">
+
+	<bean id="emails" class="org.springframework.beans.factory.config.MapFactoryBean">
+		<!-- 默认为LinkedHashMap -->
+		<property name="sourceMap">
+			<map>
+				<entry key="pechorin" value="pechorin@hero.org" />
+				<entry key="raskolnikov" value="raskolnikov@slums.org" />
+				<entry key="stavrogin" value="stavrogin@gov.org" />
+				<entry key="porfiry" value="porfiry@gov.org" />
+			</map>
+		</property>
+	</bean>
+
+	<util:list id="listEmails">
+		<value>pechorin@hero.org</value>
+		<value>raskolnikov@slums.org</value>
+		<value>stavrogin@gov.org</value>
+		<value>porfiry@gov.org</value>
+	</util:list>
+
+	<util:list id="linkedListEmails" list-class="java.util.LinkedList"><!-- 可以自定义list类型 -->
+		<value>jackshaftoe@vagabond.org</value>
+		<value>eliza@thinkingmanscrumpet.org</value>
+		<value>vanhoek@pirate.org</value>
+		<value>d'Arcachon@nemesis.org</value>
+	</util:list>
+
+	<util:map id="mapEmails">
+		<entry key="pechorin" value="pechorin@hero.org" />
+		<entry key="raskolnikov" value="raskolnikov@slums.org" />
+		<entry key="stavrogin" value="stavrogin@gov.org" />
+		<entry key="porfiry" value="porfiry@gov.org" />
+	</util:map>
+</beans>
