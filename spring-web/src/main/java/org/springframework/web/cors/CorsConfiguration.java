@@ -344,13 +344,10 @@ public class CorsConfiguration {
 		List<HttpMethod> result = new ArrayList<HttpMethod>(allowedMethods.size());
 		boolean allowed = false;
 		for (String method : allowedMethods) {
-			if (requestMethod.matches(method)) {
+			if (requestMethod.name().equals(method)) {
 				allowed = true;
 			}
-			HttpMethod resolved = HttpMethod.resolve(method);
-			if (resolved != null) {
-				result.add(resolved);
-			}
+			result.add(HttpMethod.valueOf(method));
 		}
 		return (allowed ? result : null);
 	}

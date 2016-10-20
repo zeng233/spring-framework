@@ -364,7 +364,6 @@ public class WebMvcConfigurationSupport implements ApplicationContextAware, Serv
 	@Bean
 	public HandlerMapping viewControllerHandlerMapping() {
 		ViewControllerRegistry registry = new ViewControllerRegistry();
-		registry.setApplicationContext(this.applicationContext);
 		addViewControllers(registry);
 
 		AbstractHandlerMapping handlerMapping = registry.getHandlerMapping();

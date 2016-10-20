@@ -17,6 +17,7 @@
 package org.springframework.format.datetime.standard;
 
 import java.text.ParseException;
+import java.time.Instant;
 import java.time.Period;
 import java.util.Locale;
 
@@ -32,7 +33,7 @@ import org.springframework.lang.UsesJava8;
  * @see Period#parse
  */
 @UsesJava8
-class PeriodFormatter implements Formatter<Period> {
+public class PeriodFormatter implements Formatter<Period> {
 
 	@Override
 	public Period parse(String text, Locale locale) throws ParseException {

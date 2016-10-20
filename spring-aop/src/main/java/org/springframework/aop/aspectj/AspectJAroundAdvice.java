@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2015 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package org.springframework.aop.aspectj;
 
-import java.io.Serializable;
 import java.lang.reflect.Method;
 
 import org.aopalliance.intercept.MethodInterceptor;
@@ -34,15 +33,13 @@ import org.springframework.aop.ProxyMethodInvocation;
  * @author Juergen Hoeller
  * @since 2.0
  */
-@SuppressWarnings("serial")
-public class AspectJAroundAdvice extends AbstractAspectJAdvice implements MethodInterceptor, Serializable {
+public class AspectJAroundAdvice extends AbstractAspectJAdvice implements MethodInterceptor {
 
 	public AspectJAroundAdvice(
 			Method aspectJAroundAdviceMethod, AspectJExpressionPointcut pointcut, AspectInstanceFactory aif) {
 
 		super(aspectJAroundAdviceMethod, pointcut, aif);
 	}
-
 
 	@Override
 	public boolean isBeforeAdvice() {
@@ -58,6 +55,7 @@ public class AspectJAroundAdvice extends AbstractAspectJAdvice implements Method
 	protected boolean supportsProceedingJoinPoint() {
 		return true;
 	}
+
 
 	@Override
 	public Object invoke(MethodInvocation mi) throws Throwable {

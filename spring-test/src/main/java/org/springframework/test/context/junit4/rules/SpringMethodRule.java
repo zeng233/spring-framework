@@ -20,7 +20,6 @@ import java.lang.reflect.Field;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.junit.ClassRule;
 import org.junit.rules.MethodRule;
 import org.junit.runners.model.FrameworkMethod;
@@ -80,7 +79,7 @@ import org.springframework.util.ReflectionUtils;
  * <li>{@link org.springframework.test.annotation.IfProfileValue @IfProfileValue}</li>
  * </ul>
  *
- * <p><strong>NOTE:</strong> As of Spring Framework 4.3, this class requires JUnit 4.12 or higher.
+ * <p><strong>NOTE:</strong> This class requires JUnit 4.9 or higher.
  *
  * @author Sam Brannen
  * @author Philippe Marschall
@@ -94,9 +93,16 @@ public class SpringMethodRule implements MethodRule {
 
 	private static final Log logger = LogFactory.getLog(SpringMethodRule.class);
 
+	// Used by RunAfterTestMethodCallbacks
+	private static final String MULTIPLE_FAILURE_EXCEPTION_CLASS_NAME = "org.junit.runners.model.MultipleFailureException";
+
 	static {
-		if (!ClassUtils.isPresent("org.junit.internal.Throwables", SpringMethodRule.class.getClassLoader())) {
-			throw new IllegalStateException("SpringMethodRule requires JUnit 4.12 or higher.");
+		boolean junit4dot9Present = ClassUtils.isPresent(MULTIPLE_FAILURE_EXCEPTION_CLASS_NAME,
+			SpringMethodRule.class.getClassLoader());
+		if (!junit4dot9Present) {
+			throw new IllegalStateException(String.format(
+				"Failed to find class [%s]: SpringMethodRule requires JUnit 4.9 or higher.",
+				MULTIPLE_FAILURE_EXCEPTION_CLASS_NAME));
 		}
 	}
 

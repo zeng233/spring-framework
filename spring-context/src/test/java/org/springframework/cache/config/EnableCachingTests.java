@@ -44,7 +44,7 @@ import static org.junit.Assert.*;
  * @author Chris Beams
  * @author Stephane Nicoll
  */
-public class EnableCachingTests extends AbstractCacheAnnotationTests {
+public class EnableCachingTests extends AbstractAnnotationTests {
 
 	/** hook into superclass suite of tests */
 	@Override

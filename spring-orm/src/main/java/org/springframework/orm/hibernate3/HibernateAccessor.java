@@ -48,9 +48,7 @@ import org.springframework.jdbc.support.SQLExceptionTranslator;
  * @see HibernateTemplate
  * @see HibernateInterceptor
  * @see #setFlushMode
- * @deprecated as of Spring 4.3, in favor of Hibernate 4.x/5.x
  */
-@Deprecated
 public abstract class HibernateAccessor implements InitializingBean, BeanFactoryAware {
 
 	/**

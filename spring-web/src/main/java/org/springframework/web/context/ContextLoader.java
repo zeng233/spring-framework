@@ -26,7 +26,7 @@ import javax.servlet.ServletContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.access.BeanFactoryLocator;
 import org.springframework.beans.factory.access.BeanFactoryReference;
@@ -89,6 +89,7 @@ import org.springframework.util.StringUtils;
  * @see org.springframework.web.context.support.XmlWebApplicationContext
  */
 public class ContextLoader {
+	public static final Logger mylog = Logger.getLogger(ContextLoader.class);
 
 	/**
 	 * Config param for the root WebApplicationContext id,
@@ -311,6 +312,7 @@ public class ContextLoader {
 		try {
 			// Store context in local instance variable, to guarantee that
 			// it is available on ServletContext shutdown.
+			mylog.debug("实例化WebApplicationContext开始");
 			if (this.context == null) {
 				this.context = createWebApplicationContext(servletContext);
 			}
@@ -322,12 +324,14 @@ public class ContextLoader {
 					if (cwac.getParent() == null) {
 						// The context instance was injected without an explicit parent ->
 						// determine parent for root web application context, if any.
+						mylog.debug("从servletContext从web.xml中读取是否配置ApplicationContext，如果有就是父级的IoC");
 						ApplicationContext parent = loadParentContext(servletContext);
 						cwac.setParent(parent);
 					}
 					configureAndRefreshWebApplicationContext(cwac, servletContext);
 				}
 			}
+			mylog.debug("把XmlWebApplicationContext设置到ServletContext中");
 			servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, this.context);
 
 			ClassLoader ccl = Thread.currentThread().getContextClassLoader();
@@ -392,6 +396,7 @@ public class ContextLoader {
 	 */
 	protected Class<?> determineContextClass(ServletContext servletContext) {
 		String contextClassName = servletContext.getInitParameter(CONTEXT_CLASS_PARAM);
+		mylog.debug("如果web.xml没有配置WebApplicationContext的实现，就默认到ContextLoader.properties获取XmlWebApplicationContext对象");
 		if (contextClassName != null) {
 			try {
 				return ClassUtils.forName(contextClassName, ClassUtils.getDefaultClassLoader());
@@ -429,6 +434,7 @@ public class ContextLoader {
 		}
 
 		wac.setServletContext(sc);
+		mylog.debug("获取web.xml中context-param标签的配置文件");
 		String configLocationParam = sc.getInitParameter(CONFIG_LOCATION_PARAM);
 		if (configLocationParam != null) {
 			wac.setConfigLocation(configLocationParam);
@@ -443,6 +449,7 @@ public class ContextLoader {
 		}
 
 		customizeContext(sc, wac);
+		mylog.debug("触发XmlWebApplicationContext的refresh方法");
 		wac.refresh();
 	}
 

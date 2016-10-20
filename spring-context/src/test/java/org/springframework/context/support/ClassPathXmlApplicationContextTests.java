@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import org.springframework.aop.support.AopUtils;
@@ -48,8 +49,11 @@ import static org.junit.Assert.*;
 /**
  * @author Juergen Hoeller
  * @author Chris Beams
+ * 
+ * 静态测试 StaticApplicationContextTests
  */
 public class ClassPathXmlApplicationContextTests {
+	private static final Logger log = Logger.getLogger(ClassPathXmlApplicationContextTests.class);
 
 	private static final String PATH = "/org/springframework/context/support/";
 	private static final String RESOURCE_CONTEXT = PATH + "ClassPathXmlApplicationContextTests-resource.xml";
@@ -75,6 +79,7 @@ public class ClassPathXmlApplicationContextTests {
 	@Test
 	public void testSingleConfigLocation() {
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(FQ_SIMPLE_CONTEXT);
+		log.debug("================初始化完毕==================");
 		assertTrue(ctx.containsBean("someMessageSource"));
 		ctx.close();
 	}

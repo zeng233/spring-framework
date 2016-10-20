@@ -174,7 +174,7 @@ public class CglibSubclassingInstantiationStrategy extends SimpleInstantiationSt
 
 		@Override
 		public boolean equals(Object other) {
-			return (getClass() == other.getClass() &&
+			return (getClass().equals(other.getClass()) &&
 					this.beanDefinition.equals(((CglibIdentitySupport) other).beanDefinition));
 		}
 

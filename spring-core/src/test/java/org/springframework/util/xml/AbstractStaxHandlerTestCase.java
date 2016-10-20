@@ -82,7 +82,7 @@ public abstract class AbstractStaxHandlerTestCase {
 
 	private static boolean wwwSpringframeworkOrgIsAccessible() {
 		try {
-			new Socket("www.springframework.org", 80).close();
+			new Socket("www.springframework.org", 80);
 		}
 		catch (Exception e) {
 			return false;

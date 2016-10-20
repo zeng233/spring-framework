@@ -24,10 +24,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.transform.Source;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -69,6 +71,7 @@ import org.springframework.web.servlet.handler.AbstractHandlerMethodExceptionRes
  */
 public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExceptionResolver
 		implements ApplicationContextAware, InitializingBean {
+	private static Logger mylog = Logger.getLogger(ExceptionHandlerExceptionResolver.class);
 
 	private List<HandlerMethodArgumentResolver> customArgumentResolvers;
 
@@ -319,6 +322,8 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
 
 		// Annotation-based return value types
 		handlers.add(new ModelAttributeMethodProcessor(false));
+		//处理@RequestBody、@ResponseBody注解，
+		//getMessageConverters由AnnotationDrivenBeanDefinitionParser初始化时，把json、xml等的convert转化类已添加到List列表
 		handlers.add(new RequestResponseBodyMethodProcessor(
 				getMessageConverters(), this.contentNegotiationManager, this.responseBodyAdvice));
 
@@ -340,11 +345,13 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
 
 	/**
 	 * Find an {@code @ExceptionHandler} method and invoke it to handle the raised exception.
+	 * TODO 解析注解类型的异常
 	 */
 	@Override
 	protected ModelAndView doResolveHandlerMethodException(HttpServletRequest request,
 			HttpServletResponse response, HandlerMethod handlerMethod, Exception exception) {
-
+		
+		mylog.debug("获取绑定的controller异常处理方法（使用ControllerAdvice注解）");
 		ServletInvocableHandlerMethod exceptionHandlerMethod = getExceptionHandlerMethod(handlerMethod, exception);
 		if (exceptionHandlerMethod == null) {
 			return null;
@@ -354,12 +361,15 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
 		exceptionHandlerMethod.setHandlerMethodReturnValueHandlers(this.returnValueHandlers);
 
 		ServletWebRequest webRequest = new ServletWebRequest(request, response);
+		
+		//初始化View容器，ajax方式的返回结果里面只设置了setRequestHandled(true)
 		ModelAndViewContainer mavContainer = new ModelAndViewContainer();
 
 		try {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Invoking @ExceptionHandler method: " + exceptionHandlerMethod);
 			}
+			//处理异常方法，包括对ajax异步请求的处理（ResponseBody对应的processor为RequestResponseBodyMethodProcessor）
 			exceptionHandlerMethod.invokeAndHandle(webRequest, mavContainer, exception, handlerMethod);
 		}
 		catch (Exception invocationEx) {

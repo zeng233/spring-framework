@@ -38,6 +38,7 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.handler.ExceptionWebSocketHandlerDecorator;
 
+
 /**
  * Adapts {@link WebSocketHandler} to the Jetty 9 WebSocket API.
  *
@@ -58,8 +59,8 @@ public class JettyWebSocketHandlerAdapter {
 
 
 	public JettyWebSocketHandlerAdapter(WebSocketHandler webSocketHandler, JettyWebSocketSession wsSession) {
-		Assert.notNull(webSocketHandler, "WebSocketHandler must not be null");
-		Assert.notNull(wsSession, "WebSocketSession must not be null");
+		Assert.notNull(webSocketHandler, "webSocketHandler must not be null");
+		Assert.notNull(wsSession, "wsSession must not be null");
 		this.webSocketHandler = webSocketHandler;
 		this.wsSession = wsSession;
 	}
@@ -71,8 +72,8 @@ public class JettyWebSocketHandlerAdapter {
 			this.wsSession.initializeNativeSession(session);
 			this.webSocketHandler.afterConnectionEstablished(this.wsSession);
 		}
-		catch (Throwable ex) {
-			ExceptionWebSocketHandlerDecorator.tryCloseWithError(this.wsSession, ex, logger);
+		catch (Throwable t) {
+			ExceptionWebSocketHandlerDecorator.tryCloseWithError(this.wsSession, t, logger);
 		}
 	}
 
@@ -82,8 +83,8 @@ public class JettyWebSocketHandlerAdapter {
 		try {
 			this.webSocketHandler.handleMessage(this.wsSession, message);
 		}
-		catch (Throwable ex) {
-			ExceptionWebSocketHandlerDecorator.tryCloseWithError(this.wsSession, ex, logger);
+		catch (Throwable t) {
+			ExceptionWebSocketHandlerDecorator.tryCloseWithError(this.wsSession, t, logger);
 		}
 	}
 
@@ -93,8 +94,8 @@ public class JettyWebSocketHandlerAdapter {
 		try {
 			this.webSocketHandler.handleMessage(this.wsSession, message);
 		}
-		catch (Throwable ex) {
-			ExceptionWebSocketHandlerDecorator.tryCloseWithError(this.wsSession, ex, logger);
+		catch (Throwable t) {
+			ExceptionWebSocketHandlerDecorator.tryCloseWithError(this.wsSession, t, logger);
 		}
 	}
 
@@ -106,8 +107,8 @@ public class JettyWebSocketHandlerAdapter {
 			try {
 				this.webSocketHandler.handleMessage(this.wsSession, message);
 			}
-			catch (Throwable ex) {
-				ExceptionWebSocketHandlerDecorator.tryCloseWithError(this.wsSession, ex, logger);
+			catch (Throwable t) {
+				ExceptionWebSocketHandlerDecorator.tryCloseWithError(this.wsSession, t, logger);
 			}
 		}
 	}
@@ -118,10 +119,8 @@ public class JettyWebSocketHandlerAdapter {
 		try {
 			this.webSocketHandler.afterConnectionClosed(this.wsSession, closeStatus);
 		}
-		catch (Throwable ex) {
-			if (logger.isErrorEnabled()) {
-				logger.error("Unhandled error for " + this.wsSession, ex);
-			}
+		catch (Throwable t) {
+			logger.error("Unhandled error for " + this.wsSession, t);
 		}
 	}
 
@@ -130,8 +129,8 @@ public class JettyWebSocketHandlerAdapter {
 		try {
 			this.webSocketHandler.handleTransportError(this.wsSession, cause);
 		}
-		catch (Throwable ex) {
-			ExceptionWebSocketHandlerDecorator.tryCloseWithError(this.wsSession, ex, logger);
+		catch (Throwable t) {
+			ExceptionWebSocketHandlerDecorator.tryCloseWithError(this.wsSession, t, logger);
 		}
 	}
 

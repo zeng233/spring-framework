@@ -23,15 +23,11 @@ import java.util.Iterator;
 
 import org.junit.Test;
 
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.cache.annotation.AnnotationCacheOperationSource;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.context.expression.AnnotatedElementKey;
-import org.springframework.context.support.StaticApplicationContext;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.util.ReflectionUtils;
@@ -79,8 +75,7 @@ public class ExpressionEvaluatorTests {
 		Object[] args = new Object[] { new Object(), new Object() };
 		Collection<ConcurrentMapCache> caches = Collections.singleton(new ConcurrentMapCache("test"));
 
-		EvaluationContext evalCtx = eval.createEvaluationContext(caches, method, args,
-				target, target.getClass(), null);
+		EvaluationContext evalCtx = eval.createEvaluationContext(caches, method, args, target, target.getClass());
 		Collection<CacheOperation> ops = getOps("multipleCaching");
 
 		Iterator<CacheOperation> it = ops.iterator();
@@ -127,29 +122,14 @@ public class ExpressionEvaluatorTests {
 		}
 	}
 
-	@Test
-	public void resolveBeanReference() throws Exception {
-		StaticApplicationContext applicationContext = new StaticApplicationContext();
-		BeanDefinition beanDefinition = new RootBeanDefinition(String.class);
-		applicationContext.registerBeanDefinition("myBean", beanDefinition);
-		applicationContext.refresh();
-
-		EvaluationContext context = createEvaluationContext(ExpressionEvaluator.NO_RESULT, applicationContext);
-		Object value = new SpelExpressionParser().parseExpression("@myBean.class.getName()").getValue(context);
-		assertThat(value, is(String.class.getName()));
-	}
-
 	private EvaluationContext createEvaluationContext(Object result) {
-		return createEvaluationContext(result, null);
-	}
-
-	private EvaluationContext createEvaluationContext(Object result, BeanFactory beanFactory) {
 		AnnotatedClass target = new AnnotatedClass();
 		Method method = ReflectionUtils.findMethod(AnnotatedClass.class, "multipleCaching", Object.class,
 				Object.class);
 		Object[] args = new Object[] { new Object(), new Object() };
 		Collection<ConcurrentMapCache> caches = Collections.singleton(new ConcurrentMapCache("test"));
-		return eval.createEvaluationContext(caches, method, args, target, target.getClass(), result, beanFactory);
+		EvaluationContext context = eval.createEvaluationContext(caches, method, args, target, target.getClass(), result);
+		return context;
 	}
 
 

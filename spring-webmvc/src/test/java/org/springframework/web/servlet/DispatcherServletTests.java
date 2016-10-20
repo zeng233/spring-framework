@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -71,6 +72,7 @@ import static org.mockito.Mockito.*;
  * @author Sam Brannen
  */
 public class DispatcherServletTests {
+	private static Logger mylog = Logger.getLogger(DispatcherServletTests.class);
 
 	private static final String URL_KNOWN_ONLY_PARENT = "/knownOnlyToParent.do";
 
@@ -88,15 +90,20 @@ public class DispatcherServletTests {
 		complexConfig.addInitParameter("class", "notWritable");
 		complexConfig.addInitParameter("unknownParam", "someValue");
 
-		simpleDispatcherServlet = new DispatcherServlet();
-		simpleDispatcherServlet.setContextClass(SimpleWebApplicationContext.class);
-		simpleDispatcherServlet.init(servletConfig);
+//		simpleDispatcherServlet = new DispatcherServlet();
+//		simpleDispatcherServlet.setContextClass(SimpleWebApplicationContext.class);
+//		mylog.debug("===================调用init方法====================");
+//		simpleDispatcherServlet.init(servletConfig);
 
 		complexDispatcherServlet = new DispatcherServlet();
+		System.out.println("初始化设置ComplexWebApplicationContext到DispatcherServlet，默认为XmlWebApplicationContext");
 		complexDispatcherServlet.setContextClass(ComplexWebApplicationContext.class);
 		complexDispatcherServlet.setNamespace("test");
 		complexDispatcherServlet.addRequiredProperty("publishContext");
+		mylog.debug("测试替身MockServletConfig（已经设置MockServletContext）init到DispatcherServlet");
 		complexDispatcherServlet.init(complexConfig);
+		mylog.debug("==================init执行结束================");
+		System.out.println("DispatcherServlet.init()执行完成");
 	}
 
 	private ServletContext getServletContext() {
@@ -139,11 +146,18 @@ public class DispatcherServletTests {
 		assertTrue("correct error code", response.getStatus() == HttpServletResponse.SC_NOT_FOUND);
 	}
 
+	/**
+	 * 测试监听事件
+	 * TODO 
+	 * @throws Exception
+	 */
 	@Test
 	public void requestHandledEvent() throws Exception {
 		MockHttpServletRequest request = new MockHttpServletRequest(getServletContext(), "GET", "/locale.do");
+		System.out.println("=============开始mock一个请求/local.do=============");
 		MockHttpServletResponse response = new MockHttpServletResponse();
 		complexDispatcherServlet.service(request, response);
+		System.out.println("/local.do执行完毕");
 		ComplexWebApplicationContext.TestApplicationListener listener =
 				(ComplexWebApplicationContext.TestApplicationListener) complexDispatcherServlet
 						.getWebApplicationContext().getBean("testListener");

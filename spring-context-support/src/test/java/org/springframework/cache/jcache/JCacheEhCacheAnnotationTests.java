@@ -28,7 +28,7 @@ import org.junit.Test;
 
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.config.AbstractCacheAnnotationTests;
+import org.springframework.cache.config.AbstractAnnotationTests;
 import org.springframework.cache.config.AnnotatedClassCacheableService;
 import org.springframework.cache.config.CacheableService;
 import org.springframework.cache.config.DefaultCacheableService;
@@ -43,7 +43,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * @author Stephane Nicoll
  */
-public class JCacheEhCacheAnnotationTests extends AbstractCacheAnnotationTests {
+public class JCacheEhCacheAnnotationTests extends AbstractAnnotationTests {
 
 	private CacheManager jCacheManager;
 
@@ -58,10 +58,6 @@ public class JCacheEhCacheAnnotationTests extends AbstractCacheAnnotationTests {
 		return context;
 	}
 
-	protected CachingProvider getCachingProvider() {
-		return Caching.getCachingProvider();
-	}
-
 	@After
 	public void shutdown() {
 		if (jCacheManager != null) {
@@ -74,6 +70,11 @@ public class JCacheEhCacheAnnotationTests extends AbstractCacheAnnotationTests {
 	@Test
 	@Ignore("Multi cache manager support to be added")
 	public void testCustomCacheManager() {
+	}
+
+
+	protected CachingProvider getCachingProvider() {
+		return Caching.getCachingProvider();
 	}
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2015 the original author or authors.
+ * Copyright 2014-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1172,6 +1172,7 @@ public class SpelCompilationCoverageTests extends AbstractExpressionTests {
 		assertFalse((Boolean)expression.getValue());
 	}
 
+
 	@Test
 	public void opGt() throws Exception {
 		expression = parse("3.0d > 4.0d");
@@ -1317,6 +1318,7 @@ public class SpelCompilationCoverageTests extends AbstractExpressionTests {
 		assertTrue((Boolean)expression.getValue(tc7));
 		assertCanCompile(expression);
 		assertTrue((Boolean)expression.getValue(tc7));
+
 
 		expression = parse("3.0d == 4.0d");
 		assertCanCompile(expression);
@@ -1667,6 +1669,43 @@ public class SpelCompilationCoverageTests extends AbstractExpressionTests {
 		assertEquals(3L,expression.getValue());
 		assertCanCompile(expression);
 		assertEquals(3L,expression.getValue());
+	}
+
+	public class PayloadX {
+		public int valueI = 120;
+		public Integer valueIB = 120;
+		public Integer valueIB58 = 58;
+		public Integer valueIB60 = 60;
+		public long valueJ = 120L;
+		public Long valueJB = 120L;
+		public Long valueJB58 = 58L;
+		public Long valueJB60 = 60L;
+		public double valueD = 120D;
+		public Double valueDB = 120D;
+		public Double valueDB58 = 58D;
+		public Double valueDB60 = 60D;
+		public float valueF = 120F;
+		public Float valueFB = 120F;
+		public Float valueFB58 = 58F;
+		public Float valueFB60 = 60F;
+		public byte valueB = (byte)120;
+		public byte valueB18 = (byte)18;
+		public byte valueB20 = (byte)20;
+		public Byte valueBB = (byte)120;
+		public Byte valueBB18 = (byte)18;
+		public Byte valueBB20 = (byte)20;
+		public char valueC = (char)120;
+		public Character valueCB = (char)120;
+		public short valueS = (short)120;
+		public short valueS18 = (short)18;
+		public short valueS20 = (short)20;
+		public Short valueSB = (short)120;
+		public Short valueSB18 = (short)18;
+		public Short valueSB20 = (short)20;
+		public PayloadX payload;
+		public PayloadX() {
+			payload = this;
+		}
 	}
 
 	@Test
@@ -2115,6 +2154,16 @@ public class SpelCompilationCoverageTests extends AbstractExpressionTests {
 		assertEquals("objectobject",expression.getValue(new Greeter()));
 		assertCanCompile(expression);
 		assertEquals("objectobject",expression.getValue(new Greeter()));
+	}
+
+	public static class Greeter {
+		public String getWorld() {
+			return "world";
+		}
+
+		public Object getObject() {
+			return "object";
+		}
 	}
 
 	@Test
@@ -2945,116 +2994,19 @@ public class SpelCompilationCoverageTests extends AbstractExpressionTests {
 
 	@Test
 	public void failsWhenSettingContextForExpression_SPR12326() {
-		SpelExpressionParser parser = new SpelExpressionParser(
-				new SpelParserConfiguration(SpelCompilerMode.IMMEDIATE, getClass().getClassLoader()));
-		Person3 person = new Person3("foo", 1);
-		SpelExpression expression = parser.parseRaw("#it?.age?.equals([0])");
-		StandardEvaluationContext context = new StandardEvaluationContext(new Object[] { 1 });
-		context.setVariable("it", person);
-		expression.setEvaluationContext(context);
-		assertTrue(expression.getValue(Boolean.class));
-		assertTrue(expression.getValue(Boolean.class));
-		assertCanCompile(expression);
-		assertTrue(expression.getValue(Boolean.class));
+	    SpelExpressionParser parser = new SpelExpressionParser(new SpelParserConfiguration(SpelCompilerMode.IMMEDIATE, this
+	            .getClass().getClassLoader()));
+	    Person3 person = new Person3("foo", 1);
+	    SpelExpression expression = parser.parseRaw("#it?.age?.equals([0])");
+	    StandardEvaluationContext context = new StandardEvaluationContext(new Object[] { 1 });
+	    context.setVariable("it", person);
+	    expression.setEvaluationContext(context);
+	    assertTrue(expression.getValue(Boolean.class));
+	    assertTrue(expression.getValue(Boolean.class));
+	    assertCanCompile(expression);
+	    assertTrue(expression.getValue(Boolean.class));
 	}
 
-
-	/**
-	 * Test variants of using T(...) and static/non-static method/property/field references.
-	 */
-	@Test
-	public void constructorReference_SPR13781() {
-		// Static field access on a T() referenced type
-		expression = parser.parseExpression("T(java.util.Locale).ENGLISH");
-		assertEquals("en",expression.getValue().toString());
-		assertCanCompile(expression);
-		assertEquals("en",expression.getValue().toString());
-
-		// The actual expression from the bug report. It fails if the ENGLISH reference fails
-		// to pop the type reference for Locale off the stack (if it isn't popped then
-		// toLowerCase() will be called with a Locale parameter). In this situation the
-		// code generation for ENGLISH should notice there is something on the stack that
-		// is not required and pop it off.
-		expression = parser.parseExpression("#userId.toString().toLowerCase(T(java.util.Locale).ENGLISH)");
-		StandardEvaluationContext context =
-				new StandardEvaluationContext();
-		context.setVariable("userId", "RoDnEy");
-		assertEquals("rodney",expression.getValue(context));
-		assertCanCompile(expression);
-		assertEquals("rodney",expression.getValue(context));
-
-		// Property access on a class object
-		expression = parser.parseExpression("T(String).name");
-		assertEquals("java.lang.String",expression.getValue());
-		assertCanCompile(expression);
-		assertEquals("java.lang.String",expression.getValue());
-
-		// Now the type reference isn't on the stack, and needs loading
-		context = new StandardEvaluationContext(String.class);
-		expression = parser.parseExpression("name");
-		assertEquals("java.lang.String",expression.getValue(context));
-		assertCanCompile(expression);
-		assertEquals("java.lang.String",expression.getValue(context));
-
-		expression = parser.parseExpression("T(String).getName()");
-		assertEquals("java.lang.String",expression.getValue());
-		assertCanCompile(expression);
-		assertEquals("java.lang.String",expression.getValue());
-		
-		// These tests below verify that the chain of static accesses (either method/property or field)
-		// leave the right thing on top of the stack for processing by any outer consuming code.
-		// Here the consuming code is the String.valueOf() function.  If the wrong thing were on
-		// the stack (for example if the compiled code for static methods wasn't popping the 
-		// previous thing off the stack) the valueOf() would operate on the wrong value.
-
-		String shclass = StaticsHelper.class.getName();
-		// Basic chain: property access then method access
-		expression = parser.parseExpression("T(String).valueOf(T(String).name.valueOf(1))");
-		assertEquals("1",expression.getValue());
-		assertCanCompile(expression);
-		assertEquals("1",expression.getValue());
-
-		// chain of statics ending with static method
-		expression = parser.parseExpression("T(String).valueOf(T("+shclass+").methoda().methoda().methodb())");
-		assertEquals("mb",expression.getValue());
-		assertCanCompile(expression);
-		assertEquals("mb",expression.getValue());
-
-		// chain of statics ending with static field
-		expression = parser.parseExpression("T(String).valueOf(T("+shclass+").fielda.fielda.fieldb)");
-		assertEquals("fb",expression.getValue());
-		assertCanCompile(expression);
-		assertEquals("fb",expression.getValue());
-
-		// chain of statics ending with static property access
-		expression = parser.parseExpression("T(String).valueOf(T("+shclass+").propertya.propertya.propertyb)");
-		assertEquals("pb",expression.getValue());
-		assertCanCompile(expression);
-		assertEquals("pb",expression.getValue());
-
-		// variety chain
-		expression = parser.parseExpression("T(String).valueOf(T("+shclass+").fielda.methoda().propertya.fieldb)");
-		assertEquals("fb",expression.getValue());
-		assertCanCompile(expression);
-		assertEquals("fb",expression.getValue());
-
-		expression = parser.parseExpression("T(String).valueOf(fielda.fieldb)");
-		assertEquals("fb",expression.getValue(StaticsHelper.sh));
-		assertCanCompile(expression);
-		assertEquals("fb",expression.getValue(StaticsHelper.sh));
-		
-		expression = parser.parseExpression("T(String).valueOf(propertya.propertyb)");
-		assertEquals("pb",expression.getValue(StaticsHelper.sh));
-		assertCanCompile(expression);
-		assertEquals("pb",expression.getValue(StaticsHelper.sh));
-
-		expression = parser.parseExpression("T(String).valueOf(methoda().methodb())");
-		assertEquals("mb",expression.getValue(StaticsHelper.sh));
-		assertCanCompile(expression);
-		assertEquals("mb",expression.getValue(StaticsHelper.sh));
-		
-	}
-	
 	@Test
 	public void constructorReference_SPR12326() {
 		String type = this.getClass().getName();
@@ -3158,6 +3110,40 @@ public class SpelCompilationCoverageTests extends AbstractExpressionTests {
 		context.setVariable("it", person2);
 		assertTrue((Boolean)ex.getValue(context));
 		assertTrue((Boolean)ex.getValue(context));
+	}
+
+	public class Person {
+
+	    private int age;
+
+	    public Person(int age) {
+	        this.age = age;
+	    }
+
+	    public int getAge() {
+	        return age;
+	    }
+
+	    public void setAge(int age) {
+	        this.age = age;
+	    }
+	}
+
+	public class Person3 {
+
+	    private int age;
+
+	    public Person3(String name, int age) {
+	        this.age = age;
+	    }
+
+	    public int getAge() {
+	        return age;
+	    }
+
+	    public void setAge(int age) {
+	        this.age = age;
+	    }
 	}
 
 	@Test
@@ -3682,6 +3668,7 @@ public class SpelCompilationCoverageTests extends AbstractExpressionTests {
 		assertCantCompile(expression); // method takes a string and we are passing an Integer
 	}
 
+
 	@Test
 	public void errorHandling() throws Exception {
 		TestClass5 tc = new TestClass5();
@@ -3847,6 +3834,7 @@ public class SpelCompilationCoverageTests extends AbstractExpressionTests {
 		assertEquals(0.04d,expression.getValue(payload));
 		assertEquals("D",getAst().getExitDescriptor());
 	}
+
 
 	@Test
 	public void mixingItUp_indexerOpEqTernary() throws Exception {
@@ -4212,22 +4200,22 @@ public class SpelCompilationCoverageTests extends AbstractExpressionTests {
 		assertEquals("value1",stringify(expression.getValue(mapArray)));
 		assertEquals("Ljava/lang/Object",getAst().getExitDescriptor());
 	}
-
+	
 	@Test
 	public void plusNeedingCheckcast_SPR12426() {
 		expression = parser.parseExpression("object + ' world'");
 		Object v = expression.getValue(new FooObject());
 		assertEquals("hello world",v);
 		assertCanCompile(expression);
-		assertEquals("hello world",v);
-
+		assertEquals("hello world",v);		
+		
 		expression = parser.parseExpression("object + ' world'");
 		v = expression.getValue(new FooString());
 		assertEquals("hello world",v);
 		assertCanCompile(expression);
-		assertEquals("hello world",v);
+		assertEquals("hello world",v);		
 	}
-
+	
 	@Test
 	public void mixingItUp_propertyAccessIndexerOpLtTernaryRootNull() throws Exception {
 		Payload payload = new Payload();
@@ -4570,7 +4558,7 @@ public class SpelCompilationCoverageTests extends AbstractExpressionTests {
 
 	// helper classes
 
-	public interface Message<T> {
+	public static interface Message<T> {
 
 		MessageHeaders getHeaders();
 
@@ -4775,17 +4763,6 @@ public class SpelCompilationCoverageTests extends AbstractExpressionTests {
 
 	// test classes
 
-	public static class Greeter {
-
-		public String getWorld() {
-			return "world";
-		}
-
-		public Object getObject() {
-			return "object";
-		}
-	}
-
 	public static class FooObject {
 
 		public Object getObject() { return "hello"; }
@@ -4828,40 +4805,6 @@ public class SpelCompilationCoverageTests extends AbstractExpressionTests {
 		public Payload2 payload2 = new Payload2();
 	}
 
-	public class Person {
-
-		private int age;
-
-		public Person(int age) {
-			this.age = age;
-		}
-
-		public int getAge() {
-			return age;
-		}
-
-		public void setAge(int age) {
-			this.age = age;
-		}
-	}
-
-	public class Person3 {
-
-		private int age;
-
-		public Person3(String name, int age) {
-			this.age = age;
-		}
-
-		public int getAge() {
-			return age;
-		}
-
-		public void setAge(int age) {
-			this.age = age;
-		}
-	}
-
 	public static class Two {
 
 		Three three = new Three();
@@ -4880,44 +4823,6 @@ public class SpelCompilationCoverageTests extends AbstractExpressionTests {
 
 		public double getFour() {
 			return four;
-		}
-	}
-
-	public class PayloadX {
-
-		public int valueI = 120;
-		public Integer valueIB = 120;
-		public Integer valueIB58 = 58;
-		public Integer valueIB60 = 60;
-		public long valueJ = 120L;
-		public Long valueJB = 120L;
-		public Long valueJB58 = 58L;
-		public Long valueJB60 = 60L;
-		public double valueD = 120D;
-		public Double valueDB = 120D;
-		public Double valueDB58 = 58D;
-		public Double valueDB60 = 60D;
-		public float valueF = 120F;
-		public Float valueFB = 120F;
-		public Float valueFB58 = 58F;
-		public Float valueFB60 = 60F;
-		public byte valueB = (byte)120;
-		public byte valueB18 = (byte)18;
-		public byte valueB20 = (byte)20;
-		public Byte valueBB = (byte)120;
-		public Byte valueBB18 = (byte)18;
-		public Byte valueBB20 = (byte)20;
-		public char valueC = (char)120;
-		public Character valueCB = (char)120;
-		public short valueS = (short)120;
-		public short valueS18 = (short)18;
-		public short valueS20 = (short)20;
-		public Short valueSB = (short)120;
-		public Short valueSB18 = (short)18;
-		public Short valueSB20 = (short)20;
-		public PayloadX payload;
-		public PayloadX() {
-			payload = this;
 		}
 	}
 
@@ -5189,6 +5094,7 @@ public class SpelCompilationCoverageTests extends AbstractExpressionTests {
 				}
 			}
 		}
+
 	}
 
 	public static class TestClass6 {
@@ -5253,65 +5159,65 @@ public class SpelCompilationCoverageTests extends AbstractExpressionTests {
 		}
 	}
 
-	public static class Obj {
+    public static class Obj {
 
-		private final String param1;
+        private final String param1;
 
-		public Obj(String param1){
-			this.param1 = param1;
-		}
-	}
+        public Obj(String param1){
+            this.param1 = param1;
+        }
+    }
 
-	public static class Obj2 {
+    public static class Obj2 {
 
-		public final String output;
+        public final String output;
 
-		public Obj2(String... params){
-			StringBuilder b = new StringBuilder();
-			for (String param: params) {
-				b.append(param);
-			}
-			output = b.toString();
-		}
-	}
+        public Obj2(String... params){
+        	StringBuilder b = new StringBuilder();
+        	for (String param: params) {
+        		b.append(param);
+        	}
+        	output = b.toString();
+        }
+    }
 
-	public static class Obj3 {
+    public static class Obj3 {
 
-		public final String output;
+        public final String output;
 
-		public Obj3(int... params) {
-			StringBuilder b = new StringBuilder();
-			for (int param: params) {
-				b.append(Integer.toString(param));
-			}
-			output = b.toString();
-		}
+        public Obj3(int... params) {
+        	StringBuilder b = new StringBuilder();
+        	for (int param: params) {
+        		b.append(Integer.toString(param));
+        	}
+        	output = b.toString();
+        }
+  
+        public Obj3(String s, Float f, int... ints) {
+        	StringBuilder b = new StringBuilder();
+        	b.append(s);
+        	b.append(":");
+        	b.append(Float.toString(f));
+        	b.append(":");
+        	for (int param: ints) {
+        		b.append(Integer.toString(param));
+        	}
+        	output = b.toString();
+        }
+    }
 
-		public Obj3(String s, Float f, int... ints) {
-			StringBuilder b = new StringBuilder();
-			b.append(s);
-			b.append(":");
-			b.append(Float.toString(f));
-			b.append(":");
-			for (int param: ints) {
-				b.append(Integer.toString(param));
-			}
-			output = b.toString();
-		}
-	}
+    public static class Obj4 {
 
-	public static class Obj4 {
+        public final String output;
 
-		public final String output;
-
-		public Obj4(int[] params) {
-			StringBuilder b = new StringBuilder();
-			for (int param: params) {
-				b.append(Integer.toString(param));
-			}
-			output = b.toString();
-		}
-	}
+        public Obj4(int[] params) {
+        	StringBuilder b = new StringBuilder();
+        	for (int param: params) {
+        		b.append(Integer.toString(param));
+        	}
+        	output = b.toString();
+        }
+    }
 
 	@SuppressWarnings("unused")
 	private static class TestClass9 {
@@ -5324,14 +5230,14 @@ public class SpelCompilationCoverageTests extends AbstractExpressionTests {
 	// final class HttpServlet3RequestFactory implements HttpServletRequestFactory
 	static class HttpServlet3RequestFactory {
 
-		static Servlet3SecurityContextHolderAwareRequestWrapper getOne() {
-			HttpServlet3RequestFactory outer = new HttpServlet3RequestFactory();
-			return outer.new Servlet3SecurityContextHolderAwareRequestWrapper();
-		}
+	  static Servlet3SecurityContextHolderAwareRequestWrapper getOne() {
+		  HttpServlet3RequestFactory outer = new HttpServlet3RequestFactory();
+		  return outer.new Servlet3SecurityContextHolderAwareRequestWrapper();
+	  }
 
-		// private class Servlet3SecurityContextHolderAwareRequestWrapper extends SecurityContextHolderAwareRequestWrapper
-		private class Servlet3SecurityContextHolderAwareRequestWrapper extends SecurityContextHolderAwareRequestWrapper {
-		}
+	  // private class Servlet3SecurityContextHolderAwareRequestWrapper extends SecurityContextHolderAwareRequestWrapper
+	  private class Servlet3SecurityContextHolderAwareRequestWrapper extends SecurityContextHolderAwareRequestWrapper {
+	  }
 	}
 
 	// public class SecurityContextHolderAwareRequestWrapper extends HttpServletRequestWrapper
@@ -5438,29 +5344,4 @@ public class SpelCompilationCoverageTests extends AbstractExpressionTests {
 		}
 	}
 
-	public static class StaticsHelper {
-		static StaticsHelper sh = new StaticsHelper();
-		public static StaticsHelper methoda() {
-			return sh;
-		}
-		public static String methodb() {
-			return "mb";
-		}
-		
-		public static StaticsHelper getPropertya() {
-			return sh;
-		}
-
-		public static String getPropertyb() {
-			return "pb";
-		}
-		
-
-		public static StaticsHelper fielda = sh;
-		public static String fieldb = "fb";
-		
-		public String toString() {
-			return "sh";
-		}
-	}
 }

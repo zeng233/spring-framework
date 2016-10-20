@@ -32,7 +32,7 @@ import org.springframework.lang.UsesJava8;
  * @see Duration#parse
  */
 @UsesJava8
-class DurationFormatter implements Formatter<Duration> {
+public class DurationFormatter implements Formatter<Duration> {
 
 	@Override
 	public Duration parse(String text, Locale locale) throws ParseException {

@@ -25,7 +25,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -69,6 +69,7 @@ import org.springframework.util.ClassUtils;
  * @see ScannedGenericBeanDefinition
  */
 public class ClassPathScanningCandidateComponentProvider implements EnvironmentCapable, ResourceLoaderAware {
+	private static final Logger mylog = Logger.getLogger(ClassPathScanningCandidateComponentProvider.class);
 
 	static final String DEFAULT_RESOURCE_PATTERN = "**/*.class";
 
@@ -236,6 +237,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 */
 	@SuppressWarnings("unchecked")
 	protected void registerDefaultFilters() {
+		mylog.debug("includeFilters添加Component注解类型的AnnotationTypeFilter");
 		this.includeFilters.add(new AnnotationTypeFilter(Component.class));
 		ClassLoader cl = ClassPathScanningCandidateComponentProvider.class.getClassLoader();
 		try {
@@ -267,6 +269,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 		try {
 			String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
 					resolveBasePackage(basePackage) + "/" + this.resourcePattern;
+			mylog.debug("获取" + packageSearchPath + "下的所有class文件");
 			Resource[] resources = this.resourcePatternResolver.getResources(packageSearchPath);
 			boolean traceEnabled = logger.isTraceEnabled();
 			boolean debugEnabled = logger.isDebugEnabled();
@@ -277,7 +280,9 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 				if (resource.isReadable()) {
 					try {
 						MetadataReader metadataReader = this.metadataReaderFactory.getMetadataReader(resource);
+						mylog.debug("判断是不是includeFilters中的注解类，如果是就创建ScannedGenericBeanDefinition(AnnotatedBeanDefinition类型的Bean)");
 						if (isCandidateComponent(metadataReader)) {
+							//创建AnnotatedBeanDefinition类型的bean
 							ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);
 							sbd.setResource(resource);
 							sbd.setSource(resource);
@@ -343,6 +348,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 			}
 		}
 		for (TypeFilter tf : this.includeFilters) {
+			//
 			if (tf.match(metadataReader, this.metadataReaderFactory)) {
 				return isConditionMatch(metadataReader);
 			}

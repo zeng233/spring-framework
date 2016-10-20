@@ -479,21 +479,6 @@ public class GenericConversionServiceTests {
 	}
 
 	@Test
-	public void conditionalConverterCachingForDifferentAnnotationAttributes() throws Exception {
-		conversionService.addConverter(new ColorConverter());
-		conversionService.addConverter(new MyConditionalColorConverter());
-
-		assertEquals(Color.BLACK, conversionService.convert("000000xxxx",
-				new TypeDescriptor(getClass().getField("activeColor"))));
-		assertEquals(Color.BLACK, conversionService.convert(" #000000 ",
-				new TypeDescriptor(getClass().getField("inactiveColor"))));
-		assertEquals(Color.BLACK, conversionService.convert("000000yyyy",
-				new TypeDescriptor(getClass().getField("activeColor"))));
-		assertEquals(Color.BLACK, conversionService.convert("  #000000  ",
-				new TypeDescriptor(getClass().getField("inactiveColor"))));
-	}
-
-	@Test
 	public void shouldNotSupportNullConvertibleTypesFromNonConditionalGenericConverter() {
 		GenericConverter converter = new NonConditionalGenericConverter();
 		try {
@@ -644,49 +629,14 @@ public class GenericConversionServiceTests {
 	}
 
 
-	@ExampleAnnotation(active = true)
-	public String annotatedString;
-
-	@ExampleAnnotation(active = true)
-	public Color activeColor;
-
-	@ExampleAnnotation(active = false)
-	public Color inactiveColor;
-
-	public List<Integer> list;
-
-	public Map<String, Integer> map;
-
-	public Map<String, ?> wildcardMap;
-
-	@SuppressWarnings("rawtypes")
-	public Collection rawCollection;
-
-	public Collection<?> genericCollection;
-
-	public Collection<String> stringCollection;
-
-	public Collection<Integer> integerCollection;
-
-
 	@Retention(RetentionPolicy.RUNTIME)
-	private @interface ExampleAnnotation {
+	private static @interface ExampleAnnotation {}
 
-		boolean active();
-	}
+	private static interface MyBaseInterface {}
 
+	private static interface MyInterface extends MyBaseInterface {}
 
-	private interface MyBaseInterface {
-	}
-
-
-	private interface MyInterface extends MyBaseInterface {
-	}
-
-
-	private static class MyInterfaceImplementer implements MyInterface {
-	}
-
+	private static class MyInterfaceImplementer implements MyInterface {}
 
 	private static class MyBaseInterfaceToStringConverter implements Converter<MyBaseInterface, String> {
 
@@ -696,7 +646,6 @@ public class GenericConversionServiceTests {
 		}
 	}
 
-
 	private static class MyStringArrayToResourceArrayConverter implements Converter<String[], Resource[]> {
 
 		@Override
@@ -705,7 +654,6 @@ public class GenericConversionServiceTests {
 		}
 	}
 
-
 	private static class MyStringArrayToIntegerArrayConverter implements Converter<String[], Integer[]> {
 
 		@Override
@@ -713,7 +661,6 @@ public class GenericConversionServiceTests {
 			return Arrays.stream(source).map(s -> s.substring(1)).map(Integer::valueOf).toArray(Integer[]::new);
 		}
 	}
-
 
 	private static class MyStringToIntegerArrayConverter implements Converter<String, Integer[]>	{
 
@@ -724,7 +671,6 @@ public class GenericConversionServiceTests {
 		}
 	}
 
-
 	private static class WithCopyConstructor {
 
 		WithCopyConstructor() {}
@@ -732,7 +678,6 @@ public class GenericConversionServiceTests {
 		@SuppressWarnings("unused")
 		WithCopyConstructor(WithCopyConstructor value) {}
 	}
-
 
 	private static class MyConditionalConverter implements Converter<String, Color>, ConditionalConverter {
 
@@ -754,7 +699,6 @@ public class GenericConversionServiceTests {
 		}
 	}
 
-
 	private static class NonConditionalGenericConverter implements GenericConverter {
 
 		@Override
@@ -767,7 +711,6 @@ public class GenericConversionServiceTests {
 			return null;
 		}
 	}
-
 
 	private static class MyConditionalGenericConverter implements GenericConverter, ConditionalConverter {
 
@@ -793,7 +736,6 @@ public class GenericConversionServiceTests {
 			return sourceTypes;
 		}
 	}
-
 
 	private static class MyConditionalConverterFactory implements ConverterFactory<String, Color>, ConditionalConverter {
 
@@ -826,13 +768,11 @@ public class GenericConversionServiceTests {
 		String getBaseCode();
 	}
 
-
-	private interface MyEnumInterface extends MyEnumBaseInterface {
+	private static interface MyEnumInterface extends MyEnumBaseInterface {
 		String getCode();
 	}
 
-
-	private enum MyEnum implements MyEnumInterface {
+	private static enum MyEnum implements MyEnumInterface {
 
 		A("1"),
 		B("2"),
@@ -855,8 +795,7 @@ public class GenericConversionServiceTests {
 		}
 	}
 
-
-	private enum EnumWithSubclass {
+	private static enum EnumWithSubclass {
 
 		FIRST {
 			@Override
@@ -865,7 +804,6 @@ public class GenericConversionServiceTests {
 			}
 		}
 	}
-
 
 	@SuppressWarnings("rawtypes")
 	private static class MyStringToRawCollectionConverter implements Converter<String, Collection> {
@@ -876,7 +814,6 @@ public class GenericConversionServiceTests {
 		}
 	}
 
-
 	private static class MyStringToGenericCollectionConverter implements Converter<String, Collection<?>> {
 
 		@Override
@@ -884,7 +821,6 @@ public class GenericConversionServiceTests {
 			return Collections.singleton(source + "X");
 		}
 	}
-
 
 	private static class MyEnumInterfaceToStringConverter<T extends MyEnumInterface> implements Converter<T, String> {
 
@@ -894,16 +830,14 @@ public class GenericConversionServiceTests {
 		}
 	}
 
-
 	private static class StringToMyEnumInterfaceConverterFactory implements ConverterFactory<String, MyEnumInterface> {
 
-		@SuppressWarnings({"unchecked", "rawtypes"})
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public <T extends MyEnumInterface> Converter<String, T> getConverter(Class<T> targetType) {
 			return new StringToMyEnumInterfaceConverter(targetType);
 		}
 
 		private static class StringToMyEnumInterfaceConverter<T extends Enum<?> & MyEnumInterface> implements Converter<String, T> {
-
 			private final Class<T> enumType;
 
 			public StringToMyEnumInterfaceConverter(Class<T> enumType) {
@@ -921,10 +855,9 @@ public class GenericConversionServiceTests {
 		}
 	}
 
-
 	private static class StringToMyEnumBaseInterfaceConverterFactory implements ConverterFactory<String, MyEnumBaseInterface> {
 
-		@SuppressWarnings({"unchecked", "rawtypes"})
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public <T extends MyEnumBaseInterface> Converter<String, T> getConverter(Class<T> targetType) {
 			return new StringToMyEnumBaseInterfaceConverter(targetType);
 		}
@@ -948,7 +881,6 @@ public class GenericConversionServiceTests {
 		}
 	}
 
-
 	private static class MyStringToStringCollectionConverter implements Converter<String, Collection<String>> {
 
 		@Override
@@ -957,7 +889,6 @@ public class GenericConversionServiceTests {
 		}
 	}
 
-
 	private static class MyStringToIntegerCollectionConverter implements Converter<String, Collection<Integer>> {
 
 		@Override
@@ -965,7 +896,6 @@ public class GenericConversionServiceTests {
 			return Collections.singleton(source.length());
 		}
 	}
-
 
 	@SuppressWarnings("rawtypes")
 	private static class UntypedConverter implements Converter {
@@ -976,27 +906,28 @@ public class GenericConversionServiceTests {
 		}
 	}
 
-
 	private static class ColorConverter implements Converter<String, Color> {
-
 		@Override
-		public Color convert(String source) {
-			return Color.decode(source.trim());
-		}
+		public Color convert(String source) { if (!source.startsWith("#")) source = "#" + source; return Color.decode(source); }
 	}
 
 
-	private static class MyConditionalColorConverter implements Converter<String, Color>, ConditionalConverter {
+	@ExampleAnnotation
+	public String annotatedString;
 
-		@Override
-		public boolean matches(TypeDescriptor sourceType, TypeDescriptor targetType) {
-			ExampleAnnotation ann = targetType.getAnnotation(ExampleAnnotation.class);
-			return (ann != null && ann.active());
-		}
+	public List<Integer> list;
 
-		@Override
-		public Color convert(String source) {
-			return Color.decode(source.substring(0, 6));
-		}
-	}
+	public Map<String, Integer> map;
+
+	public Map<String, ?> wildcardMap;
+
+	@SuppressWarnings("rawtypes")
+	public Collection rawCollection;
+
+	public Collection<?> genericCollection;
+
+	public Collection<String> stringCollection;
+
+	public Collection<Integer> integerCollection;
+
 }

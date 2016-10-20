@@ -22,10 +22,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.aop.support.AopUtils;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.cache.Cache;
 import org.springframework.context.expression.AnnotatedElementKey;
-import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.context.expression.CachedExpressionEvaluator;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
@@ -77,12 +75,12 @@ class ExpressionEvaluator extends CachedExpressionEvaluator {
 
 	/**
 	 * Create an {@link EvaluationContext} without a return value.
-	 * @see #createEvaluationContext(Collection, Method, Object[], Object, Class, Object, BeanFactory)
+	 * @see #createEvaluationContext(Collection, Method, Object[], Object, Class, Object)
 	 */
 	public EvaluationContext createEvaluationContext(Collection<? extends Cache> caches,
-			Method method, Object[] args, Object target, Class<?> targetClass, BeanFactory beanFactory) {
+			Method method, Object[] args, Object target, Class<?> targetClass) {
 
-		return createEvaluationContext(caches, method, args, target, targetClass, NO_RESULT, beanFactory);
+		return createEvaluationContext(caches, method, args, target, targetClass, NO_RESULT);
 	}
 
 	/**
@@ -97,8 +95,7 @@ class ExpressionEvaluator extends CachedExpressionEvaluator {
 	 * @return the evaluation context
 	 */
 	public EvaluationContext createEvaluationContext(Collection<? extends Cache> caches,
-			Method method, Object[] args, Object target, Class<?> targetClass, Object result,
-			BeanFactory beanFactory) {
+			Method method, Object[] args, Object target, Class<?> targetClass, Object result) {
 
 		CacheExpressionRootObject rootObject = new CacheExpressionRootObject(caches,
 				method, args, target, targetClass);
@@ -110,9 +107,6 @@ class ExpressionEvaluator extends CachedExpressionEvaluator {
 		}
 		else if (result != NO_RESULT) {
 			evaluationContext.setVariable(RESULT_VARIABLE, result);
-		}
-		if (beanFactory != null) {
-			evaluationContext.setBeanResolver(new BeanFactoryResolver(beanFactory));
 		}
 		return evaluationContext;
 	}

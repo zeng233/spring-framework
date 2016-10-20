@@ -29,7 +29,6 @@ import org.springframework.cache.annotation.Caching;
  *
  * @author Costin Leau
  * @author Phillip Webb
- * @author Stephane Nicoll
  */
 public class DefaultCacheableService implements CacheableService<Long> {
 
@@ -45,18 +44,6 @@ public class DefaultCacheableService implements CacheableService<Long> {
 	@Override
 	@Cacheable("testCache")
 	public Long cacheNull(Object arg1) {
-		return null;
-	}
-
-	@Override
-	@Cacheable(cacheNames = "testCache", sync = true)
-	public Long cacheSync(Object arg1) {
-		return counter.getAndIncrement();
-	}
-
-	@Override
-	@Cacheable(cacheNames = "testCache", sync = true)
-	public Long cacheSyncNull(Object arg1) {
 		return null;
 	}
 
@@ -94,14 +81,8 @@ public class DefaultCacheableService implements CacheableService<Long> {
 	}
 
 	@Override
-	@Cacheable(cacheNames = "testCache", condition = "#p0 == 3")
+	@Cacheable(cacheNames = "testCache", condition = "#classField == 3")
 	public Long conditional(int classField) {
-		return counter.getAndIncrement();
-	}
-
-	@Override
-	@Cacheable(cacheNames = "testCache", sync = true, condition = "#p0 == 3")
-	public Long conditionalSync(int field) {
 		return counter.getAndIncrement();
 	}
 
@@ -118,7 +99,7 @@ public class DefaultCacheableService implements CacheableService<Long> {
 	}
 
 	@Override
-	@Cacheable(cacheNames = "testCache")
+	@Cacheable("testCache")
 	public Long varArgsKey(Object... args) {
 		return counter.getAndIncrement();
 	}
@@ -192,18 +173,6 @@ public class DefaultCacheableService implements CacheableService<Long> {
 	@Override
 	@Cacheable("testCache")
 	public Long throwUnchecked(Object arg1) {
-		throw new UnsupportedOperationException(arg1.toString());
-	}
-
-	@Override
-	@Cacheable(cacheNames = "testCache", sync = true)
-	public Long throwCheckedSync(Object arg1) throws Exception {
-		throw new IOException(arg1.toString());
-	}
-
-	@Override
-	@Cacheable(cacheNames = "testCache", sync = true)
-	public Long throwUncheckedSync(Object arg1) {
 		throw new UnsupportedOperationException(arg1.toString());
 	}
 

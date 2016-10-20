@@ -239,15 +239,15 @@ public abstract class SpelNodeImpl implements SpelNode, Opcodes {
 			// The final parameter may or may not need packaging into an array, or nothing may
 			// have been passed to satisfy the varargs and so something needs to be built.
 			int p = 0; // Current supplied argument being processed
-			int childCount = arguments.length;
+			int childcount = arguments.length;
 						
 			// Fulfill all the parameter requirements except the last one
-			for (p = 0; p < paramDescriptors.length - 1; p++) {
+			for (p = 0; p < paramDescriptors.length-1;p++) {
 				generateCodeForArgument(mv, cf, arguments[p], paramDescriptors[p]);
 			}
 			
-			SpelNodeImpl lastchild = (childCount == 0 ? null : arguments[childCount - 1]);
-			String arraytype = paramDescriptors[paramDescriptors.length - 1];
+			SpelNodeImpl lastchild = (childcount == 0 ? null : arguments[childcount-1]);			
+			String arraytype = paramDescriptors[paramDescriptors.length-1];
 			// Determine if the final passed argument is already suitably packaged in array
 			// form to be passed to the method
 			if (lastchild != null && lastchild.getExitDescriptor().equals(arraytype)) {
@@ -256,10 +256,10 @@ public abstract class SpelNodeImpl implements SpelNode, Opcodes {
 			else {
 				arraytype = arraytype.substring(1); // trim the leading '[', may leave other '['		
 				// build array big enough to hold remaining arguments
-				CodeFlow.insertNewArrayCode(mv, childCount - p, arraytype);
+				CodeFlow.insertNewArrayCode(mv, childcount-p, arraytype);
 				// Package up the remaining arguments into the array
 				int arrayindex = 0;
-				while (p < childCount) {
+				while (p < childcount) {
 					SpelNodeImpl child = arguments[p];
 					mv.visitInsn(DUP);
 					CodeFlow.insertOptimalLoad(mv, arrayindex++);
@@ -280,20 +280,20 @@ public abstract class SpelNodeImpl implements SpelNode, Opcodes {
 	 * Ask an argument to generate its bytecode and then follow it up
 	 * with any boxing/unboxing/checkcasting to ensure it matches the expected parameter descriptor.
 	 */
-	protected static void generateCodeForArgument(MethodVisitor mv, CodeFlow cf, SpelNodeImpl argument, String paramDesc) {
+	protected static void generateCodeForArgument(MethodVisitor mv, CodeFlow cf, SpelNodeImpl argument, String paramDescriptor) {
 		cf.enterCompilationScope();
 		argument.generateCode(mv, cf);
 		boolean primitiveOnStack = CodeFlow.isPrimitive(cf.lastDescriptor());
 		// Check if need to box it for the method reference?
-		if (primitiveOnStack && paramDesc.charAt(0) == 'L') {
+		if (primitiveOnStack && paramDescriptor.charAt(0) == 'L') {
 			CodeFlow.insertBoxIfNecessary(mv, cf.lastDescriptor().charAt(0));
 		}
-		else if (paramDesc.length() == 1 && !primitiveOnStack) {
-			CodeFlow.insertUnboxInsns(mv, paramDesc.charAt(0), cf.lastDescriptor());
+		else if (paramDescriptor.length() == 1 && !primitiveOnStack) {
+			CodeFlow.insertUnboxInsns(mv, paramDescriptor.charAt(0), cf.lastDescriptor());
 		}
-		else if (!cf.lastDescriptor().equals(paramDesc)) {
+		else if (!cf.lastDescriptor().equals(paramDescriptor)) {
 			// This would be unnecessary in the case of subtyping (e.g. method takes Number but Integer passed in)
-			CodeFlow.insertCheckCast(mv, paramDesc);
+			CodeFlow.insertCheckCast(mv, paramDescriptor);
 		}
 		cf.exitCompilationScope();
 	}

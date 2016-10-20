@@ -470,7 +470,7 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Return the value of the {@code Access-Control-Allow-Methods} response header.
+	 * Returns the value of the {@code Access-Control-Allow-Methods} response header.
 	 */
 	public List<HttpMethod> getAccessControlAllowMethods() {
 		List<HttpMethod> result = new ArrayList<HttpMethod>();
@@ -478,10 +478,7 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 		if (value != null) {
 			String[] tokens = value.split(",\\s*");
 			for (String token : tokens) {
-				HttpMethod resolved = HttpMethod.resolve(token);
-				if (resolved != null) {
-					result.add(resolved);
-				}
+				result.add(HttpMethod.valueOf(token));
 			}
 		}
 		return result;
@@ -495,7 +492,7 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Return the value of the {@code Access-Control-Allow-Origin} response header.
+	 * Returns the value of the {@code Access-Control-Allow-Origin} response header.
 	 */
 	public String getAccessControlAllowOrigin() {
 		return getFirst(ACCESS_CONTROL_ALLOW_ORIGIN);
@@ -553,10 +550,11 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Return the value of the {@code Access-Control-Request-Method} request header.
+	 * Returns the value of the {@code Access-Control-Request-Method} request header.
 	 */
 	public HttpMethod getAccessControlRequestMethod() {
-		return HttpMethod.resolve(getFirst(ACCESS_CONTROL_REQUEST_METHOD));
+		String value = getFirst(ACCESS_CONTROL_REQUEST_METHOD);
+		return (value != null ? HttpMethod.valueOf(value) : null);
 	}
 
 	/**
@@ -617,15 +615,12 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	public Set<HttpMethod> getAllow() {
 		String value = getFirst(ALLOW);
 		if (!StringUtils.isEmpty(value)) {
-			List<HttpMethod> result = new LinkedList<HttpMethod>();
+			List<HttpMethod> allowedMethod = new ArrayList<HttpMethod>(5);
 			String[] tokens = value.split(",\\s*");
 			for (String token : tokens) {
-				HttpMethod resolved = HttpMethod.resolve(token);
-				if (resolved != null) {
-					result.add(resolved);
-				}
+				allowedMethod.add(HttpMethod.valueOf(token));
 			}
-			return EnumSet.copyOf(result);
+			return EnumSet.copyOf(allowedMethod);
 		}
 		else {
 			return EnumSet.noneOf(HttpMethod.class);
@@ -640,7 +635,7 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Return the value of the {@code Cache-Control} header.
+	 * Returns the value of the {@code Cache-Control} header.
 	 */
 	public String getCacheControl() {
 		return getFirst(CACHE_CONTROL);
@@ -661,7 +656,7 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Return the value of the {@code Connection} header.
+	 * Returns the value of the {@code Connection} header.
 	 */
 	public List<String> getConnection() {
 		return getFirstValueAsList(CONNECTION);
@@ -925,7 +920,7 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Return the value of the {@code Range} header.
+	 * Returns the value of the {@code Range} header.
 	 * <p>Returns an empty list when the range is unknown.
 	 */
 	public List<HttpRange> getRange() {
@@ -941,7 +936,7 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Return the value of the {@code Upgrade} header.
+	 * Returns the value of the {@code Upgrade} header.
 	 */
 	public String getUpgrade() {
 		return getFirst(UPGRADE);

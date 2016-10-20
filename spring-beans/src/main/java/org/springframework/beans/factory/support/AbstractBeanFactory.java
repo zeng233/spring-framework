@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeansException;
@@ -111,6 +112,7 @@ import org.springframework.util.StringValueResolver;
  * @see DefaultListableBeanFactory#getBeanDefinition
  */
 public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport implements ConfigurableBeanFactory {
+	private static final Logger mylog = Logger.getLogger(DefaultListableBeanFactory.class);
 
 	/** Parent bean factory, for bean inheritance support */
 	private BeanFactory parentBeanFactory;
@@ -235,7 +237,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	protected <T> T doGetBean(
 			final String name, final Class<T> requiredType, final Object[] args, boolean typeCheckOnly)
 			throws BeansException {
-
+		mylog.debug("获取bean开始");
 		final String beanName = transformedBeanName(name);
 		Object bean;
 
@@ -257,6 +259,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		else {
 			// Fail if we're already creating this bean instance:
 			// We're assumably within a circular reference.
+			mylog.debug("检测prototype类型的bean是不是同一个线程创建的");
 			if (isPrototypeCurrentlyInCreation(beanName)) {
 				throw new BeanCurrentlyInCreationException(beanName);
 			}
@@ -277,10 +280,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			}
 
 			if (!typeCheckOnly) {
+				mylog.debug("如果是第一次创建，在alreadyCreated变量Map里面缓存");
 				markBeanAsCreated(beanName);
 			}
 
 			try {
+				mylog.debug("创建或者从缓存中获取RootBeanDefinition");
 				final RootBeanDefinition mbd = getMergedLocalBeanDefinition(beanName);
 				checkMergedBeanDefinition(mbd, beanName, args);
 
@@ -303,6 +308,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 						@Override
 						public Object getObject() throws BeansException {
 							try {
+								mylog.debug("创建依赖的bean，由于是从DefaultListableBeanFactory执行getBean方法的，createBean在当前类没有就到子类去找");
 								return createBean(beanName, mbd, args);
 							}
 							catch (BeansException ex) {
@@ -319,6 +325,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 				else if (mbd.isPrototype()) {
 					// It's a prototype -> create a new instance.
+					mylog.debug("依赖的bean如果是prototype，就重新创建bean");
 					Object prototypeInstance = null;
 					try {
 						beforePrototypeCreation(beanName);
@@ -1062,7 +1069,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		String scopeName = mbd.getScope();
 		Scope scope = this.scopes.get(scopeName);
 		if (scope == null) {
-			throw new IllegalStateException("No Scope SPI registered for scope name '" + scopeName + "'");
+			throw new IllegalStateException("No Scope SPI registered for scope '" + scopeName + "'");
 		}
 		Object bean = scope.remove(beanName);
 		if (bean != null) {
@@ -1108,6 +1115,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	protected void initBeanWrapper(BeanWrapper bw) {
 		bw.setConversionService(getConversionService());
+		mylog.debug("添加各种CustomEditors");
 		registerCustomEditors(bw);
 	}
 
@@ -1125,6 +1133,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		if (registrySupport != null) {
 			registrySupport.useConfigValueEditors();
 		}
+		mylog.debug("添加各种自定义的editor，默认添加了ResourceEditorRegistrar");
+		//默认添加了ResourceEditorRegistrar
 		if (!this.propertyEditorRegistrars.isEmpty()) {
 			for (PropertyEditorRegistrar registrar : this.propertyEditorRegistrars) {
 				try {
@@ -1250,6 +1260,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				}
 
 				// Set default singleton scope, if not configured before.
+				mylog.debug("设置bean的Scope是单例还是原型");
 				if (!StringUtils.hasLength(mbd.getScope())) {
 					mbd.setScope(RootBeanDefinition.SCOPE_SINGLETON);
 				}
@@ -1475,14 +1486,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 					logger.debug("Bean currently in creation on FactoryBean type check: " + ex);
 				}
 			}
-			else if (mbd.isLazyInit()) {
-				if (logger.isDebugEnabled()) {
-					logger.debug("Bean creation exception on lazy FactoryBean type check: " + ex);
-				}
-			}
 			else {
 				if (logger.isWarnEnabled()) {
-					logger.warn("Bean creation exception on non-lazy FactoryBean type check: " + ex);
+					logger.warn("Bean creation exception on FactoryBean type check: " + ex);
 				}
 			}
 			onSuppressedException(ex);
@@ -1614,8 +1620,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 */
 	protected boolean requiresDestruction(Object bean, RootBeanDefinition mbd) {
 		return (bean != null &&
-				(DisposableBeanAdapter.hasDestroyMethod(bean, mbd) || (hasDestructionAwareBeanPostProcessors() &&
-						DisposableBeanAdapter.hasApplicableProcessors(bean, getBeanPostProcessors()))));
+				(DisposableBeanAdapter.hasDestroyMethod(bean, mbd) || hasDestructionAwareBeanPostProcessors()));
 	}
 
 	/**
@@ -1644,7 +1649,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				// A bean with a custom scope...
 				Scope scope = this.scopes.get(mbd.getScope());
 				if (scope == null) {
-					throw new IllegalStateException("No Scope registered for scope name '" + mbd.getScope() + "'");
+					throw new IllegalStateException("No Scope registered for scope '" + mbd.getScope() + "'");
 				}
 				scope.registerDestructionCallback(beanName,
 						new DisposableBeanAdapter(bean, beanName, mbd, getBeanPostProcessors(), acc));

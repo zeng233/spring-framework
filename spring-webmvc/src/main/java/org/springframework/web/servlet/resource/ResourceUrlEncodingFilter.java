@@ -54,9 +54,9 @@ public class ResourceUrlEncodingFilter extends OncePerRequestFilter {
 
 	private static class ResourceUrlEncodingResponseWrapper extends HttpServletResponseWrapper {
 
-		private final HttpServletRequest request;
+		private HttpServletRequest request;
 
-		/* Cache the index of the path within the DispatcherServlet mapping */
+		/* Cache the index of the path within the DispatcherServlet mapping. */
 		private Integer indexLookupPath;
 
 		public ResourceUrlEncodingResponseWrapper(HttpServletRequest request, HttpServletResponse wrapped) {
@@ -71,7 +71,6 @@ public class ResourceUrlEncodingFilter extends OncePerRequestFilter {
 				logger.debug("Request attribute exposing ResourceUrlProvider not found");
 				return super.encodeURL(url);
 			}
-
 			initIndexLookupPath(resourceUrlProvider);
 			if (url.length() >= this.indexLookupPath) {
 				String prefix = url.substring(0, this.indexLookupPath);
@@ -83,13 +82,12 @@ public class ResourceUrlEncodingFilter extends OncePerRequestFilter {
 					return super.encodeURL(prefix + lookupPath + suffix);
 				}
 			}
-
 			return super.encodeURL(url);
 		}
 
 		private ResourceUrlProvider getResourceUrlProvider() {
-			return (ResourceUrlProvider) this.request.getAttribute(
-					ResourceUrlProviderExposingInterceptor.RESOURCE_URL_PROVIDER_ATTR);
+			String name = ResourceUrlProviderExposingInterceptor.RESOURCE_URL_PROVIDER_ATTR;
+			return (ResourceUrlProvider) this.request.getAttribute(name);
 		}
 
 		private void initIndexLookupPath(ResourceUrlProvider urlProvider) {
@@ -97,19 +95,12 @@ public class ResourceUrlEncodingFilter extends OncePerRequestFilter {
 				String requestUri = urlProvider.getPathHelper().getRequestUri(this.request);
 				String lookupPath = urlProvider.getPathHelper().getLookupPathForRequest(this.request);
 				this.indexLookupPath = requestUri.lastIndexOf(lookupPath);
-
-				if ("/".equals(lookupPath) && !"/".equals(requestUri)) {
-					String contextPath = urlProvider.getPathHelper().getContextPath(this.request);
-					if (requestUri.equals(contextPath)) {
-						this.indexLookupPath = requestUri.length();
-					}
-				}
 			}
 		}
 
 		private int getQueryParamsIndex(String url) {
 			int index = url.indexOf("?");
-			return (index > 0 ? index : url.length());
+			return index > 0 ? index : url.length();
 		}
 	}
 

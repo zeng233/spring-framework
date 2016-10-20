@@ -21,7 +21,7 @@ import javax.servlet.ServletException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.web.WebApplicationInitializer;
 
@@ -39,6 +39,7 @@ import org.springframework.web.WebApplicationInitializer;
  * @since 3.2
  */
 public abstract class AbstractContextLoaderInitializer implements WebApplicationInitializer {
+	private static final Logger mylog = Logger.getLogger(AbstractContextLoaderInitializer.class); 
 
 	/** Logger available to subclasses */
 	protected final Log logger = LogFactory.getLog(getClass());
@@ -57,6 +58,7 @@ public abstract class AbstractContextLoaderInitializer implements WebApplication
 	 */
 	protected void registerContextLoaderListener(ServletContext servletContext) {
 		WebApplicationContext rootAppContext = createRootApplicationContext();
+		mylog.debug("创建WebApplicationContext，如果不为空并注册ContextLoaderListener");
 		if (rootAppContext != null) {
 			ContextLoaderListener listener = new ContextLoaderListener(rootAppContext);
 			listener.setContextInitializers(getRootApplicationContextInitializers());

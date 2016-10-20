@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2015 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Before;
 import org.junit.Test;
-
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -62,10 +61,10 @@ public class ScheduledAndTransactionalAnnotationIntegrationTests {
 		ctx.register(Config.class, JdkProxyTxConfig.class, RepoConfigA.class);
 		try {
 			ctx.refresh();
-			fail("Should have thrown BeanCreationException");
+			fail("expected exception");
 		}
 		catch (BeanCreationException ex) {
-			assertTrue(ex.getRootCause() instanceof IllegalStateException);
+			assertTrue(ex.getRootCause().getMessage().startsWith("@Scheduled method 'scheduled' found"));
 		}
 	}
 

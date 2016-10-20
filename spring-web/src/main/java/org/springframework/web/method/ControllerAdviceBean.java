@@ -19,7 +19,6 @@ package org.springframework.web.method;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,7 +27,6 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.Ordered;
-import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.OrderUtils;
 import org.springframework.util.Assert;
@@ -103,19 +101,14 @@ public class ControllerAdviceBean implements Ordered {
 			this.order = initOrderFromBean(bean);
 		}
 
-		ControllerAdvice annotation = AnnotatedElementUtils.findMergedAnnotation(
-				beanType, ControllerAdvice.class);
-
-		if (annotation != null) {
-			this.basePackages = initBasePackages(annotation);
-			this.assignableTypes = Arrays.asList(annotation.assignableTypes());
-			this.annotations = Arrays.asList(annotation.annotations());
+		ControllerAdvice annotation = AnnotationUtils.findAnnotation(beanType, ControllerAdvice.class);
+		if (annotation == null) {
+			throw new IllegalArgumentException(
+					"Bean type [" + beanType.getName() + "] is not annotated as @ControllerAdvice");
 		}
-		else {
-			this.basePackages = Collections.emptySet();
-			this.assignableTypes = Collections.emptyList();
-			this.annotations = Collections.emptyList();
-		}
+		this.basePackages = initBasePackages(annotation);
+		this.assignableTypes = Arrays.asList(annotation.assignableTypes());
+		this.annotations = Arrays.asList(annotation.annotations());
 	}
 
 

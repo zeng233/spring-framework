@@ -823,6 +823,7 @@ public final class XmlBeanFactoryTests {
 		assertNotNull(a.getSpouse());
 	}
 
+	//TODO
 	@Test
 	public void testAutowire() throws Exception {
 		DefaultListableBeanFactory xbf = new DefaultListableBeanFactory();

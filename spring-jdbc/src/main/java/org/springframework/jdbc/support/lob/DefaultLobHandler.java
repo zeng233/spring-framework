@@ -207,6 +207,7 @@ public class DefaultLobHandler extends AbstractLobHandler {
 	}
 
 	@Override
+	@SuppressWarnings("resource")
 	public LobCreator getLobCreator() {
 		return (this.createTemporaryLob ? new TemporaryLobCreator() : new DefaultLobCreator());
 	}

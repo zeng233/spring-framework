@@ -285,17 +285,6 @@ public class AnnotationDrivenEventListenerTests {
 	}
 
 	@Test
-	public void privateMethodOnCglibProxyFails() throws Exception {
-		try {
-			load(CglibProxyWithPrivateMethod.class);
-			fail("Should have thrown BeanInitializationException");
-		}
-		catch (BeanInitializationException ex) {
-			assertTrue(ex.getCause() instanceof IllegalStateException);
-		}
-	}
-
-	@Test
 	public void eventListenerWorksWithCustomScope() throws Exception {
 		load(CustomScopeTestBean.class);
 		CustomScope customScope = new CustomScope();
@@ -473,10 +462,6 @@ public class AnnotationDrivenEventListenerTests {
 		this.context.publishEvent(timestamp);
 		this.eventCollector.assertEvent(listener, event, "OK", timestamp);
 		this.eventCollector.assertTotalEventsCount(3);
-
-		this.context.publishEvent(42d);
-		this.eventCollector.assertEvent(listener, event, "OK", timestamp, 42d);
-		this.eventCollector.assertTotalEventsCount(4);
 	}
 
 	@Test
@@ -496,10 +481,6 @@ public class AnnotationDrivenEventListenerTests {
 		this.eventCollector.assertTotalEventsCount(0);
 
 		this.context.publishEvent(maxLong);
-		this.eventCollector.assertNoEventReceived(listener);
-		this.eventCollector.assertTotalEventsCount(0);
-
-		this.context.publishEvent(24d);
 		this.eventCollector.assertNoEventReceived(listener);
 		this.eventCollector.assertTotalEventsCount(0);
 	}
@@ -552,18 +533,6 @@ public class AnnotationDrivenEventListenerTests {
 		@Bean
 		public CountDownLatch testCountDownLatch() {
 			return new CountDownLatch(1);
-		}
-
-		@Bean
-		public TestConditionEvaluator conditionEvaluator() {
-			return new TestConditionEvaluator();
-		}
-
-		static class TestConditionEvaluator {
-
-			public boolean valid(Double ratio) {
-				return new Double(42).equals(ratio);
-			}
 		}
 	}
 
@@ -802,17 +771,6 @@ public class AnnotationDrivenEventListenerTests {
 
 
 	@Component
-	@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
-	static class CglibProxyWithPrivateMethod extends AbstractTestEventListener {
-
-		@EventListener
-		private void handleIt(TestEvent event) {
-			collectEvent(event);
-		}
-	}
-
-
-	@Component
 	@Scope(scopeName = "custom", proxyMode = ScopedProxyMode.TARGET_CLASS)
 	static class CustomScopeTestBean extends AbstractTestEventListener {
 
@@ -851,11 +809,6 @@ public class AnnotationDrivenEventListenerTests {
 		@EventListener(condition = "#root.event.timestamp > #p0")
 		public void handleTimestamp(Long timestamp) {
 			collectEvent(timestamp);
-		}
-
-		@EventListener(condition = "@conditionEvaluator.valid(#p0)")
-		public void handleRatio(Double ratio) {
-			collectEvent(ratio);
 		}
 	}
 

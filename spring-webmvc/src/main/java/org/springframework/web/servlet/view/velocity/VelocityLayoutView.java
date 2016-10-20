@@ -50,9 +50,7 @@ import org.springframework.core.NestedIOException;
  * @see #setLayoutUrl
  * @see #setLayoutKey
  * @see #setScreenContentKey
- * @deprecated as of Spring 4.3, in favor of FreeMarker
  */
-@Deprecated
 public class VelocityLayoutView extends VelocityToolboxView {
 
 	/**

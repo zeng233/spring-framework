@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2015 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,7 +107,6 @@ import org.springframework.util.StringUtils;
  *
  * @author Juergen Hoeller
  * @author Mark Fisher
- * @author Stephane Nicoll
  * @since 2.5
  * @see #setAutowiredAnnotationType
  * @see Autowired
@@ -271,19 +270,6 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 					Constructor<?> defaultConstructor = null;
 					for (Constructor<?> candidate : rawCandidates) {
 						AnnotationAttributes ann = findAutowiredAnnotation(candidate);
-						if (ann == null) {
-							Class<?> userClass = ClassUtils.getUserClass(beanClass);
-							if (userClass != beanClass) {
-								try {
-									Constructor<?> superCtor =
-											userClass.getDeclaredConstructor(candidate.getParameterTypes());
-									ann = findAutowiredAnnotation(superCtor);
-								}
-								catch (NoSuchMethodException ex) {
-									// Simply proceed, no equivalent superclass constructor found...
-								}
-							}
-						}
 						if (ann != null) {
 							if (requiredConstructor != null) {
 								throw new BeanCreationException(beanName,
@@ -325,9 +311,6 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 							}
 						}
 						candidateConstructors = candidates.toArray(new Constructor<?>[candidates.size()]);
-					}
-					else if (rawCandidates.length == 1 && rawCandidates[0].getParameterTypes().length > 0) {
-						candidateConstructors = new Constructor<?>[] {rawCandidates[0]};
 					}
 					else {
 						candidateConstructors = new Constructor<?>[0];

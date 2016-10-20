@@ -30,7 +30,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.websocket.CloseReason;
 
+import org.glassfish.tyrus.core.TyrusEndpointWrapper;
 import org.glassfish.tyrus.core.TyrusUpgradeResponse;
+import org.glassfish.tyrus.core.TyrusWebSocketEngine;
 import org.glassfish.tyrus.core.Utils;
 import org.glassfish.tyrus.spi.Connection;
 import org.glassfish.tyrus.spi.WebSocketEngine.UpgradeInfo;
@@ -38,34 +40,45 @@ import org.glassfish.tyrus.spi.Writer;
 
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
+import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.socket.server.HandshakeFailureException;
 
 /**
  * A WebSocket {@code RequestUpgradeStrategy} for Oracle's WebLogic.
- * Supports 12.1.3 as well as 12.2.1, as of Spring Framework 4.2.3.
+ * Supports 12.1.3 and 12.2.1.0.
  *
  * @author Rossen Stoyanchev
  * @since 4.1
  */
 public class WebLogicRequestUpgradeStrategy extends AbstractTyrusRequestUpgradeStrategy {
 
+	private static ClassLoader classLoader = WebLogicRequestUpgradeStrategy.class.getClassLoader();
+
 	private static final boolean WLS_12_1_3 = isWebLogic1213();
 
-	private static final TyrusEndpointHelper endpointHelper =
-			(WLS_12_1_3 ? new Tyrus135EndpointHelper() : new Tyrus17EndpointHelper());
+	private static final TyrusEndpointHelper endpointHelper = WLS_12_1_3 ?
+			new Tyrus135EndpointHelper() : new Tyrus17EndpointHelper();
 
 	private static final TyrusMuxableWebSocketHelper webSocketHelper = new TyrusMuxableWebSocketHelper();
 
 	private static final WebLogicServletWriterHelper servletWriterHelper = new WebLogicServletWriterHelper();
 
-	private static final Connection.CloseListener noOpCloseListener = new Connection.CloseListener() {
 
-		@Override
-		public void close(CloseReason reason) {
+
+	private static boolean isWebLogic1213() {
+		try {
+			type("weblogic.websocket.tyrus.TyrusMuxableWebSocket").getDeclaredConstructor(
+					type("weblogic.servlet.internal.MuxableSocketHTTP"));
+			return true;
 		}
-	};
-
+		catch (NoSuchMethodException e) {
+			return false;
+		}
+		catch (ClassNotFoundException ex) {
+			throw new IllegalStateException("No compatible WebSocket version found", ex);
+		}
+	}
 
 
 	@Override
@@ -101,23 +114,15 @@ public class WebLogicRequestUpgradeStrategy extends AbstractTyrusRequestUpgradeS
 		webSocketHelper.registerForReadEvent(webSocket);
 	}
 
-
-	private static boolean isWebLogic1213() {
-		try {
-			type("weblogic.websocket.tyrus.TyrusMuxableWebSocket").getDeclaredConstructor(
-					type("weblogic.servlet.internal.MuxableSocketHTTP"));
-			return true;
+	private static Object getNativeRequest(ServletRequest request) {
+		while (request instanceof ServletRequestWrapper) {
+			request = ((ServletRequestWrapper) request).getRequest();
 		}
-		catch (NoSuchMethodException ex) {
-			return false;
-		}
-		catch (ClassNotFoundException ex) {
-			throw new IllegalStateException("No compatible WebSocket version found", ex);
-		}
+		return request;
 	}
 
 	private static Class<?> type(String className) throws ClassNotFoundException {
-		return WebLogicRequestUpgradeStrategy.class.getClassLoader().loadClass(className);
+		return classLoader.loadClass(className);
 	}
 
 	private static Method method(String className, String method, Class<?>... paramTypes)
@@ -126,12 +131,13 @@ public class WebLogicRequestUpgradeStrategy extends AbstractTyrusRequestUpgradeS
 		return type(className).getDeclaredMethod(method, paramTypes);
 	}
 
-	private static Object getNativeRequest(ServletRequest request) {
-		while (request instanceof ServletRequestWrapper) {
-			request = ((ServletRequestWrapper) request).getRequest();
+
+	private static final Connection.CloseListener noOpCloseListener = new Connection.CloseListener() {
+
+		@Override
+		public void close(CloseReason reason) {
 		}
-		return request;
-	}
+	};
 
 
 	/**
@@ -152,7 +158,6 @@ public class WebLogicRequestUpgradeStrategy extends AbstractTyrusRequestUpgradeS
 		static {
 			try {
 				type = type("weblogic.websocket.tyrus.TyrusMuxableWebSocket");
-
 				if (WLS_12_1_3) {
 					constructor = type.getDeclaredConstructor(type("weblogic.servlet.internal.MuxableSocketHTTP"));
 					subjectHelper = null;
@@ -166,6 +171,7 @@ public class WebLogicRequestUpgradeStrategy extends AbstractTyrusRequestUpgradeS
 				}
 
 				upgradeMethod = type.getMethod("upgrade", type("weblogic.socket.MuxableSocket"), ServletContext.class);
+
 				readEventMethod = type.getMethod("registerForReadEvent");
 			}
 			catch (Exception ex) {
@@ -175,8 +181,10 @@ public class WebLogicRequestUpgradeStrategy extends AbstractTyrusRequestUpgradeS
 
 		private Object newInstance(HttpServletRequest request, Object httpSocket) {
 			try {
-				Object[] args = (WLS_12_1_3 ? new Object[] {httpSocket} :
+				Object[] args = (WLS_12_1_3 ?
+						new Object[] {httpSocket} :
 						new Object[] {httpSocket, null, subjectHelper.getSubject(request)});
+
 				return constructor.newInstance(args);
 			}
 			catch (Exception ex) {
@@ -203,7 +211,6 @@ public class WebLogicRequestUpgradeStrategy extends AbstractTyrusRequestUpgradeS
 		}
 	}
 
-
 	private static class SubjectHelper {
 
 		private final Method securityContextMethod;
@@ -213,6 +220,7 @@ public class WebLogicRequestUpgradeStrategy extends AbstractTyrusRequestUpgradeS
 		private final Method providerMethod;
 
 		private final Method anonymousSubjectMethod;
+
 
 		public SubjectHelper() {
 			try {
@@ -249,7 +257,6 @@ public class WebLogicRequestUpgradeStrategy extends AbstractTyrusRequestUpgradeS
 			}
 		}
 	}
-
 
 	/**
 	 * Helps to create and invoke {@code weblogic.websocket.tyrus.TyrusServletWriter}.

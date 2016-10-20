@@ -18,6 +18,7 @@ package org.springframework.context.event;
 
 import java.util.concurrent.Executor;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
@@ -43,6 +44,7 @@ import org.springframework.util.ErrorHandler;
  * @see #setTaskExecutor
  */
 public class SimpleApplicationEventMulticaster extends AbstractApplicationEventMulticaster {
+	private static Logger mylog = Logger.getLogger(SimpleApplicationEventMulticaster.class);
 
 	private Executor taskExecutor;
 
@@ -122,6 +124,7 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 	@Override
 	public void multicastEvent(final ApplicationEvent event, ResolvableType eventType) {
 		ResolvableType type = (eventType != null ? eventType : resolveDefaultEventType(event));
+		mylog.debug("service：处理完请求遍历Listener列表，触发onApplicationEvent方法");
 		for (final ApplicationListener<?> listener : getApplicationListeners(event, type)) {
 			Executor executor = getTaskExecutor();
 			if (executor != null) {

@@ -42,8 +42,7 @@ import java.util.TimeZone;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
-import org.xml.sax.InputSource;
-
+import org.apache.log4j.Logger;
 import org.springframework.beans.propertyeditors.ByteArrayPropertyEditor;
 import org.springframework.beans.propertyeditors.CharArrayPropertyEditor;
 import org.springframework.beans.propertyeditors.CharacterEditor;
@@ -72,6 +71,7 @@ import org.springframework.core.convert.ConversionService;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourceArrayPropertyEditor;
 import org.springframework.util.ClassUtils;
+import org.xml.sax.InputSource;
 
 /**
  * Base implementation of the {@link PropertyEditorRegistry} interface.
@@ -86,6 +86,7 @@ import org.springframework.util.ClassUtils;
  * @see java.beans.PropertyEditorSupport#setValue
  */
 public class PropertyEditorRegistrySupport implements PropertyEditorRegistry {
+	private static Logger mylog = Logger.getLogger(PropertyEditorRegistrySupport.class);
 
 	private static Class<?> zoneIdClass;
 
@@ -190,6 +191,7 @@ public class PropertyEditorRegistrySupport implements PropertyEditorRegistry {
 			}
 		}
 		if (this.defaultEditors == null) {
+			mylog.debug("创建各种转换器");
 			createDefaultEditors();
 		}
 		return this.defaultEditors.get(requiredType);

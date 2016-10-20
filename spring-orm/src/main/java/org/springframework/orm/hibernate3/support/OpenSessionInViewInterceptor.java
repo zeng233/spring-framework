@@ -20,6 +20,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.orm.hibernate3.HibernateAccessor;
+import org.springframework.orm.hibernate3.SessionFactoryUtils;
+import org.springframework.orm.hibernate3.SessionHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.context.request.AsyncWebRequestInterceptor;
@@ -88,10 +91,8 @@ import org.springframework.web.context.request.async.WebAsyncUtils;
  * @see org.springframework.orm.hibernate3.SessionFactoryUtils#getSession
  * @see org.springframework.transaction.support.TransactionSynchronizationManager
  * @see org.hibernate.SessionFactory#getCurrentSession()
- * @deprecated as of Spring 4.3, in favor of Hibernate 4.x/5.x
  */
-@Deprecated
-public class OpenSessionInViewInterceptor extends org.springframework.orm.hibernate3.HibernateAccessor implements AsyncWebRequestInterceptor {
+public class OpenSessionInViewInterceptor extends HibernateAccessor implements AsyncWebRequestInterceptor {
 
 	/**
 	 * Suffix that gets appended to the {@code SessionFactory}
@@ -120,8 +121,8 @@ public class OpenSessionInViewInterceptor extends org.springframework.orm.hibern
 	 * its own session (like without Open Session in View). Each of those
 	 * sessions will be registered for deferred close, though, actually
 	 * processed at request completion.
-	 * @see org.springframework.orm.hibernate3.SessionFactoryUtils#initDeferredClose
-	 * @see org.springframework.orm.hibernate3.SessionFactoryUtils#processDeferredClose
+	 * @see SessionFactoryUtils#initDeferredClose
+	 * @see SessionFactoryUtils#processDeferredClose
 	 */
 	public void setSingleSession(boolean singleSession) {
 		this.singleSession = singleSession;
@@ -153,7 +154,7 @@ public class OpenSessionInViewInterceptor extends org.springframework.orm.hibern
 		}
 
 		if ((isSingleSession() && TransactionSynchronizationManager.hasResource(getSessionFactory())) ||
-				org.springframework.orm.hibernate3.SessionFactoryUtils.isDeferredCloseActive(getSessionFactory())) {
+			SessionFactoryUtils.isDeferredCloseActive(getSessionFactory())) {
 			// Do not modify the Session: just mark the request accordingly.
 			Integer count = (Integer) request.getAttribute(participateAttributeName, WebRequest.SCOPE_REQUEST);
 			int newCount = (count != null ? count + 1 : 1);
@@ -163,10 +164,10 @@ public class OpenSessionInViewInterceptor extends org.springframework.orm.hibern
 			if (isSingleSession()) {
 				// single session mode
 				logger.debug("Opening single Hibernate Session in OpenSessionInViewInterceptor");
-				Session session = org.springframework.orm.hibernate3.SessionFactoryUtils.getSession(
+				Session session = SessionFactoryUtils.getSession(
 						getSessionFactory(), getEntityInterceptor(), getJdbcExceptionTranslator());
 				applyFlushMode(session, false);
-				org.springframework.orm.hibernate3.SessionHolder sessionHolder = new org.springframework.orm.hibernate3.SessionHolder(session);
+				SessionHolder sessionHolder = new SessionHolder(session);
 				TransactionSynchronizationManager.bindResource(getSessionFactory(), sessionHolder);
 
 				AsyncRequestInterceptor asyncRequestInterceptor =
@@ -176,7 +177,7 @@ public class OpenSessionInViewInterceptor extends org.springframework.orm.hibern
 			}
 			else {
 				// deferred close mode
-				org.springframework.orm.hibernate3.SessionFactoryUtils.initDeferredClose(getSessionFactory());
+				SessionFactoryUtils.initDeferredClose(getSessionFactory());
 			}
 		}
 	}
@@ -192,8 +193,8 @@ public class OpenSessionInViewInterceptor extends org.springframework.orm.hibern
 	public void postHandle(WebRequest request, ModelMap model) throws DataAccessException {
 		if (isSingleSession()) {
 			// Only potentially flush in single session mode.
-			org.springframework.orm.hibernate3.SessionHolder sessionHolder =
-					(org.springframework.orm.hibernate3.SessionHolder) TransactionSynchronizationManager.getResource(getSessionFactory());
+			SessionHolder sessionHolder =
+					(SessionHolder) TransactionSynchronizationManager.getResource(getSessionFactory());
 			logger.debug("Flushing single Hibernate Session in OpenSessionInViewInterceptor");
 			try {
 				flushIfNecessary(sessionHolder.getSession(), false);
@@ -215,14 +216,14 @@ public class OpenSessionInViewInterceptor extends org.springframework.orm.hibern
 		if (!decrementParticipateCount(request)) {
 			if (isSingleSession()) {
 				// single session mode
-				org.springframework.orm.hibernate3.SessionHolder sessionHolder =
-						(org.springframework.orm.hibernate3.SessionHolder) TransactionSynchronizationManager.unbindResource(getSessionFactory());
+				SessionHolder sessionHolder =
+						(SessionHolder) TransactionSynchronizationManager.unbindResource(getSessionFactory());
 				logger.debug("Closing single Hibernate Session in OpenSessionInViewInterceptor");
-				org.springframework.orm.hibernate3.SessionFactoryUtils.closeSession(sessionHolder.getSession());
+				SessionFactoryUtils.closeSession(sessionHolder.getSession());
 			}
 			else {
 				// deferred close mode
-				org.springframework.orm.hibernate3.SessionFactoryUtils.processDeferredClose(getSessionFactory());
+				SessionFactoryUtils.processDeferredClose(getSessionFactory());
 			}
 		}
 	}

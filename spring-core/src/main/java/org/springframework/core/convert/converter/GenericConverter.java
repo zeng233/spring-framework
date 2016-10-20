@@ -67,7 +67,7 @@ public interface GenericConverter {
 	/**
 	 * Holder for a source-to-target class pair.
 	 */
-	final class ConvertiblePair {
+	public static final class ConvertiblePair {
 
 		private final Class<?> sourceType;
 
@@ -102,7 +102,7 @@ public interface GenericConverter {
 				return false;
 			}
 			ConvertiblePair otherPair = (ConvertiblePair) other;
-			return (this.sourceType == otherPair.sourceType && this.targetType == otherPair.targetType);
+			return (this.sourceType.equals(otherPair.sourceType) && this.targetType.equals(otherPair.targetType));
 		}
 
 		@Override

@@ -16,21 +16,27 @@
 
 package org.springframework.test.util;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
-import com.jayway.jsonpath.InvalidPathException;
-import com.jayway.jsonpath.JsonPath;
 import org.hamcrest.Matcher;
 
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
-import static org.hamcrest.MatcherAssert.*;
-import static org.hamcrest.core.IsInstanceOf.*;
-import static org.springframework.test.util.AssertionErrors.*;
+import com.jayway.jsonpath.InvalidPathException;
+import com.jayway.jsonpath.JsonPath;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.springframework.test.util.AssertionErrors.assertEquals;
+import static org.springframework.test.util.AssertionErrors.assertTrue;
+import static org.springframework.test.util.AssertionErrors.fail;
 
 /**
  * A helper class for applying assertions via JSON path expressions.
@@ -46,6 +52,26 @@ import static org.springframework.test.util.AssertionErrors.*;
  */
 public class JsonPathExpectationsHelper {
 
+	private static Method compileMethod;
+
+	private static Object emptyFilters;
+
+	static {
+		// Reflective bridging between JsonPath 0.9.x and 1.x
+		for (Method candidate : JsonPath.class.getMethods()) {
+			if (candidate.getName().equals("compile")) {
+				Class<?>[] paramTypes = candidate.getParameterTypes();
+				if (paramTypes.length == 2 && String.class == paramTypes[0] && paramTypes[1].isArray()) {
+					compileMethod = candidate;
+					emptyFilters = Array.newInstance(paramTypes[1].getComponentType(), 0);
+					break;
+				}
+			}
+		}
+		Assert.state(compileMethod != null, "Unexpected JsonPath API - no compile(String, ...) method found");
+	}
+
+
 	private final String expression;
 
 	private final JsonPath jsonPath;
@@ -60,7 +86,8 @@ public class JsonPathExpectationsHelper {
 	public JsonPathExpectationsHelper(String expression, Object... args) {
 		Assert.hasText(expression, "expression must not be null or empty");
 		this.expression = String.format(expression, args);
-		this.jsonPath = JsonPath.compile(this.expression);
+		this.jsonPath = (JsonPath) ReflectionUtils.invokeMethod(
+				compileMethod, null, this.expression, emptyFilters);
 	}
 
 

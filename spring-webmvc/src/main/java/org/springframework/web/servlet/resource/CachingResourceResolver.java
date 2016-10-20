@@ -42,16 +42,14 @@ public class CachingResourceResolver extends AbstractResourceResolver {
 
 	private final Cache cache;
 
-
 	public CachingResourceResolver(CacheManager cacheManager, String cacheName) {
 		this(cacheManager.getCache(cacheName));
 	}
 
 	public CachingResourceResolver(Cache cache) {
-		Assert.notNull(cache, "Cache is required");
+		Assert.notNull(cache, "'cache' is required");
 		this.cache = cache;
 	}
-
 
 	/**
 	 * Return the configured {@code Cache}.
@@ -59,7 +57,6 @@ public class CachingResourceResolver extends AbstractResourceResolver {
 	public Cache getCache() {
 		return this.cache;
 	}
-
 
 	@Override
 	protected Resource resolveResourceInternal(HttpServletRequest request, String requestPath,
@@ -70,7 +67,7 @@ public class CachingResourceResolver extends AbstractResourceResolver {
 
 		if (resource != null) {
 			if (logger.isTraceEnabled()) {
-				logger.trace("Found match: " + resource);
+				logger.trace("Found match");
 			}
 			return resource;
 		}
@@ -78,7 +75,7 @@ public class CachingResourceResolver extends AbstractResourceResolver {
 		resource = chain.resolveResource(request, requestPath, locations);
 		if (resource != null) {
 			if (logger.isTraceEnabled()) {
-				logger.trace("Putting resolved resource in cache: " + resource);
+				logger.trace("Putting resolved resource in cache");
 			}
 			this.cache.put(key, resource);
 		}
@@ -107,7 +104,7 @@ public class CachingResourceResolver extends AbstractResourceResolver {
 
 		if (resolvedUrlPath != null) {
 			if (logger.isTraceEnabled()) {
-				logger.trace("Found match: \"" + resolvedUrlPath + "\"");
+				logger.trace("Found match");
 			}
 			return resolvedUrlPath;
 		}
@@ -115,7 +112,7 @@ public class CachingResourceResolver extends AbstractResourceResolver {
 		resolvedUrlPath = chain.resolveUrlPath(resourceUrlPath, locations);
 		if (resolvedUrlPath != null) {
 			if (logger.isTraceEnabled()) {
-				logger.trace("Putting resolved resource URL path in cache: \"" + resolvedUrlPath + "\"");
+				logger.trace("Putting resolved resource URL path in cache");
 			}
 			this.cache.put(key, resolvedUrlPath);
 		}

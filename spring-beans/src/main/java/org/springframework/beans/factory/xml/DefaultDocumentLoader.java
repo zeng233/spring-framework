@@ -22,12 +22,12 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
+import org.springframework.util.xml.XmlValidationModeDetector;
 import org.w3c.dom.Document;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
-
-import org.springframework.util.xml.XmlValidationModeDetector;
 
 /**
  * Spring's default {@link DocumentLoader} implementation.
@@ -45,6 +45,7 @@ import org.springframework.util.xml.XmlValidationModeDetector;
  * @since 2.0
  */
 public class DefaultDocumentLoader implements DocumentLoader {
+	private static final Logger mylog = Logger.getLogger(DefaultDocumentLoader.class);
 
 	/**
 	 * JAXP attribute used to configure the schema language for validation.
@@ -72,6 +73,7 @@ public class DefaultDocumentLoader implements DocumentLoader {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Using JAXP provider [" + factory.getClass().getName() + "]");
 		}
+		mylog.debug("传入xml解析器并创建DocumentBuilder");
 		DocumentBuilder builder = createDocumentBuilder(factory, entityResolver, errorHandler);
 		return builder.parse(inputSource);
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2015 the original author or authors.
+ * Copyright 2002-2011 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,18 +29,17 @@ import org.springframework.core.annotation.AnnotationUtils;
 class BeanAnnotationHelper {
 
 	/**
-	 * Return whether the given method is directly or indirectly annotated with
-	 * the {@link Bean} annotation.
+	 * Return whether the given method is annotated directly or indirectly with @Bean.
 	 */
 	public static boolean isBeanAnnotated(Method method) {
-		return (AnnotationUtils.findAnnotation(method, Bean.class) != null);
+		return AnnotationUtils.findAnnotation(method, Bean.class) != null;
 	}
 
 	public static String determineBeanNameFor(Method beanMethod) {
-		// By default, the bean name is the name of the @Bean-annotated method
+		// by default the bean name is the name of the @Bean-annotated method
 		String beanName = beanMethod.getName();
 
-		// Check to see if the user has explicitly set a custom bean name...
+		// check to see if the user has explicitly set the bean name
 		Bean bean = AnnotationUtils.findAnnotation(beanMethod, Bean.class);
 		if (bean != null && bean.name().length > 0) {
 			beanName = bean.name()[0];

@@ -81,7 +81,6 @@ import org.springframework.validation.Validator;
  *
  * @author Rossen Stoyanchev
  * @author Brian Clozel
- * @author Juergen Hoeller
  * @since 4.0
  */
 public class SimpAnnotationMethodMessageHandler extends AbstractMethodMessageHandler<SimpMessageMappingInfo>
@@ -306,7 +305,7 @@ public class SimpAnnotationMethodMessageHandler extends AbstractMethodMessageHan
 
 	protected List<HandlerMethodArgumentResolver> initArgumentResolvers() {
 		ConfigurableBeanFactory beanFactory = (getApplicationContext() instanceof ConfigurableApplicationContext ?
-				((ConfigurableApplicationContext) getApplicationContext()).getBeanFactory() : null);
+						((ConfigurableApplicationContext) getApplicationContext()).getBeanFactory() : null);
 
 		List<HandlerMethodArgumentResolver> resolvers = new ArrayList<HandlerMethodArgumentResolver>();
 
@@ -365,53 +364,41 @@ public class SimpAnnotationMethodMessageHandler extends AbstractMethodMessageHan
 
 	@Override
 	protected SimpMessageMappingInfo getMappingForMethod(Method method, Class<?> handlerType) {
-		MessageMapping messageAnn = AnnotationUtils.findAnnotation(method, MessageMapping.class);
-		if (messageAnn != null) {
-			MessageMapping typeAnn = AnnotationUtils.findAnnotation(handlerType, MessageMapping.class);
-			// Only actually register it if there are destinations specified;
-			// otherwise @MessageMapping is just being used as a (meta-annotation) marker.
-			if (messageAnn.value().length > 0 || (typeAnn != null && typeAnn.value().length > 0)) {
-				SimpMessageMappingInfo result = createMessageMappingCondition(messageAnn.value());
-				if (typeAnn != null) {
-					result = createMessageMappingCondition(typeAnn.value()).combine(result);
-				}
-				return result;
+		MessageMapping typeAnnotation = AnnotationUtils.findAnnotation(handlerType, MessageMapping.class);
+		MessageMapping messageAnnotation = AnnotationUtils.findAnnotation(method, MessageMapping.class);
+		if (messageAnnotation != null) {
+			SimpMessageMappingInfo result = createMessageMappingCondition(messageAnnotation);
+			if (typeAnnotation != null) {
+				result = createMessageMappingCondition(typeAnnotation).combine(result);
 			}
+			return result;
 		}
-
-		SubscribeMapping subscribeAnn = AnnotationUtils.findAnnotation(method, SubscribeMapping.class);
-		if (subscribeAnn != null) {
-			MessageMapping typeAnn = AnnotationUtils.findAnnotation(handlerType, MessageMapping.class);
-			// Only actually register it if there are destinations specified;
-			// otherwise @SubscribeMapping is just being used as a (meta-annotation) marker.
-			if (subscribeAnn.value().length > 0 || (typeAnn != null && typeAnn.value().length > 0)) {
-				SimpMessageMappingInfo result = createSubscribeMappingCondition(subscribeAnn.value());
-				if (typeAnn != null) {
-					result = createMessageMappingCondition(typeAnn.value()).combine(result);
-				}
-				return result;
+		SubscribeMapping subscribeAnnotation = AnnotationUtils.findAnnotation(method, SubscribeMapping.class);
+		if (subscribeAnnotation != null) {
+			SimpMessageMappingInfo result = createSubscribeCondition(subscribeAnnotation);
+			if (typeAnnotation != null) {
+				result = createMessageMappingCondition(typeAnnotation).combine(result);
 			}
+			return result;
 		}
-
 		return null;
 	}
 
-	private SimpMessageMappingInfo createMessageMappingCondition(String[] destinations) {
-		String[] resolvedDestinations = resolveEmbeddedValuesInDestinations(destinations);
+	private SimpMessageMappingInfo createMessageMappingCondition(MessageMapping annotation) {
+		String[] destinations = resolveEmbeddedValuesInDestinations(annotation.value());
 		return new SimpMessageMappingInfo(SimpMessageTypeMessageCondition.MESSAGE,
-				new DestinationPatternsMessageCondition(resolvedDestinations, this.pathMatcher));
+				new DestinationPatternsMessageCondition(destinations, this.pathMatcher));
 	}
 
-	private SimpMessageMappingInfo createSubscribeMappingCondition(String[] destinations) {
-		String[] resolvedDestinations = resolveEmbeddedValuesInDestinations(destinations);
+	private SimpMessageMappingInfo createSubscribeCondition(SubscribeMapping annotation) {
+		String[] destinations = resolveEmbeddedValuesInDestinations(annotation.value());
 		return new SimpMessageMappingInfo(SimpMessageTypeMessageCondition.SUBSCRIBE,
-				new DestinationPatternsMessageCondition(resolvedDestinations, this.pathMatcher));
+				new DestinationPatternsMessageCondition(destinations, this.pathMatcher));
 	}
 
 	/**
 	 * Resolve placeholder values in the given array of destinations.
 	 * @return a new array with updated destinations
-	 * @since 4.2
 	 */
 	protected String[] resolveEmbeddedValuesInDestinations(String[] destinations) {
 		if (this.valueResolver == null) {

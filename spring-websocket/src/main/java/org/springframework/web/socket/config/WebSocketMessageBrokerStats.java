@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2015 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import org.springframework.web.socket.messaging.StompSubProtocolHandler;
 import org.springframework.web.socket.messaging.SubProtocolHandler;
 import org.springframework.web.socket.messaging.SubProtocolWebSocketHandler;
 
+
 /**
  * A central class for aggregating information about internal state and counters
  * from key infrastructure components of the setup that comes with
@@ -50,7 +51,7 @@ import org.springframework.web.socket.messaging.SubProtocolWebSocketHandler;
  */
 public class WebSocketMessageBrokerStats {
 
-	private static final Log logger = LogFactory.getLog(WebSocketMessageBrokerStats.class);
+	private static Log logger = LogFactory.getLog(WebSocketMessageBrokerStats.class);
 
 
 	private SubProtocolWebSocketHandler webSocketHandler;
@@ -180,8 +181,8 @@ public class WebSocketMessageBrokerStats {
 	}
 
 	private String getExecutorStatsInfo(Executor executor) {
-		String str = executor.toString();
-		return str.substring(str.indexOf("pool"), str.length() - 1);
+		String s = executor.toString();
+		return s.substring(s.indexOf("pool"), s.length() - 1);
 	}
 
 	public String toString() {

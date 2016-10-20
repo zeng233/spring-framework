@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
@@ -47,6 +47,7 @@ import org.springframework.util.CollectionUtils;
  * @see DefaultBeanDefinitionDocumentReader
  */
 public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver {
+	private static final Logger mylog = Logger.getLogger(DefaultNamespaceHandlerResolver.class);
 
 	/**
 	 * The location to look for the mapping files. Can be present in multiple JAR files.
@@ -128,6 +129,7 @@ public class DefaultNamespaceHandlerResolver implements NamespaceHandlerResolver
 							"] does not implement the [" + NamespaceHandler.class.getName() + "] interface");
 				}
 				NamespaceHandler namespaceHandler = (NamespaceHandler) BeanUtils.instantiateClass(handlerClass);
+				mylog.debug("注册自定义标签对应的parser解析器");
 				namespaceHandler.init();
 				handlerMappings.put(namespaceUri, namespaceHandler);
 				return namespaceHandler;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2015 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package org.springframework.beans.factory.annotation;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryUtils;
@@ -26,7 +27,6 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.AutowireCandidateQualifier;
 import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ObjectUtils;
 
 /**
@@ -77,19 +77,20 @@ public class BeanFactoryAnnotationUtils {
 	 * @throws NoSuchBeanDefinitionException if no matching bean of type {@code T} found
 	 */
 	private static <T> T qualifiedBeanOfType(ConfigurableListableBeanFactory bf, Class<T> beanType, String qualifier) {
-		String[] candidateBeans = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(bf, beanType);
-		String matchingBean = null;
-		for (String beanName : candidateBeans) {
+		Map<String, T> candidateBeans = BeanFactoryUtils.beansOfTypeIncludingAncestors(bf, beanType);
+		T matchingBean = null;
+		for (Map.Entry<String, T> entry : candidateBeans.entrySet()) {
+			String beanName = entry.getKey();
 			if (isQualifierMatch(qualifier, beanName, bf)) {
 				if (matchingBean != null) {
 					throw new NoSuchBeanDefinitionException(qualifier, "No unique " + beanType.getSimpleName() +
 							" bean found for qualifier '" + qualifier + "'");
 				}
-				matchingBean = beanName;
+				matchingBean = entry.getValue();
 			}
 		}
 		if (matchingBean != null) {
-			return bf.getBean(matchingBean, beanType);
+			return matchingBean;
 		}
 		else if (bf.containsBean(qualifier)) {
 			// Fallback: target bean at least found by bean name - probably a manually registered singleton.
@@ -114,7 +115,6 @@ public class BeanFactoryAnnotationUtils {
 		if (bf.containsBean(beanName)) {
 			try {
 				BeanDefinition bd = bf.getMergedBeanDefinition(beanName);
-				// Explicit qualifier metadata on bean definition? (typically in XML definition)
 				if (bd instanceof AbstractBeanDefinition) {
 					AbstractBeanDefinition abd = (AbstractBeanDefinition) bd;
 					AutowireCandidateQualifier candidate = abd.getQualifier(Qualifier.class.getName());
@@ -123,22 +123,13 @@ public class BeanFactoryAnnotationUtils {
 						return true;
 					}
 				}
-				// Corresponding qualifier on factory method? (typically in configuration class)
 				if (bd instanceof RootBeanDefinition) {
 					Method factoryMethod = ((RootBeanDefinition) bd).getResolvedFactoryMethod();
 					if (factoryMethod != null) {
-						Qualifier targetAnnotation = AnnotationUtils.getAnnotation(factoryMethod, Qualifier.class);
-						if (targetAnnotation != null) {
-							return qualifier.equals(targetAnnotation.value());
+						Qualifier targetAnnotation = factoryMethod.getAnnotation(Qualifier.class);
+						if (targetAnnotation != null && qualifier.equals(targetAnnotation.value())) {
+							return true;
 						}
-					}
-				}
-				// Corresponding qualifier on bean implementation class? (for custom user types)
-				Class<?> beanType = bf.getType(beanName);
-				if (beanType != null) {
-					Qualifier targetAnnotation = AnnotationUtils.getAnnotation(beanType, Qualifier.class);
-					if (targetAnnotation != null) {
-						return qualifier.equals(targetAnnotation.value());
 					}
 				}
 			}

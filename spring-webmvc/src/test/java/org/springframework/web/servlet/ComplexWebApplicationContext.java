@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -29,6 +30,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -74,9 +76,11 @@ import org.springframework.web.util.WebUtils;
  * @since 21.05.2003
  */
 public class ComplexWebApplicationContext extends StaticWebApplicationContext {
+	private static Logger mylog = Logger.getLogger(ComplexWebApplicationContext.class);
 
 	@Override
 	public void refresh() throws BeansException {
+		System.out.println("===============init:ComplexWebApplicationContext注册各种初始化类===========");
 		registerSingleton(DispatcherServlet.LOCALE_RESOLVER_BEAN_NAME, SessionLocaleResolver.class);
 		registerSingleton(DispatcherServlet.THEME_RESOLVER_BEAN_NAME, SessionThemeResolver.class);
 
@@ -166,12 +170,14 @@ public class ComplexWebApplicationContext extends StaticWebApplicationContext {
 		registerSingleton("handlerExceptionResolver", SimpleMappingExceptionResolver.class, pvs);
 
 		registerSingleton("multipartResolver", MockMultipartResolver.class);
+		mylog.debug("refresh：注册TestApplicationListener");
 		registerSingleton("testListener", TestApplicationListener.class);
 
 		addMessage("test", Locale.ENGLISH, "test message");
 		addMessage("test", Locale.CANADA, "Canadian & test message");
 
 		super.refresh();
+		mylog.debug("=============refresh操作结束=================");
 	}
 
 

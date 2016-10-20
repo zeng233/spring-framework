@@ -98,35 +98,6 @@ public class AnnotatedElementUtils {
 
 
 	/**
-	 * Build an adapted {@link AnnotatedElement} for the given annotations,
-	 * typically for use with other methods on {@link AnnotatedElementUtils}.
-	 * @param annotations the annotations to expose through the {@code AnnotatedElement}
-	 * @since 4.3
-	 */
-	public static AnnotatedElement forAnnotations(final Annotation... annotations) {
-		return new AnnotatedElement() {
-			@Override
-			@SuppressWarnings("unchecked")
-			public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
-				for (Annotation ann : annotations) {
-					if (ann.annotationType() == annotationClass) {
-						return (T) ann;
-					}
-				}
-				return null;
-			}
-			@Override
-			public Annotation[] getAnnotations() {
-				return annotations;
-			}
-			@Override
-			public Annotation[] getDeclaredAnnotations() {
-				return annotations;
-			}
-		};
-	}
-
-	/**
 	 * Get the fully qualified class names of all meta-annotation types
 	 * <em>present</em> on the annotation (of the specified {@code annotationType})
 	 * on the supplied {@link AnnotatedElement}.
@@ -325,7 +296,7 @@ public class AnnotatedElementUtils {
 	 */
 	public static <A extends Annotation> A getMergedAnnotation(AnnotatedElement element, Class<A> annotationType) {
 		AnnotationAttributes attributes = getMergedAnnotationAttributes(element, annotationType);
-		return AnnotationUtils.synthesizeAnnotation(attributes, annotationType, element);
+		return (attributes != null ? AnnotationUtils.synthesizeAnnotation(attributes, annotationType, element) : null);
 	}
 
 	/**
@@ -430,7 +401,8 @@ public class AnnotatedElementUtils {
 	public static <A extends Annotation> A findMergedAnnotation(AnnotatedElement element, Class<A> annotationType) {
 		Assert.notNull(annotationType, "annotationType must not be null");
 		AnnotationAttributes attributes = findMergedAnnotationAttributes(element, annotationType, false, false);
-		return AnnotationUtils.synthesizeAnnotation(attributes, annotationType, element);
+		return (attributes != null ?
+				AnnotationUtils.synthesizeAnnotation(attributes, annotationType, element) : null);
 	}
 
 	/**
@@ -457,7 +429,8 @@ public class AnnotatedElementUtils {
 	@SuppressWarnings("unchecked")
 	public static <A extends Annotation> A findMergedAnnotation(AnnotatedElement element, String annotationName) {
 		AnnotationAttributes attributes = findMergedAnnotationAttributes(element, annotationName, false, false);
-		return AnnotationUtils.synthesizeAnnotation(attributes, (Class<A>) attributes.annotationType(), element);
+		return (attributes != null ?
+				AnnotationUtils.synthesizeAnnotation(attributes, (Class<A>) attributes.annotationType(), element) : null);
 	}
 
 	/**

@@ -18,6 +18,7 @@ package org.springframework.context.support;
 
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.ResourceEntityResolver;
@@ -43,6 +44,7 @@ import org.springframework.core.io.Resource;
  * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
  */
 public abstract class AbstractXmlApplicationContext extends AbstractRefreshableConfigApplicationContext {
+	private static final Logger mylog = Logger.getLogger(AbstractXmlApplicationContext.class);
 
 	private boolean validating = true;
 
@@ -79,12 +81,14 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableC
 	@Override
 	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws BeansException, IOException {
 		// Create a new XmlBeanDefinitionReader for the given BeanFactory.
+		mylog.debug("初始化XmlBeanDefinitionReader");
 		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
 
 		// Configure the bean definition reader with this context's
 		// resource loading environment.
 		beanDefinitionReader.setEnvironment(this.getEnvironment());
 		beanDefinitionReader.setResourceLoader(this);
+		mylog.debug("实例化xml资源解析器ResourceEntityResolver，查看ResourceEntityResolver父类，构造函数实例化DTD和schema解析器");
 		beanDefinitionReader.setEntityResolver(new ResourceEntityResolver(this));
 
 		// Allow a subclass to provide custom initialization of the reader,

@@ -22,7 +22,7 @@ import java.util.Map;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 
@@ -42,6 +42,7 @@ import org.springframework.beans.factory.config.BeanDefinitionHolder;
  * @see #registerBeanDefinitionDecorator(String, BeanDefinitionDecorator)
  */
 public abstract class NamespaceHandlerSupport implements NamespaceHandler {
+	private static final Logger mylog = Logger.getLogger(NamespaceHandlerSupport.class);
 
 	/**
 	 * Stores the {@link BeanDefinitionParser} implementations keyed by the
@@ -80,6 +81,7 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	 */
 	private BeanDefinitionParser findParserForElement(Element element, ParserContext parserContext) {
 		String localName = parserContext.getDelegate().getLocalName(element);
+		mylog.debug("解析spring.handlers文件时，每个schema地址对应一个parse，NamespaceHandler执行init方法时，将自定义标签对应的parse存到Map");
 		BeanDefinitionParser parser = this.parsers.get(localName);
 		if (parser == null) {
 			parserContext.getReaderContext().fatal(

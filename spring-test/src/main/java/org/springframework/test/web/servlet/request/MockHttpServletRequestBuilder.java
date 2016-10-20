@@ -142,28 +142,12 @@ public class MockHttpServletRequestBuilder
 
 	/**
 	 * Add a request parameter to the {@link MockHttpServletRequest}.
-	 * <p>If called more than once, new values get added to existing ones.
+	 * If called more than once, the new values are added.
 	 * @param name the parameter name
 	 * @param values one or more values
 	 */
 	public MockHttpServletRequestBuilder param(String name, String... values) {
 		addToMultiValueMap(this.parameters, name, values);
-		return this;
-	}
-
-	/**
-	 * Add a map of request parameters to the {@link MockHttpServletRequest},
-	 * for example when testing a form submission.
-	 * <p>If called more than once, new values get added to existing ones.
-	 * @param params the parameters to add
-	 * @since 4.2.4
-	 */
-	public MockHttpServletRequestBuilder params(MultiValueMap<String, String> params) {
-		for (String name : params.keySet()) {
-			for (String value : params.get(name)) {
-				this.parameters.add(name, value);
-			}
-		}
 		return this;
 	}
 
@@ -301,7 +285,7 @@ public class MockHttpServletRequestBuilder
 	 * @param value the attribute value
 	 */
 	public MockHttpServletRequestBuilder requestAttr(String name, Object value) {
-		addToMap(this.attributes, name, value);
+		addAttributeToMap(this.attributes, name, value);
 		return this;
 	}
 
@@ -311,7 +295,7 @@ public class MockHttpServletRequestBuilder
 	 * @param value the session attribute value
 	 */
 	public MockHttpServletRequestBuilder sessionAttr(String name, Object value) {
-		addToMap(this.sessionAttributes, name, value);
+		addAttributeToMap(this.sessionAttributes, name, value);
 		return this;
 	}
 
@@ -333,7 +317,7 @@ public class MockHttpServletRequestBuilder
 	 * @param value the flash attribute value
 	 */
 	public MockHttpServletRequestBuilder flashAttr(String name, Object value) {
-		addToMap(this.flashAttributes, name, value);
+		addAttributeToMap(this.flashAttributes, name, value);
 		return this;
 	}
 
@@ -713,19 +697,19 @@ public class MockHttpServletRequestBuilder
 		return request;
 	}
 
-
-	private static void addToMap(Map<String, Object> map, String name, Object value) {
-		Assert.hasLength(name, "'name' must not be empty");
-		Assert.notNull(value, "'value' must not be null");
-		map.put(name, value);
-	}
-
 	private static <T> void addToMultiValueMap(MultiValueMap<String, T> map, String name, T[] values) {
 		Assert.hasLength(name, "'name' must not be empty");
+		Assert.notNull(values, "'values' is required");
 		Assert.notEmpty(values, "'values' must not be empty");
 		for (T value : values) {
 			map.add(name, value);
 		}
+	}
+
+	private static void addAttributeToMap(Map<String, Object> map, String name, Object value) {
+		Assert.hasLength(name, "'name' must not be empty");
+		Assert.notNull(value, "'value' must not be null");
+		map.put(name, value);
 	}
 
 }

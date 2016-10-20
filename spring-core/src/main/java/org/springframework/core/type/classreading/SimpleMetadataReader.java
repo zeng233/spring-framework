@@ -20,6 +20,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.log4j.Logger;
 import org.springframework.asm.ClassReader;
 import org.springframework.core.NestedIOException;
 import org.springframework.core.io.Resource;
@@ -38,6 +39,7 @@ import org.springframework.core.type.ClassMetadata;
  * @since 2.5
  */
 final class SimpleMetadataReader implements MetadataReader {
+	private static final Logger mylog = Logger.getLogger(SimpleMetadataReader.class);
 
 	private final Resource resource;
 
@@ -60,9 +62,11 @@ final class SimpleMetadataReader implements MetadataReader {
 			is.close();
 		}
 
+		mylog.debug("实例化AnnotationMetadataReadingVisitor，并赋值给annotationMetadata");
 		AnnotationMetadataReadingVisitor visitor = new AnnotationMetadataReadingVisitor(classLoader);
+		mylog.debug("读取类的注解，并设置到metaAnnotationMap，如果Service注解源文件实际也包含@Component注解");
 		classReader.accept(visitor, ClassReader.SKIP_DEBUG);
-
+		
 		this.annotationMetadata = visitor;
 		// (since AnnotationMetadataReadingVisitor extends ClassMetadataReadingVisitor)
 		this.classMetadata = visitor;

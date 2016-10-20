@@ -62,9 +62,7 @@ import org.springframework.util.ReflectionUtils;
  * @see #initTool
  * @see org.apache.velocity.tools.view.context.ViewContext
  * @see org.apache.velocity.tools.view.context.ChainedContext
- * @deprecated as of Spring 4.3, in favor of FreeMarker
  */
-@Deprecated
 public class VelocityToolboxView extends VelocityView {
 
 	private String toolboxConfigLocation;

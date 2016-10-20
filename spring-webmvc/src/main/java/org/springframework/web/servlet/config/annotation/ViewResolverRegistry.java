@@ -41,6 +41,8 @@ import org.springframework.web.servlet.view.script.ScriptTemplateConfigurer;
 import org.springframework.web.servlet.view.script.ScriptTemplateViewResolver;
 import org.springframework.web.servlet.view.tiles3.TilesConfigurer;
 import org.springframework.web.servlet.view.tiles3.TilesViewResolver;
+import org.springframework.web.servlet.view.velocity.VelocityConfigurer;
+import org.springframework.web.servlet.view.velocity.VelocityViewResolver;
 
 /**
  * Assist with the configuration of a chain of
@@ -84,8 +86,10 @@ public class ViewResolverRegistry {
 	 * Enable use of a {@link ContentNegotiatingViewResolver} to front all other
 	 * configured view resolvers and select among all selected Views based on
 	 * media types requested by the client (e.g. in the Accept header).
+	 *
 	 * <p>If invoked multiple times the provided default views will be added to
 	 * any other default views that may have been configured already.
+	 *
 	 * @see ContentNegotiatingViewResolver#setDefaultViews
 	 */
 	public void enableContentNegotiation(View... defaultViews) {
@@ -96,6 +100,7 @@ public class ViewResolverRegistry {
 	 * Enable use of a {@link ContentNegotiatingViewResolver} to front all other
 	 * configured view resolvers and select among all selected Views based on
 	 * media types requested by the client (e.g. in the Accept header).
+	 *
 	 * <p>If invoked multiple times the provided default views will be added to
 	 * any other default views that may have been configured already.
 	 *
@@ -107,8 +112,9 @@ public class ViewResolverRegistry {
 	}
 
 	private void initContentNegotiatingViewResolver(View[] defaultViews) {
+
 		// ContentNegotiatingResolver in the registry: elevate its precedence!
-		this.order = (this.order != null ? this.order : Ordered.HIGHEST_PRECEDENCE);
+		this.order = (this.order == null ? Ordered.HIGHEST_PRECEDENCE : this.order);
 
 		if (this.contentNegotiatingResolver != null) {
 			if (!ObjectUtils.isEmpty(defaultViews)) {
@@ -130,6 +136,7 @@ public class ViewResolverRegistry {
 	/**
 	 * Register JSP view resolver using a default view name prefix of "/WEB-INF/"
 	 * and a default suffix of ".jsp".
+	 *
 	 * <p>When this method is invoked more than once, each call will register a
 	 * new ViewResolver instance. Note that since it's not easy to determine
 	 * if a JSP exists without forwarding to it, using multiple JSP-based view
@@ -142,6 +149,7 @@ public class ViewResolverRegistry {
 
 	/**
 	 * Register JSP view resolver with the specified prefix and suffix.
+	 *
 	 * <p>When this method is invoked more than once, each call will register a
 	 * new ViewResolver instance. Note that since it's not easy to determine
 	 * if a JSP exists without forwarding to it, using multiple JSP-based view
@@ -158,6 +166,7 @@ public class ViewResolverRegistry {
 
 	/**
 	 * Register Tiles 3.x view resolver.
+	 *
 	 * <p><strong>Note</strong> that you must also configure Tiles by adding a
 	 * {@link org.springframework.web.servlet.view.tiles3.TilesConfigurer} bean.
 	 */
@@ -175,6 +184,7 @@ public class ViewResolverRegistry {
 	/**
 	 * Register a FreeMarker view resolver with an empty default view name
 	 * prefix and a default suffix of ".ftl".
+	 *
 	 * <p><strong>Note</strong> that you must also configure FreeMarker by adding a
 	 * {@link org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer} bean.
 	 */
@@ -193,13 +203,12 @@ public class ViewResolverRegistry {
 	/**
 	 * Register Velocity view resolver with an empty default view name
 	 * prefix and a default suffix of ".vm".
+	 *
 	 * <p><strong>Note</strong> that you must also configure Velocity by adding a
 	 * {@link org.springframework.web.servlet.view.velocity.VelocityConfigurer} bean.
-	 * @deprecated as of Spring 4.3, in favor of FreeMarker
 	 */
-	@Deprecated
 	public UrlBasedViewResolverRegistration velocity() {
-		if (this.applicationContext != null && !hasBeanOfType(org.springframework.web.servlet.view.velocity.VelocityConfigurer.class)) {
+		if (this.applicationContext != null && !hasBeanOfType(VelocityConfigurer.class)) {
 			throw new BeanInitializationException("In addition to a Velocity view resolver " +
 					"there must also be a single VelocityConfig bean in this web application context " +
 					"(or its parent): VelocityConfigurer is the usual implementation. " +
@@ -304,23 +313,22 @@ public class ViewResolverRegistry {
 
 	private static class TilesRegistration extends UrlBasedViewResolverRegistration {
 
-		public TilesRegistration() {
+		private TilesRegistration() {
 			super(new TilesViewResolver());
 		}
 	}
 
 	private static class VelocityRegistration extends UrlBasedViewResolverRegistration {
 
-		@SuppressWarnings("deprecation")
-		public VelocityRegistration() {
-			super(new org.springframework.web.servlet.view.velocity.VelocityViewResolver());
+		private VelocityRegistration() {
+			super(new VelocityViewResolver());
 			getViewResolver().setSuffix(".vm");
 		}
 	}
 
 	private static class FreeMarkerRegistration extends UrlBasedViewResolverRegistration {
 
-		public FreeMarkerRegistration() {
+		private FreeMarkerRegistration() {
 			super(new FreeMarkerViewResolver());
 			getViewResolver().setSuffix(".ftl");
 		}
@@ -328,7 +336,7 @@ public class ViewResolverRegistry {
 
 	private static class GroovyMarkupRegistration extends UrlBasedViewResolverRegistration {
 
-		public GroovyMarkupRegistration() {
+		private GroovyMarkupRegistration() {
 			super(new GroovyMarkupViewResolver());
 			getViewResolver().setSuffix(".tpl");
 		}
@@ -336,7 +344,7 @@ public class ViewResolverRegistry {
 
 	private static class ScriptRegistration extends UrlBasedViewResolverRegistration {
 
-		public ScriptRegistration() {
+		private ScriptRegistration() {
 			super(new ScriptTemplateViewResolver());
 			getViewResolver();
 		}

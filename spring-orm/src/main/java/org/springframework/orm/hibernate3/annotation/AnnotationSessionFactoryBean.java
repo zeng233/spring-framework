@@ -38,6 +38,7 @@ import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.core.type.filter.TypeFilter;
+import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 import org.springframework.util.ClassUtils;
 
 /**
@@ -73,11 +74,8 @@ import org.springframework.util.ClassUtils;
  * @see #setHibernateProperties
  * @see #setAnnotatedClasses
  * @see #setAnnotatedPackages
- * @deprecated as of Spring 4.3, in favor of Hibernate 4.x/5.x
  */
-@Deprecated
-public class AnnotationSessionFactoryBean extends org.springframework.orm.hibernate3.LocalSessionFactoryBean
-		implements ResourceLoaderAware {
+public class AnnotationSessionFactoryBean extends LocalSessionFactoryBean implements ResourceLoaderAware {
 
 	private static final String RESOURCE_PATTERN = "/**/*.class";
 

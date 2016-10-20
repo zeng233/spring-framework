@@ -314,7 +314,7 @@ public abstract class AbstractMethodMessageHandler<T>
 	 * under the same mapping
 	 */
 	protected void registerHandlerMethod(Object handler, Method method, T mapping) {
-		Assert.notNull(mapping, "Mapping must not be null");
+		Assert.notNull(mapping, "Mapping must bot be null");
 		HandlerMethod newHandlerMethod = createHandlerMethod(handler, method);
 		HandlerMethod oldHandlerMethod = this.handlerMethods.get(mapping);
 
@@ -456,7 +456,7 @@ public abstract class AbstractMethodMessageHandler<T>
 		for (T mapping : mappingsToCheck) {
 			T match = getMatchingMapping(mapping, message);
 			if (match != null) {
-				matches.add(new Match(match, this.handlerMethods.get(mapping)));
+				matches.add(new Match(match, handlerMethods.get(mapping)));
 			}
 		}
 	}

@@ -20,10 +20,7 @@ import java.lang.annotation.Annotation;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
+import org.apache.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -41,6 +38,9 @@ import org.springframework.core.type.filter.AssignableTypeFilter;
 import org.springframework.core.type.filter.RegexPatternTypeFilter;
 import org.springframework.core.type.filter.TypeFilter;
 import org.springframework.util.StringUtils;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Parser for the {@code <context:component-scan/>} element.
@@ -51,6 +51,7 @@ import org.springframework.util.StringUtils;
  * @since 2.5
  */
 public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
+	private static final Logger mylog = Logger.getLogger(ComponentScanBeanDefinitionParser.class);
 
 	private static final String BASE_PACKAGE_ATTRIBUTE = "base-package";
 
@@ -77,6 +78,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 
 	@Override
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
+		mylog.debug(element.getTagName() + "获取<context:component-scan>标签的base-package属性");
 		String basePackage = element.getAttribute(BASE_PACKAGE_ATTRIBUTE);
 		basePackage = parserContext.getReaderContext().getEnvironment().resolvePlaceholders(basePackage);
 		String[] basePackages = StringUtils.tokenizeToStringArray(basePackage,
@@ -84,7 +86,9 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 
 		// Actually scan for bean definitions and register them.
 		ClassPathBeanDefinitionScanner scanner = configureScanner(parserContext, element);
+		mylog.debug("ClassPathBeanDefinitionScanner.doScan开始扫描 " + basePackage + " 下的类");
 		Set<BeanDefinitionHolder> beanDefinitions = scanner.doScan(basePackages);
+		mylog.debug("添加默认标签的BeanPostProcessor");
 		registerComponents(parserContext.getReaderContext(), beanDefinitions, element);
 
 		return null;
@@ -97,6 +101,7 @@ public class ComponentScanBeanDefinitionParser implements BeanDefinitionParser {
 		}
 
 		// Delegate bean definition registration to scanner class.
+		mylog.debug("初始化ClassPathBeanDefinitionScanner");
 		ClassPathBeanDefinitionScanner scanner = createScanner(parserContext.getReaderContext(), useDefaultFilters);
 		scanner.setResourceLoader(parserContext.getReaderContext().getResourceLoader());
 		scanner.setEnvironment(parserContext.getReaderContext().getEnvironment());

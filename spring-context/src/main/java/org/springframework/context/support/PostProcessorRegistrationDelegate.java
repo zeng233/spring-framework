@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -53,13 +53,15 @@ import org.springframework.core.PriorityOrdered;
  * @since 4.0
  */
 class PostProcessorRegistrationDelegate {
+	private static Logger mylog = Logger.getLogger(PostProcessorRegistrationDelegate.class);
 
 	public static void invokeBeanFactoryPostProcessors(
 			ConfigurableListableBeanFactory beanFactory, List<BeanFactoryPostProcessor> beanFactoryPostProcessors) {
 
 		// Invoke BeanDefinitionRegistryPostProcessors first, if any.
 		Set<String> processedBeans = new HashSet<String>();
-
+		
+		mylog.debug("首先执行BeanDefinitionRegistryPostProcessor.postProcessBeanDefinitionRegistry()");
 		if (beanFactory instanceof BeanDefinitionRegistry) {
 			BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
 			List<BeanFactoryPostProcessor> regularPostProcessors = new LinkedList<BeanFactoryPostProcessor>();
@@ -183,6 +185,8 @@ class PostProcessorRegistrationDelegate {
 		// Clear cached merged bean definitions since the post-processors might have
 		// modified the original metadata, e.g. replacing placeholders in values...
 		beanFactory.clearMetadataCache();
+		
+		mylog.debug("=========BeanFactoryPostProcessors调用完成");
 	}
 
 	public static void registerBeanPostProcessors(
@@ -249,7 +253,9 @@ class PostProcessorRegistrationDelegate {
 		sortPostProcessors(beanFactory, internalPostProcessors);
 		registerBeanPostProcessors(beanFactory, internalPostProcessors);
 
+		mylog.debug("检测applicationContext的PostProcessor-ApplicationListenerDetector");
 		beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(applicationContext));
+		mylog.debug("===========注册BeanPostProcessors完成");
 	}
 
 	private static void sortPostProcessors(ConfigurableListableBeanFactory beanFactory, List<?> postProcessors) {
@@ -347,8 +353,7 @@ class PostProcessorRegistrationDelegate {
 	 * BeanPostProcessor that detects beans which implement the ApplicationListener interface.
 	 * This catches beans that can't reliably be detected by getBeanNamesForType.
 	 */
-	private static class ApplicationListenerDetector
-			implements DestructionAwareBeanPostProcessor, MergedBeanDefinitionPostProcessor {
+	private static class ApplicationListenerDetector implements MergedBeanDefinitionPostProcessor, DestructionAwareBeanPostProcessor {
 
 		private static final Log logger = LogFactory.getLog(ApplicationListenerDetector.class);
 
@@ -402,11 +407,6 @@ class PostProcessorRegistrationDelegate {
 				multicaster.removeApplicationListener((ApplicationListener<?>) bean);
 				multicaster.removeApplicationListenerBean(beanName);
 			}
-		}
-
-		@Override
-		public boolean requiresDestruction(Object bean) {
-			return (bean instanceof ApplicationListener);
 		}
 	}
 

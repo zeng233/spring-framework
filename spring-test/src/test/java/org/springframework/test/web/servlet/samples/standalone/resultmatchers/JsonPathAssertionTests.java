@@ -45,7 +45,6 @@ public class JsonPathAssertionTests {
 
 	private MockMvc mockMvc;
 
-
 	@Before
 	public void setup() {
 		this.mockMvc = standaloneSetup(new MusicController())
@@ -55,9 +54,9 @@ public class JsonPathAssertionTests {
 				.build();
 	}
 
-
 	@Test
-	public void exists() throws Exception {
+	public void testExists() throws Exception {
+
 		String composerByName = "$.composers[?(@.name == '%s')]";
 		String performerByName = "$.performers[?(@.name == '%s')]";
 
@@ -75,15 +74,16 @@ public class JsonPathAssertionTests {
 	}
 
 	@Test
-	public void doesNotExist() throws Exception {
+	public void testDoesNotExist() throws Exception {
 		this.mockMvc.perform(get("/music/people"))
 			.andExpect(jsonPath("$.composers[?(@.name == 'Edvard Grieeeeeeg')]").doesNotExist())
 			.andExpect(jsonPath("$.composers[?(@.name == 'Robert Schuuuuuuman')]").doesNotExist())
+			.andExpect(jsonPath("$.composers[-1]").doesNotExist())
 			.andExpect(jsonPath("$.composers[4]").doesNotExist());
 	}
 
 	@Test
-	public void equality() throws Exception {
+	public void testEqualTo() throws Exception {
 		this.mockMvc.perform(get("/music/people"))
 			.andExpect(jsonPath("$.composers[0].name").value("Johann Sebastian Bach"))
 			.andExpect(jsonPath("$.performers[1].name").value("Yehudi Menuhin"));
@@ -95,7 +95,7 @@ public class JsonPathAssertionTests {
 	}
 
 	@Test
-	public void hamcrestMatcher() throws Exception {
+	public void testHamcrestMatcher() throws Exception {
 		this.mockMvc.perform(get("/music/people"))
 			.andExpect(jsonPath("$.composers[0].name", startsWith("Johann")))
 			.andExpect(jsonPath("$.performers[0].name", endsWith("Ashkenazy")))
@@ -104,7 +104,8 @@ public class JsonPathAssertionTests {
 	}
 
 	@Test
-	public void hamcrestMatcherWithParameterizedJsonPath() throws Exception {
+	public void testHamcrestMatcherWithParameterizedJsonPath() throws Exception {
+
 		String composerName = "$.composers[%s].name";
 		String performerName = "$.performers[%s].name";
 
@@ -134,5 +135,4 @@ public class JsonPathAssertionTests {
 			return map;
 		}
 	}
-
 }

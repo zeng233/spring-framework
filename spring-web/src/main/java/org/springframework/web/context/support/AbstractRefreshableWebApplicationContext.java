@@ -19,6 +19,7 @@ package org.springframework.web.context.support;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.support.AbstractRefreshableConfigApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -78,6 +79,7 @@ import org.springframework.web.context.ServletContextAware;
  */
 public abstract class AbstractRefreshableWebApplicationContext extends AbstractRefreshableConfigApplicationContext
 		implements ConfigurableWebApplicationContext, ThemeSource {
+	private static Logger mylog = Logger.getLogger(AbstractRefreshableWebApplicationContext.class);
 
 	/** Servlet context that this context runs in */
 	private ServletContext servletContext;
@@ -157,6 +159,7 @@ public abstract class AbstractRefreshableWebApplicationContext extends AbstractR
 	 */
 	@Override
 	protected void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) {
+		mylog.debug("添加ServletContextAwareProcessor到" + beanFactory);
 		beanFactory.addBeanPostProcessor(new ServletContextAwareProcessor(this.servletContext, this.servletConfig));
 		beanFactory.ignoreDependencyInterface(ServletContextAware.class);
 		beanFactory.ignoreDependencyInterface(ServletConfigAware.class);

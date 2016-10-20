@@ -16,6 +16,7 @@
 
 package org.springframework.context.support;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ClassPathResource;
@@ -49,6 +50,8 @@ import org.springframework.util.Assert;
  * @see GenericApplicationContext
  */
 public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContext {
+	
+	private static final Logger log = Logger.getLogger(ClassPathXmlApplicationContext.class);
 
 	private Resource[] configResources;
 
@@ -134,7 +137,9 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
 			throws BeansException {
 
 		super(parent);
+		log.debug("初始化bean的xml文件");
 		setConfigLocations(configLocations);
+		log.debug("初始化之前将以前的BeanFactory等关闭完，重新refresh");
 		if (refresh) {
 			refresh();
 		}

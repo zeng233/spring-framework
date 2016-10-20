@@ -21,7 +21,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyEditorRegistrar;
 import org.springframework.core.Ordered;
@@ -93,6 +93,7 @@ import org.springframework.util.ClassUtils;
  * @see org.springframework.validation.DataBinder#registerCustomEditor
  */
 public class CustomEditorConfigurer implements BeanFactoryPostProcessor, Ordered {
+	private static Logger mylog = Logger.getLogger(CustomEditorConfigurer.class);
 
 	protected final Log logger = LogFactory.getLog(getClass());
 
@@ -139,6 +140,7 @@ public class CustomEditorConfigurer implements BeanFactoryPostProcessor, Ordered
 
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+		mylog.debug("CustomEditorConfigurer是BeanFactoryPostProcessor的实现，配置了customEditors在启动时就执行，把转换器添加到map或者list中，BeanWrapper会使用到");
 		if (this.propertyEditorRegistrars != null) {
 			for (PropertyEditorRegistrar propertyEditorRegistrar : this.propertyEditorRegistrars) {
 				beanFactory.addPropertyEditorRegistrar(propertyEditorRegistrar);

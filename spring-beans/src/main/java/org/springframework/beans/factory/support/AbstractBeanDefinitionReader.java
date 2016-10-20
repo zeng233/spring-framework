@@ -21,7 +21,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.EnvironmentCapable;
@@ -45,6 +45,7 @@ import org.springframework.util.Assert;
  * @see BeanDefinitionReaderUtils
  */
 public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable, BeanDefinitionReader {
+	private static final Logger mylog = Logger.getLogger(AbstractBeanDefinitionReader.class);
 
 	/** Logger available to subclasses */
 	protected final Log logger = LogFactory.getLog(getClass());
@@ -177,6 +178,7 @@ public abstract class AbstractBeanDefinitionReader implements EnvironmentCapable
 	public int loadBeanDefinitions(Resource... resources) throws BeanDefinitionStoreException {
 		Assert.notNull(resources, "Resource array must not be null");
 		int counter = 0;
+		mylog.debug("遍历多个资源文件");
 		for (Resource resource : resources) {
 			counter += loadBeanDefinitions(resource);
 		}

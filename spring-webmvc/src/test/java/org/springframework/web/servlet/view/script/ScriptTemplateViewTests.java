@@ -30,7 +30,6 @@ import javax.script.Invocable;
 import javax.script.ScriptEngine;
 
 import org.hamcrest.Matchers;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -48,6 +47,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.mock;
 
 /**
  * Unit tests for {@link ScriptTemplateView}.
@@ -212,7 +212,6 @@ public class ScriptTemplateViewTests {
 	}
 
 	@Test
-	@SuppressWarnings("resource")
 	public void parentLoader() {
 		this.view.setEngine(mock(InvocableScriptEngine.class));
 		this.view.setRenderFunction("render");

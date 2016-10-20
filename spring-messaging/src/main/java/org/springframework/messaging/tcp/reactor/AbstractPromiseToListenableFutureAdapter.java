@@ -20,15 +20,14 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import reactor.fn.Consumer;
-import reactor.rx.Promise;
-
 import org.springframework.util.Assert;
 import org.springframework.util.concurrent.FailureCallback;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.util.concurrent.ListenableFutureCallbackRegistry;
 import org.springframework.util.concurrent.SuccessCallback;
+import reactor.fn.Consumer;
+import reactor.rx.Promise;
 
 /**
  * Adapts a reactor {@link Promise} to {@link ListenableFuture} optionally converting
@@ -56,20 +55,21 @@ abstract class AbstractPromiseToListenableFutureAdapter<S, T> implements Listena
 				try {
 					registry.success(adapt(result));
 				}
-				catch (Throwable ex) {
-					registry.failure(ex);
+				catch (Throwable t) {
+					registry.failure(t);
 				}
 			}
 		});
 
 		this.promise.onError(new Consumer<Throwable>() {
 			@Override
-			public void accept(Throwable ex) {
-				registry.failure(ex);
+			public void accept(Throwable t) {
+				registry.failure(t);
 			}
 		});
 	}
 
+	protected abstract T adapt(S result);
 
 	@Override
 	public T get() throws InterruptedException {
@@ -111,8 +111,5 @@ abstract class AbstractPromiseToListenableFutureAdapter<S, T> implements Listena
 		this.registry.addSuccessCallback(successCallback);
 		this.registry.addFailureCallback(failureCallback);
 	}
-
-
-	protected abstract T adapt(S result);
 
 }

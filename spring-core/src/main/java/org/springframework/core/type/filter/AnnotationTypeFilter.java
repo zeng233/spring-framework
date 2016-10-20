@@ -19,6 +19,7 @@ package org.springframework.core.type.filter;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Inherited;
 
+import org.apache.log4j.Logger;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.classreading.MetadataReader;
@@ -36,6 +37,7 @@ import org.springframework.util.ClassUtils;
  * @since 2.5
  */
 public class AnnotationTypeFilter extends AbstractTypeHierarchyTraversingFilter {
+	private static final Logger mylog = Logger.getLogger(AnnotationTypeFilter.class);
 
 	private final Class<? extends Annotation> annotationType;
 
@@ -79,6 +81,7 @@ public class AnnotationTypeFilter extends AbstractTypeHierarchyTraversingFilter 
 
 	@Override
 	protected boolean matchSelf(MetadataReader metadataReader) {
+		mylog.debug("重写父类的matchSelf方法，从CachingMetadataReaderFactory获取SimpleMetadataReader");
 		AnnotationMetadata metadata = metadataReader.getAnnotationMetadata();
 		return metadata.hasAnnotation(this.annotationType.getName()) ||
 				(this.considerMetaAnnotations && metadata.hasMetaAnnotation(this.annotationType.getName()));

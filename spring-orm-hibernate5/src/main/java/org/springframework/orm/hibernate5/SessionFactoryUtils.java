@@ -20,6 +20,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.hibernate.HibernateException;
 import org.hibernate.JDBCException;
 import org.hibernate.NonUniqueObjectException;
@@ -37,7 +38,6 @@ import org.hibernate.StaleStateException;
 import org.hibernate.TransientObjectException;
 import org.hibernate.UnresolvableObjectException;
 import org.hibernate.WrongClassException;
-import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.lock.OptimisticEntityLockException;
 import org.hibernate.dialect.lock.PessimisticEntityLockException;
 import org.hibernate.engine.jdbc.connections.spi.ConnectionProvider;
@@ -94,13 +94,9 @@ public abstract class SessionFactoryUtils {
 	 */
 	public static DataSource getDataSource(SessionFactory sessionFactory) {
 		if (sessionFactory instanceof SessionFactoryImplementor) {
-			SessionFactoryImplementor sfi = (SessionFactoryImplementor) sessionFactory;
-			Object dataSourceValue = sfi.getProperties().get(Environment.DATASOURCE);
-			if (dataSourceValue instanceof DataSource) {
-				return (DataSource) dataSourceValue;
-			}
 			try {
-				ConnectionProvider cp = sfi.getServiceRegistry().getService(ConnectionProvider.class);
+				ConnectionProvider cp = ((SessionFactoryImplementor) sessionFactory).getServiceRegistry().getService(
+						ConnectionProvider.class);
 				if (cp != null) {
 					return cp.unwrap(DataSource.class);
 				}

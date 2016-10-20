@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2015 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.springframework.web.servlet.resource;
 
 import org.springframework.core.io.Resource;
 
 /**
- * An extension of {@link VersionPathStrategy} that adds a method
- * to determine the actual version of a {@link Resource}.
+ * An extension of {@link VersionPathStrategy} that adds a method to determine the
+ * actual version of a {@link org.springframework.core.io.Resource Resource}.
  *
  * @author Brian Clozel
  * @author Rossen Stoyanchev
@@ -30,9 +29,9 @@ import org.springframework.core.io.Resource;
 public interface VersionStrategy extends VersionPathStrategy {
 
 	/**
-	 * Determine the version for the given resource.
+	 * Get the version for the given resource.
 	 * @param resource the resource to check
-	 * @return the version (never {@code null})
+	 * @return the version, never {@code null}
 	 */
 	String getResourceVersion(Resource resource);
 

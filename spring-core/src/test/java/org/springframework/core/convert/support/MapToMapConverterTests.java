@@ -36,14 +36,9 @@ import org.springframework.util.MultiValueMap;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
-/**
- * @author Keith Donald
- * @author Phil Webb
- * @author Juergen Hoeller
- */
 public class MapToMapConverterTests {
 
-	private final GenericConversionService conversionService = new GenericConversionService();
+	private GenericConversionService conversionService = new GenericConversionService();
 
 
 	@Before
@@ -59,15 +54,12 @@ public class MapToMapConverterTests {
 		map.put("2", "37");
 		TypeDescriptor sourceType = TypeDescriptor.forObject(map);
 		TypeDescriptor targetType = new TypeDescriptor(getClass().getField("scalarMapTarget"));
-
 		assertTrue(conversionService.canConvert(sourceType, targetType));
 		try {
 			conversionService.convert(map, sourceType, targetType);
+		} catch (ConversionFailedException e) {
+			assertTrue(e.getCause() instanceof ConverterNotFoundException);
 		}
-		catch (ConversionFailedException ex) {
-			assertTrue(ex.getCause() instanceof ConverterNotFoundException);
-		}
-
 		conversionService.addConverterFactory(new StringToNumberConverterFactory());
 		assertTrue(conversionService.canConvert(sourceType, targetType));
 		@SuppressWarnings("unchecked")
@@ -82,7 +74,6 @@ public class MapToMapConverterTests {
 		Map<String, String> map = new HashMap<String, String>();
 		map.put("1", "9");
 		map.put("2", "37");
-
 		assertTrue(conversionService.canConvert(Map.class, Map.class));
 		assertSame(map, conversionService.convert(map, Map.class));
 	}
@@ -94,15 +85,12 @@ public class MapToMapConverterTests {
 		map.put("2", "37");
 		TypeDescriptor sourceType = new TypeDescriptor(getClass().getField("notGenericMapSource"));
 		TypeDescriptor targetType = new TypeDescriptor(getClass().getField("scalarMapTarget"));
-
 		assertTrue(conversionService.canConvert(sourceType, targetType));
 		try {
 			conversionService.convert(map, sourceType, targetType);
+		} catch (ConversionFailedException e) {
+			assertTrue(e.getCause() instanceof ConverterNotFoundException);
 		}
-		catch (ConversionFailedException ex) {
-			assertTrue(ex.getCause() instanceof ConverterNotFoundException);
-		}
-
 		conversionService.addConverterFactory(new StringToNumberConverterFactory());
 		assertTrue(conversionService.canConvert(sourceType, targetType));
 		@SuppressWarnings("unchecked")
@@ -119,15 +107,12 @@ public class MapToMapConverterTests {
 		map.put("2", Arrays.asList("37", "23"));
 		TypeDescriptor sourceType = TypeDescriptor.forObject(map);
 		TypeDescriptor targetType = new TypeDescriptor(getClass().getField("collectionMapTarget"));
-
 		assertTrue(conversionService.canConvert(sourceType, targetType));
 		try {
 			conversionService.convert(map, sourceType, targetType);
+		} catch (ConversionFailedException e) {
+			assertTrue(e.getCause() instanceof ConverterNotFoundException);
 		}
-		catch (ConversionFailedException ex) {
-			assertTrue(ex.getCause() instanceof ConverterNotFoundException);
-		}
-
 		conversionService.addConverter(new CollectionToCollectionConverter(conversionService));
 		conversionService.addConverterFactory(new StringToNumberConverterFactory());
 		assertTrue(conversionService.canConvert(sourceType, targetType));
@@ -145,7 +130,6 @@ public class MapToMapConverterTests {
 		map.put("2", Arrays.asList("37", "23"));
 		TypeDescriptor sourceType = new TypeDescriptor(getClass().getField("sourceCollectionMapTarget"));
 		TypeDescriptor targetType = new TypeDescriptor(getClass().getField("collectionMapTarget"));
-
 		assertFalse(conversionService.canConvert(sourceType, targetType));
 		try {
 			conversionService.convert(map, sourceType, targetType);
@@ -154,7 +138,6 @@ public class MapToMapConverterTests {
 		catch (ConverterNotFoundException ex) {
 			// expected
 		}
-
 		conversionService.addConverter(new CollectionToCollectionConverter(conversionService));
 		conversionService.addConverterFactory(new StringToNumberConverterFactory());
 		assertTrue(conversionService.canConvert(sourceType, targetType));
@@ -170,7 +153,6 @@ public class MapToMapConverterTests {
 		Map<String, List<String>> map = new HashMap<String, List<String>>();
 		map.put("1", Arrays.asList("9", "12"));
 		map.put("2", Arrays.asList("37", "23"));
-
 		assertTrue(conversionService.canConvert(Map.class, Map.class));
 		assertSame(map, conversionService.convert(map, Map.class));
 	}
@@ -182,7 +164,6 @@ public class MapToMapConverterTests {
 		map.put("2", Arrays.asList("37", "23"));
 		conversionService.addConverter(new CollectionToCollectionConverter(conversionService));
 		conversionService.addConverter(new CollectionToObjectConverter(conversionService));
-
 		assertTrue(conversionService.canConvert(Map.class, Map.class));
 		assertSame(map, conversionService.convert(map, Map.class));
 	}
@@ -192,7 +173,6 @@ public class MapToMapConverterTests {
 		Map<String, String> map = new HashMap<String, String>();
 		TypeDescriptor sourceType = TypeDescriptor.forObject(map);
 		TypeDescriptor targetType = new TypeDescriptor(getClass().getField("emptyMapTarget"));
-
 		assertTrue(conversionService.canConvert(sourceType, targetType));
 		assertSame(map, conversionService.convert(map, sourceType, targetType));
 	}
@@ -200,7 +180,6 @@ public class MapToMapConverterTests {
 	@Test
 	public void emptyMapNoTargetGenericInfo() throws Exception {
 		Map<String, String> map = new HashMap<String, String>();
-
 		assertTrue(conversionService.canConvert(Map.class, Map.class));
 		assertSame(map, conversionService.convert(map, Map.class));
 	}
@@ -210,7 +189,6 @@ public class MapToMapConverterTests {
 		Map<String, String> map = new HashMap<String, String>();
 		TypeDescriptor sourceType = TypeDescriptor.forObject(map);
 		TypeDescriptor targetType = new TypeDescriptor(getClass().getField("emptyMapDifferentTarget"));
-
 		assertTrue(conversionService.canConvert(sourceType, targetType));
 		@SuppressWarnings("unchecked")
 		LinkedHashMap<String, String> result = (LinkedHashMap<String, String>) conversionService.convert(map, sourceType, targetType);
@@ -227,7 +205,6 @@ public class MapToMapConverterTests {
 				TypeDescriptor.valueOf(String.class), TypeDescriptor.valueOf(Integer.class));
 		TypeDescriptor targetType = TypeDescriptor.map(NoDefaultConstructorMap.class,
 				TypeDescriptor.valueOf(String.class), TypeDescriptor.valueOf(Integer.class));
-
 		assertTrue(conversionService.canConvert(sourceType, targetType));
 		@SuppressWarnings("unchecked")
 		Map<String, Integer> result = (Map<String, Integer>) conversionService.convert(map, sourceType, targetType);
@@ -243,7 +220,6 @@ public class MapToMapConverterTests {
 		source.put("a", Arrays.asList(1, 2, 3));
 		source.put("b", Arrays.asList(4, 5, 6));
 		TypeDescriptor targetType = new TypeDescriptor(getClass().getField("multiValueMapTarget"));
-
 		MultiValueMap<String, String> converted = (MultiValueMap<String, String>) conversionService.convert(source, targetType);
 		assertThat(converted.size(), equalTo(2));
 		assertThat(converted.get("a"), equalTo(Arrays.asList("1", "2", "3")));
@@ -258,7 +234,6 @@ public class MapToMapConverterTests {
 		source.put("a", 1);
 		source.put("b", 2);
 		TypeDescriptor targetType = new TypeDescriptor(getClass().getField("multiValueMapTarget"));
-
 		MultiValueMap<String, String> converted = (MultiValueMap<String, String>) conversionService.convert(source, targetType);
 		assertThat(converted.size(), equalTo(2));
 		assertThat(converted.get("a"), equalTo(Arrays.asList("1")));
@@ -274,10 +249,21 @@ public class MapToMapConverterTests {
 		EnumMap<MyEnum, Integer> result = new EnumMap<MyEnum, Integer>(MyEnum.class);
 		result.put(MyEnum.A, 1);
 		result.put(MyEnum.C, 2);
-
-		assertEquals(result, conversionService.convert(source,
-				TypeDescriptor.forObject(source), new TypeDescriptor(getClass().getField("enumMap"))));
+		assertEquals(result,
+				conversionService.convert(source, TypeDescriptor.forObject(source), new TypeDescriptor(getClass().getField("enumMap"))));
 	}
+
+
+	@SuppressWarnings("serial")
+	public static class NoDefaultConstructorMap<K, V> extends HashMap<K, V> {
+
+		public NoDefaultConstructorMap(Map<? extends K, ? extends V> map) {
+			super(map);
+		}
+	}
+
+
+	public static enum MyEnum {A, B, C}
 
 
 	public Map<Integer, Integer> scalarMapTarget;
@@ -296,17 +282,5 @@ public class MapToMapConverterTests {
 	public Map notGenericMapSource;
 
 	public EnumMap<MyEnum, Integer> enumMap;
-
-
-	@SuppressWarnings("serial")
-	public static class NoDefaultConstructorMap<K, V> extends HashMap<K, V> {
-
-		public NoDefaultConstructorMap(Map<? extends K, ? extends V> map) {
-			super(map);
-		}
-	}
-
-
-	public enum MyEnum {A, B, C}
 
 }

@@ -35,7 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -155,6 +155,7 @@ import org.springframework.web.util.WebUtils;
  */
 @SuppressWarnings("serial")
 public class DispatcherServlet extends FrameworkServlet {
+	private static Logger mylog = Logger.getLogger(DispatcherServlet.class);
 
 	/** Well-known name for the MultipartResolver object in the bean factory for this namespace. */
 	public static final String MULTIPART_RESOLVER_BEAN_NAME = "multipartResolver";
@@ -261,6 +262,8 @@ public class DispatcherServlet extends FrameworkServlet {
 	/**
 	 * Name of the class path resource (relative to the DispatcherServlet class)
 	 * that defines DispatcherServlet's default strategy names.
+	 * 
+	 * DispatcherServlet默认加载类，TODO
 	 */
 	private static final String DEFAULT_STRATEGIES_PATH = "DispatcherServlet.properties";
 
@@ -476,9 +479,11 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * <p>May be overridden in subclasses in order to initialize further strategy objects.
 	 */
 	protected void initStrategies(ApplicationContext context) {
+		mylog.debug("init:完成各种初始化策略");
 		initMultipartResolver(context);
 		initLocaleResolver(context);
 		initThemeResolver(context);
+		mylog.debug("init：初始化各种HandlerMappings");
 		initHandlerMappings(context);
 		initHandlerAdapters(context);
 		initHandlerExceptionResolvers(context);
@@ -890,6 +895,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		request.setAttribute(FLASH_MAP_MANAGER_ATTRIBUTE, this.flashMapManager);
 
 		try {
+			mylog.debug("service：分发请求");
 			doDispatch(request, response);
 		}
 		finally {
@@ -929,6 +935,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				multipartRequestParsed = (processedRequest != request);
 
 				// Determine handler for the current request.
+				mylog.debug("service：获取执行链HandlerExecutionChain");
 				mappedHandler = getHandler(processedRequest);
 				if (mappedHandler == null || mappedHandler.getHandler() == null) {
 					noHandlerFound(processedRequest, response);
@@ -936,6 +943,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				}
 
 				// Determine handler adapter for the current request.
+				mylog.debug("service：根据handler找到适配器");
 				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
 
 				// Process last-modified header, if supported by the handler.
@@ -950,12 +958,15 @@ public class DispatcherServlet extends FrameworkServlet {
 						return;
 					}
 				}
-
+				
+				//执行链执行拦截器HandlerInterceptor.preHandle
+				mylog.debug("执行拦截器的preHandle方法");
 				if (!mappedHandler.applyPreHandle(processedRequest, response)) {
 					return;
 				}
 
 				// Actually invoke the handler.
+				mylog.debug("service：HandlerAdapter处理请求");
 				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
 
 				if (asyncManager.isConcurrentHandlingStarted()) {
@@ -963,11 +974,13 @@ public class DispatcherServlet extends FrameworkServlet {
 				}
 
 				applyDefaultViewName(processedRequest, mv);
+				//请求执行完后拦截器再处理
 				mappedHandler.applyPostHandle(processedRequest, response, mv);
 			}
 			catch (Exception ex) {
 				dispatchException = ex;
 			}
+			mylog.debug("service：渲染请求结果ModelAndView，包括对异常的处理HandlerExceptionResolver");
 			processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);
 		}
 		catch (Exception ex) {
@@ -1017,6 +1030,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 			else {
 				Object handler = (mappedHandler != null ? mappedHandler.getHandler() : null);
+				mylog.debug("处理有异常的请求");
 				mv = processHandlerException(request, response, handler, exception);
 				errorView = (mv != null);
 			}
@@ -1112,6 +1126,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	 * @return the HandlerExecutionChain, or {@code null} if no handler could be found
 	 */
 	protected HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
+		mylog.debug("handler找到url对应的controller");
 		for (HandlerMapping hm : this.handlerMappings) {
 			if (logger.isTraceEnabled()) {
 				logger.trace(
@@ -1137,8 +1152,9 @@ public class DispatcherServlet extends FrameworkServlet {
 					"] in DispatcherServlet with name '" + getServletName() + "'");
 		}
 		if (this.throwExceptionIfNoHandlerFound) {
-			throw new NoHandlerFoundException(request.getMethod(), getRequestUri(request),
-					new ServletServerHttpRequest(request).getHeaders());
+			ServletServerHttpRequest sshr = new ServletServerHttpRequest(request);
+			throw new NoHandlerFoundException(
+					sshr.getMethod().name(), sshr.getServletRequest().getRequestURI(), sshr.getHeaders());
 		}
 		else {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);

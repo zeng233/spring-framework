@@ -53,14 +53,13 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.socket.WebSocketExtension;
 import org.springframework.web.socket.server.HandshakeFailureException;
 
-import static org.glassfish.tyrus.spi.WebSocketEngine.UpgradeStatus.*;
+import static org.glassfish.tyrus.spi.WebSocketEngine.UpgradeStatus.SUCCESS;
 
 /**
  * A base class for {@code RequestUpgradeStrategy} implementations on top of
  * JSR-356 based servers which include Tyrus as their WebSocket engine.
  *
- * <p>Works with Tyrus 1.3.5 (WebLogic 12.1.3), Tyrus 1.7 (GlassFish 4.1.0),
- * Tyrus 1.11 (WebLogic 12.2.1), and Tyrus 1.12 (GlassFish 4.1.1).
+ * <p>Works with Tyrus 1.3.5 (WebLogic 12.1.3) and Tyrus 1.7+ (GlassFish 4.1.x).
  *
  * @author Rossen Stoyanchev
  * @author Brian Clozel
@@ -114,7 +113,7 @@ public abstract class AbstractTyrusRequestUpgradeStrategy extends AbstractStanda
 			success = SUCCESS.equals(upgradeInfo.getStatus());
 			if (success) {
 				if (logger.isTraceEnabled()) {
-					logger.trace("Successful request upgrade: " + upgradeResponse.getHeaders());
+					logger.trace("Successful upgrade: " + upgradeResponse.getHeaders());
 				}
 				handleSuccess(servletRequest, servletResponse, upgradeInfo, upgradeResponse);
 			}
@@ -232,7 +231,6 @@ public abstract class AbstractTyrusRequestUpgradeStrategy extends AbstractStanda
 			Object clusterContext = accessor.getPropertyValue("clusterContext");
 			try {
 				if (constructorWithBooleanArgument) {
-					// Tyrus 1.11+
 					return constructor.newInstance(registration.getEndpoint(), registration, provider, container,
 							"/", registration.getConfigurator(), sessionListener, clusterContext, null, Boolean.TRUE);
 				}

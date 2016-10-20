@@ -48,9 +48,7 @@ import org.springframework.beans.factory.InitializingBean;
  * @author Juergen Hoeller
  * @since 1.2
  * @see LocalSessionFactoryBean#setTypeDefinitions(TypeDefinitionBean[])
- * @deprecated as of Spring 4.3, in favor of Hibernate 4.x/5.x
  */
-@Deprecated
 public class TypeDefinitionBean implements BeanNameAware, InitializingBean {
 
 	private String typeName;

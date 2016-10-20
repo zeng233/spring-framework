@@ -19,7 +19,7 @@ package org.springframework.web.servlet.mvc.method.annotation;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.util.Collections;
+import java.util.Arrays;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -34,20 +34,16 @@ import org.springframework.mock.web.test.MockHttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ClassUtils;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.method.annotation.ModelMethodProcessor;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.servlet.ModelAndView;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Test fixture with {@link ExceptionHandlerExceptionResolver}.
@@ -57,7 +53,6 @@ import static org.junit.Assert.assertTrue;
  * @author Kazuki Shimizu
  * @since 3.1
  */
-@SuppressWarnings("unused")
 public class ExceptionHandlerExceptionResolverTests {
 
 	private static int RESOLVER_COUNT;
@@ -87,7 +82,6 @@ public class ExceptionHandlerExceptionResolverTests {
 	}
 
 
-	@SuppressWarnings("ConstantConditions")
 	@Test
 	public void nullHandler() {
 		Object handler = null;
@@ -99,7 +93,7 @@ public class ExceptionHandlerExceptionResolverTests {
 	@Test
 	public void setCustomArgumentResolvers() throws Exception {
 		HandlerMethodArgumentResolver resolver = new ServletRequestMethodArgumentResolver();
-		this.resolver.setCustomArgumentResolvers(Collections.singletonList(resolver));
+		this.resolver.setCustomArgumentResolvers(Arrays.asList(resolver));
 		this.resolver.afterPropertiesSet();
 
 		assertTrue(this.resolver.getArgumentResolvers().getResolvers().contains(resolver));
@@ -109,7 +103,7 @@ public class ExceptionHandlerExceptionResolverTests {
 	@Test
 	public void setArgumentResolvers() throws Exception {
 		HandlerMethodArgumentResolver resolver = new ServletRequestMethodArgumentResolver();
-		this.resolver.setArgumentResolvers(Collections.singletonList(resolver));
+		this.resolver.setArgumentResolvers(Arrays.asList(resolver));
 		this.resolver.afterPropertiesSet();
 
 		assertMethodProcessorCount(1, HANDLER_COUNT);
@@ -118,7 +112,7 @@ public class ExceptionHandlerExceptionResolverTests {
 	@Test
 	public void setCustomReturnValueHandlers() {
 		HandlerMethodReturnValueHandler handler = new ViewNameMethodReturnValueHandler();
-		this.resolver.setCustomReturnValueHandlers(Collections.singletonList(handler));
+		this.resolver.setCustomReturnValueHandlers(Arrays.asList(handler));
 		this.resolver.afterPropertiesSet();
 
 		assertTrue(this.resolver.getReturnValueHandlers().getHandlers().contains(handler));
@@ -128,7 +122,7 @@ public class ExceptionHandlerExceptionResolverTests {
 	@Test
 	public void setReturnValueHandlers() {
 		HandlerMethodReturnValueHandler handler = new ModelMethodProcessor();
-		this.resolver.setReturnValueHandlers(Collections.singletonList(handler));
+		this.resolver.setReturnValueHandlers(Arrays.asList(handler));
 		this.resolver.afterPropertiesSet();
 
 		assertMethodProcessorCount(RESOLVER_COUNT, 1);
@@ -336,27 +330,30 @@ public class ExceptionHandlerExceptionResolverTests {
 	}
 
 
-	@RestControllerAdvice
+	@ControllerAdvice
 	@Order(1)
 	static class TestExceptionResolver {
 
 		@ExceptionHandler
+		@ResponseBody
 		public String handleException(IllegalStateException ex) {
 			return "TestExceptionResolver: " + ClassUtils.getShortName(ex.getClass());
 		}
 
 		@ExceptionHandler(ArrayIndexOutOfBoundsException.class)
+		@ResponseBody
 		public String handleWithHandlerMethod(HandlerMethod handlerMethod) {
 			return "HandlerMethod: " + handlerMethod.getMethod().getName();
 		}
 	}
 
 
-	@RestControllerAdvice
+	@ControllerAdvice
 	@Order(2)
 	static class AnotherTestExceptionResolver {
 
 		@ExceptionHandler({IllegalStateException.class, IllegalAccessException.class})
+		@ResponseBody
 		public String handleException(Exception ex) {
 			return "AnotherTestExceptionResolver: " + ClassUtils.getShortName(ex.getClass());
 		}
@@ -376,33 +373,36 @@ public class ExceptionHandlerExceptionResolverTests {
 	}
 
 
-	@RestControllerAdvice("java.lang")
+	@ControllerAdvice("java.lang")
 	@Order(1)
 	static class NotCalledTestExceptionResolver {
 
 		@ExceptionHandler
+		@ResponseBody
 		public String handleException(IllegalStateException ex) {
 			return "NotCalledTestExceptionResolver: " + ClassUtils.getShortName(ex.getClass());
 		}
 	}
 
 
-	@RestControllerAdvice("org.springframework.web.servlet.mvc.method.annotation")
+	@ControllerAdvice("org.springframework.web.servlet.mvc.method.annotation")
 	@Order(2)
 	static class BasePackageTestExceptionResolver {
 
 		@ExceptionHandler
+		@ResponseBody
 		public String handleException(IllegalStateException ex) {
 			return "BasePackageTestExceptionResolver: " + ClassUtils.getShortName(ex.getClass());
 		}
 	}
 
 
-	@RestControllerAdvice
+	@ControllerAdvice
 	@Order(3)
 	static class DefaultTestExceptionResolver {
 
 		@ExceptionHandler
+		@ResponseBody
 		public String handleException(IllegalStateException ex) {
 			return "DefaultTestExceptionResolver: " + ClassUtils.getShortName(ex.getClass());
 		}

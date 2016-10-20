@@ -16,10 +16,6 @@
 
 package org.springframework.aop.aspectj.annotation;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.Serializable;
-
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.AjType;
 import org.aspectj.lang.reflect.AjTypeSystem;
@@ -44,27 +40,12 @@ import org.springframework.aop.support.ComposablePointcut;
  * @since 2.0
  * @see org.springframework.aop.aspectj.AspectJExpressionPointcut
  */
-@SuppressWarnings("serial")
-public class AspectMetadata implements Serializable {
-
-	/**
-	 * The name of this aspect as defined to Spring (the bean name) -
-	 * allows us to determine if two pieces of advice come from the
-	 * same aspect and hence their relative precedence.
-	 */
-	private final String aspectName;
-
-	/**
-	 * The aspect class, stored separately for re-resolution of the
-	 * corresponding AjType on deserialization.
-	 */
-	private final Class<?> aspectClass;
+public class AspectMetadata {
 
 	/**
 	 * AspectJ reflection information (AspectJ 5 / Java 5 specific).
-	 * Re-resolved on deserialization since it isn't serializable itself.
 	 */
-	private transient AjType<?> ajType;
+	private final AjType<?> ajType;
 
 	/**
 	 * Spring AOP pointcut corresponding to the per clause of the
@@ -72,6 +53,13 @@ public class AspectMetadata implements Serializable {
 	 * case of a singleton, otherwise an AspectJExpressionPointcut.
 	 */
 	private final Pointcut perClausePointcut;
+
+	/**
+	 * The name of this aspect as defined to Spring (the bean name) -
+	 * allows us to determine if two pieces of advice come from the
+	 * same aspect and hence their relative precedence.
+	 */
+	private String aspectName;
 
 
 	/**
@@ -95,11 +83,10 @@ public class AspectMetadata implements Serializable {
 		if (ajType == null) {
 			throw new IllegalArgumentException("Class '" + aspectClass.getName() + "' is not an @AspectJ aspect");
 		}
-		if (ajType.getDeclarePrecedence().length > 0) {
+		this.ajType = ajType;
+		if (this.ajType.getDeclarePrecedence().length > 0) {
 			throw new IllegalArgumentException("DeclarePrecendence not presently supported in Spring AOP");
 		}
-		this.aspectClass = ajType.getJavaClass();
-		this.ajType = ajType;
 
 		switch (this.ajType.getPerClause().getKind()) {
 			case SINGLETON :
@@ -145,7 +132,7 @@ public class AspectMetadata implements Serializable {
 	 * Return the aspect class.
 	 */
 	public Class<?> getAspectClass() {
-		return this.aspectClass;
+		return this.ajType.getJavaClass();
 	}
 
 	/**
@@ -184,12 +171,6 @@ public class AspectMetadata implements Serializable {
 	 */
 	public boolean isLazilyInstantiated() {
 		return (isPerThisOrPerTarget() || isPerTypeWithin());
-	}
-
-
-	private void readObject(ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
-		inputStream.defaultReadObject();
-		this.ajType = AjTypeSystem.getAjType(this.aspectClass);
 	}
 
 }

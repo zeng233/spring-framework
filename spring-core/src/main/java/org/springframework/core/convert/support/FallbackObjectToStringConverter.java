@@ -56,7 +56,8 @@ final class FallbackObjectToStringConverter implements ConditionalGenericConvert
 		}
 		return (CharSequence.class.isAssignableFrom(sourceClass) ||
 				StringWriter.class.isAssignableFrom(sourceClass) ||
-				ObjectToObjectConverter.hasConversionMethodOrConstructor(sourceClass, String.class));
+				ObjectToObjectConverter.hasFactoryMethod(sourceClass, String.class) ||
+				ObjectToObjectConverter.hasFactoryConstructor(sourceClass, String.class));
 	}
 
 	@Override

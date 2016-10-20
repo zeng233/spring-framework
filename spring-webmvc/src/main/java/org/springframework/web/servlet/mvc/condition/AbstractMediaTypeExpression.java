@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2015 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,39 +41,36 @@ abstract class AbstractMediaTypeExpression implements Comparable<AbstractMediaTy
 
 	private final boolean isNegated;
 
-
 	AbstractMediaTypeExpression(String expression) {
 		if (expression.startsWith("!")) {
-			this.isNegated = true;
+			isNegated = true;
 			expression = expression.substring(1);
 		}
 		else {
-			this.isNegated = false;
+			isNegated = false;
 		}
 		this.mediaType = MediaType.parseMediaType(expression);
 	}
 
 	AbstractMediaTypeExpression(MediaType mediaType, boolean negated) {
 		this.mediaType = mediaType;
-		this.isNegated = negated;
+		isNegated = negated;
 	}
-
 
 	@Override
 	public MediaType getMediaType() {
-		return this.mediaType;
+		return mediaType;
 	}
 
 	@Override
 	public boolean isNegated() {
-		return this.isNegated;
+		return isNegated;
 	}
-
 
 	public final boolean match(HttpServletRequest request) {
 		try {
 			boolean match = matchMediaType(request);
-			return (!this.isNegated ? match : !match);
+			return !isNegated ? match : !match;
 		}
 		catch (HttpMediaTypeException ex) {
 			return false;
@@ -81,7 +78,6 @@ abstract class AbstractMediaTypeExpression implements Comparable<AbstractMediaTy
 	}
 
 	protected abstract boolean matchMediaType(HttpServletRequest request) throws HttpMediaTypeException;
-
 
 	@Override
 	public int compareTo(AbstractMediaTypeExpression other) {
@@ -93,25 +89,25 @@ abstract class AbstractMediaTypeExpression implements Comparable<AbstractMediaTy
 		if (this == obj) {
 			return true;
 		}
-		if (obj != null && getClass() == obj.getClass()) {
+		if (obj != null && getClass().equals(obj.getClass())) {
 			AbstractMediaTypeExpression other = (AbstractMediaTypeExpression) obj;
-			return (this.mediaType.equals(other.mediaType) && this.isNegated == other.isNegated);
+			return (this.mediaType.equals(other.mediaType)) && (this.isNegated == other.isNegated);
 		}
 		return false;
 	}
 
 	@Override
 	public int hashCode() {
-		return this.mediaType.hashCode();
+		return mediaType.hashCode();
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		if (this.isNegated) {
+		if (isNegated) {
 			builder.append('!');
 		}
-		builder.append(this.mediaType.toString());
+		builder.append(mediaType.toString());
 		return builder.toString();
 	}
 

@@ -16,7 +16,6 @@
 
 package org.springframework.aop.aspectj;
 
-import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
@@ -33,16 +32,13 @@ import org.springframework.util.TypeUtils;
  * @author Ramnivas Laddad
  * @since 2.0
  */
-@SuppressWarnings("serial")
-public class AspectJAfterReturningAdvice extends AbstractAspectJAdvice
-		implements AfterReturningAdvice, AfterAdvice, Serializable {
+public class AspectJAfterReturningAdvice extends AbstractAspectJAdvice implements AfterReturningAdvice, AfterAdvice {
 
 	public AspectJAfterReturningAdvice(
 			Method aspectJBeforeAdviceMethod, AspectJExpressionPointcut pointcut, AspectInstanceFactory aif) {
 
 		super(aspectJBeforeAdviceMethod, pointcut, aif);
 	}
-
 
 	@Override
 	public boolean isBeforeAdvice() {
@@ -65,7 +61,6 @@ public class AspectJAfterReturningAdvice extends AbstractAspectJAdvice
 			invokeAdviceMethod(getJoinPointMatch(), returnValue, null);
 		}
 	}
-
 
 	/**
 	 * Following AspectJ semantics, if a returning clause was specified, then the

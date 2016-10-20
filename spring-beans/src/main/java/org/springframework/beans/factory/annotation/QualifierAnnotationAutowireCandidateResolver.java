@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2015 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,8 +32,6 @@ import org.springframework.beans.factory.support.AutowireCandidateResolver;
 import org.springframework.beans.factory.support.GenericTypeAwareAutowireCandidateResolver;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.core.MethodParameter;
-import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -317,20 +315,25 @@ public class QualifierAnnotationAutowireCandidateResolver extends GenericTypeAwa
 	 * Determine a suggested value from any of the given candidate annotations.
 	 */
 	protected Object findValue(Annotation[] annotationsToSearch) {
-		AnnotationAttributes attr = AnnotatedElementUtils.getMergedAnnotationAttributes(
-				AnnotatedElementUtils.forAnnotations(annotationsToSearch), this.valueAnnotationType);
-		if (attr != null) {
-			return extractValue(attr);
+		for (Annotation annotation : annotationsToSearch) {
+			if (this.valueAnnotationType.isInstance(annotation)) {
+				return extractValue(annotation);
+			}
+		}
+		for (Annotation annotation : annotationsToSearch) {
+			Annotation metaAnn = annotation.annotationType().getAnnotation(this.valueAnnotationType);
+			if (metaAnn != null) {
+				return extractValue(metaAnn);
+			}
 		}
 		return null;
 	}
 
 	/**
 	 * Extract the value attribute from the given annotation.
-	 * @since 4.3
 	 */
-	protected Object extractValue(AnnotationAttributes attr) {
-		Object value = attr.get(AnnotationUtils.VALUE);
+	protected Object extractValue(Annotation valueAnnotation) {
+		Object value = AnnotationUtils.getValue(valueAnnotation);
 		if (value == null) {
 			throw new IllegalStateException("Value annotation must have a value attribute");
 		}

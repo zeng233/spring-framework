@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
@@ -33,6 +34,7 @@ import org.springframework.core.io.ResourceLoader;
  * @since 2.5
  */
 public class CachingMetadataReaderFactory extends SimpleMetadataReaderFactory {
+	private static final Logger mylog = Logger.getLogger(CachingMetadataReaderFactory.class);
 
 	/** Default maximum number of entries for the MetadataReader cache: 256 */
 	public static final int DEFAULT_CACHE_LIMIT = 256;
@@ -99,6 +101,7 @@ public class CachingMetadataReaderFactory extends SimpleMetadataReaderFactory {
 		synchronized (this.metadataReaderCache) {
 			MetadataReader metadataReader = this.metadataReaderCache.get(resource);
 			if (metadataReader == null) {
+				mylog.debug("根据bean的class路径地址，新建SimpleMetadataReader，并放入LinkedHashMap缓存");
 				metadataReader = super.getMetadataReader(resource);
 				this.metadataReaderCache.put(resource, metadataReader);
 			}

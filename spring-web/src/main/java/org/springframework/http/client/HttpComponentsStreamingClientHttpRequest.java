@@ -65,7 +65,7 @@ final class HttpComponentsStreamingClientHttpRequest extends AbstractClientHttpR
 
 	@Override
 	public HttpMethod getMethod() {
-		return HttpMethod.resolve(this.httpRequest.getMethod());
+		return HttpMethod.valueOf(this.httpRequest.getMethod());
 	}
 
 	@Override

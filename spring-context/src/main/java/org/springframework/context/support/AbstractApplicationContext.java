@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.CachedIntrospectionResults;
 import org.springframework.beans.factory.BeanFactory;
@@ -77,7 +77,6 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.ReflectionUtils;
 
 /**
  * Abstract implementation of the {@link org.springframework.context.ApplicationContext}
@@ -123,6 +122,8 @@ import org.springframework.util.ReflectionUtils;
  */
 public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		implements ConfigurableApplicationContext, DisposableBean {
+	
+	private static Logger mylog = Logger.getLogger(AbstractApplicationContext.class);
 
 	/**
 	 * Name of the MessageSource bean in the factory.
@@ -378,6 +379,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			this.earlyApplicationEvents.add(applicationEvent);
 		}
 		else {
+			mylog.debug("service:处理完请求之后触发事件通知");
 			getApplicationEventMulticaster().multicastEvent(applicationEvent, eventType);
 		}
 
@@ -502,42 +504,58 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 	@Override
 	public void refresh() throws BeansException, IllegalStateException {
+		mylog.debug("==============refresh操作开始=============");
 		synchronized (this.startupShutdownMonitor) {
 			// Prepare this context for refreshing.
+			mylog.debug("1、执行prepareRefresh()");
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
+			mylog.debug("2、解析bean，并注册到DefaultListableBeanFactory，最后返回该对象");
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
-
+			
 			// Prepare the bean factory for use in this context.
+			mylog.debug("3、初始化DefaultListableBeanFactory设置");
 			prepareBeanFactory(beanFactory);
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
+				//初始化就加载bean
+				mylog.debug("4、添加BeanPostProcessor");
 				postProcessBeanFactory(beanFactory);
 
 				// Invoke factory processors registered as beans in the context.
+				mylog.debug("5、执行上下文中的BeanFactoryPostProcessors");
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
+				mylog.debug("6、注册自定义标签对应的BeanPostProcessor");
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
+				//初始化国际化文件、properties资源文件
+				mylog.debug("7、初始化国际化文件、properties资源文件");
 				initMessageSource();
 
 				// Initialize event multicaster for this context.
+				mylog.debug("8、初始化事件多路广播（事件对象）");
 				initApplicationEventMulticaster();
 
 				// Initialize other special beans in specific context subclasses.
+				//默认方法为空
+				mylog.debug("9、onRefresh()");
 				onRefresh();
 
 				// Check for listener beans and register them.
+				mylog.debug("10、注册各种监听器（观察者）");
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.
+				mylog.debug("11、finishBeanFactoryInitialization");
 				finishBeanFactoryInitialization(beanFactory);
 
 				// Last step: publish corresponding event.
+				mylog.debug("12、启动bean的生命周期");
 				finishRefresh();
 			}
 
@@ -563,6 +581,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				resetCommonCaches();
 			}
 		}
+		
+		mylog.debug("===============refresh操作结束====================");
 	}
 
 	/**
@@ -606,6 +626,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * @see #getBeanFactory()
 	 */
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
+		mylog.debug("刷新ListableBeanFactory，关闭以前的BeanFactory，重新创建BeanFactory");
 		refreshBeanFactory();
 		ConfigurableListableBeanFactory beanFactory = getBeanFactory();
 		if (logger.isDebugEnabled()) {
@@ -621,11 +642,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		// Tell the internal bean factory to use the context's class loader etc.
+		mylog.debug("添加bean类加载器");
 		beanFactory.setBeanClassLoader(getClassLoader());
+		mylog.debug("添加Spel表达式解析类StandardBeanExpressionResolver");
 		beanFactory.setBeanExpressionResolver(new StandardBeanExpressionResolver(beanFactory.getBeanClassLoader()));
+		mylog.debug("添加资源编辑登记器ResourceEditorRegistrar");
 		beanFactory.addPropertyEditorRegistrar(new ResourceEditorRegistrar(this, getEnvironment()));
 
 		// Configure the bean factory with context callbacks.
+		mylog.debug("添加ApplicationContextAwareProcessor");
 		beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
 		beanFactory.ignoreDependencyInterface(ResourceLoaderAware.class);
 		beanFactory.ignoreDependencyInterface(ApplicationEventPublisherAware.class);
@@ -736,6 +761,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			}
 		}
 		else {
+			mylog.debug("新建默认的广播器SimpleApplicationEventMulticaster来触发监听器");
 			this.applicationEventMulticaster = new SimpleApplicationEventMulticaster(beanFactory);
 			beanFactory.registerSingleton(APPLICATION_EVENT_MULTICASTER_BEAN_NAME, this.applicationEventMulticaster);
 			if (logger.isDebugEnabled()) {
@@ -762,6 +788,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 		else {
 			DefaultLifecycleProcessor defaultProcessor = new DefaultLifecycleProcessor();
+			mylog.debug("初始化lifecycleProcessor，并设置beanFactory");
 			defaultProcessor.setBeanFactory(beanFactory);
 			this.lifecycleProcessor = defaultProcessor;
 			beanFactory.registerSingleton(LIFECYCLE_PROCESSOR_BEAN_NAME, this.lifecycleProcessor);
@@ -836,6 +863,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.freezeConfiguration();
 
 		// Instantiate all remaining (non-lazy-init) singletons.
+		mylog.debug("开始初始化单例的eagerBean");
 		beanFactory.preInstantiateSingletons();
 	}
 
@@ -846,12 +874,16 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void finishRefresh() {
 		// Initialize lifecycle processor for this context.
+		mylog.debug("初始化LifecycleProcessor，默认为DefaultLifecycleProcessor(BeanFactoryAware的实现)");
 		initLifecycleProcessor();
 
 		// Propagate refresh to lifecycle processor first.
+		//启动bean
+		mylog.debug("启动bean");
 		getLifecycleProcessor().onRefresh();
 
 		// Publish the final event.
+		mylog.debug("触发ContextRefreshedEvent事件，添加SourceFilteringListener监听器已添加监听器" + this);
 		publishEvent(new ContextRefreshedEvent(this));
 
 		// Participate in LiveBeansView MBean, if active.
@@ -868,15 +900,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	}
 
 	/**
-	 * Reset Spring's common core caches, in particular the {@link ReflectionUtils},
-	 * {@link ResolvableType} and {@link CachedIntrospectionResults} caches.
+	 * Reset Spring's common core caches, in particular the {@link ResolvableType}
+	 * and the {@link CachedIntrospectionResults} caches.
 	 * @since 4.2
-	 * @see ReflectionUtils#clearCache()
 	 * @see ResolvableType#clearCache()
 	 * @see CachedIntrospectionResults#clearClassLoader(ClassLoader)
 	 */
 	protected void resetCommonCaches() {
-		ReflectionUtils.clearCache();
 		ResolvableType.clearCache();
 		CachedIntrospectionResults.clearClassLoader(getClassLoader());
 	}

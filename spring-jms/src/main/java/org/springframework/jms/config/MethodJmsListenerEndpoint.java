@@ -56,7 +56,7 @@ public class MethodJmsListenerEndpoint extends AbstractJmsListenerEndpoint {
 
 
 	/**
-	 * Set the actual bean instance to invoke this endpoint method on.
+	 * Set the object instance that should manage this endpoint.
 	 */
 	public void setBean(Object bean) {
 		this.bean = bean;
@@ -67,7 +67,7 @@ public class MethodJmsListenerEndpoint extends AbstractJmsListenerEndpoint {
 	}
 
 	/**
-	 * Set the method to invoke for processing a message managed by this endpoint.
+	 * Set the method to invoke to process a message managed by this endpoint.
 	 */
 	public void setMethod(Method method) {
 		this.method = method;
@@ -146,7 +146,6 @@ public class MethodJmsListenerEndpoint extends AbstractJmsListenerEndpoint {
 
 	/**
 	 * Create an empty {@link MessagingMessageListenerAdapter} instance.
-	 * @return a new {@code MessagingMessageListenerAdapter} or subclass thereof
 	 */
 	protected MessagingMessageListenerAdapter createMessageListenerInstance() {
 		return new MessagingMessageListenerAdapter();

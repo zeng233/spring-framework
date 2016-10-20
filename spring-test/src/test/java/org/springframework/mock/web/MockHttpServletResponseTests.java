@@ -19,6 +19,7 @@ package org.springframework.mock.web;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Test;
@@ -91,7 +92,9 @@ public class MockHttpServletResponseTests {
 		assertEquals("UTF-8", response.getCharacterEncoding());
 	}
 
-	@Test  // SPR-12677
+	// SPR-12677
+
+	@Test
 	public void contentTypeHeaderWithMoreComplexCharsetSyntax() {
 		String contentType = "test/plain;charset=\"utf-8\";foo=\"charset=bar\";foocharset=bar;foo=bar";
 		response.setHeader("Content-Type", contentType);
@@ -134,13 +137,6 @@ public class MockHttpServletResponseTests {
 	@Test
 	public void contentLengthHeader() {
 		response.addHeader("Content-Length", "66");
-		assertEquals(66, response.getContentLength());
-		assertEquals("66", response.getHeader("Content-Length"));
-	}
-
-	@Test
-	public void contentLengthIntHeader() {
-		response.addIntHeader("Content-Length", 66);
 		assertEquals(66, response.getContentLength());
 		assertEquals("66", response.getHeader("Content-Length"));
 	}
@@ -273,14 +269,20 @@ public class MockHttpServletResponseTests {
 		response.getDateHeader("Last-Modified");
 	}
 
-	@Test  // SPR-10414
+	/**
+	 * SPR-10414
+	 */
+	@Test
 	public void modifyStatusAfterSendError() throws IOException {
 		response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		response.setStatus(HttpServletResponse.SC_OK);
 		assertEquals(response.getStatus(),HttpServletResponse.SC_NOT_FOUND);
 	}
 
-	@Test  // SPR-10414
+	/**
+	 * SPR-10414
+	 */
+	@Test
 	@SuppressWarnings("deprecation")
 	public void modifyStatusMessageAfterSendError() throws IOException {
 		response.sendError(HttpServletResponse.SC_NOT_FOUND);

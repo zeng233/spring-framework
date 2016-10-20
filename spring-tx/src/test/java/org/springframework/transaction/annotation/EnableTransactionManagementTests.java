@@ -94,7 +94,6 @@ public class EnableTransactionManagementTests {
 	 * get loaded -- or in this case, attempted to be loaded at which point the test fails.
 	 */
 	@Test
-	@SuppressWarnings("resource")
 	public void proxyTypeAspectJCausesRegistrationOfAnnotationTransactionAspect() {
 		try {
 			new AnnotationConfigApplicationContext(EnableAspectJTxConfig.class, TxManagerConfig.class);

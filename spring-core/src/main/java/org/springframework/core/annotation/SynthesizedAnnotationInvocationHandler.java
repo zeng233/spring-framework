@@ -60,7 +60,6 @@ class SynthesizedAnnotationInvocationHandler implements InvocationHandler {
 		this.attributeExtractor = attributeExtractor;
 	}
 
-
 	@Override
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		if (isEqualsMethod(method)) {
@@ -76,8 +75,8 @@ class SynthesizedAnnotationInvocationHandler implements InvocationHandler {
 			return annotationType();
 		}
 		if (!isAttributeMethod(method)) {
-			String msg = String.format("Method [%s] is unsupported for synthesized annotation type [%s]",
-					method, annotationType());
+			String msg = String.format("Method [%s] is unsupported for synthesized annotation type [%s]", method,
+				annotationType());
 			throw new AnnotationConfigurationException(msg);
 		}
 		return getAttributeValue(method);
@@ -93,9 +92,9 @@ class SynthesizedAnnotationInvocationHandler implements InvocationHandler {
 		if (value == null) {
 			value = this.attributeExtractor.getAttributeValue(attributeMethod);
 			if (value == null) {
-				String msg = String.format("%s returned null for attribute name [%s] from attribute source [%s]",
-						this.attributeExtractor.getClass().getName(), attributeName, this.attributeExtractor.getSource());
-				throw new IllegalStateException(msg);
+				throw new IllegalStateException(String.format(
+					"%s returned null for attribute name [%s] from attribute source [%s]",
+					this.attributeExtractor.getClass().getName(), attributeName, this.attributeExtractor.getSource()));
 			}
 
 			// Synthesize nested annotations before returning them.
@@ -201,6 +200,7 @@ class SynthesizedAnnotationInvocationHandler implements InvocationHandler {
 	 * in Spring's {@link ObjectUtils} because those hash code generation
 	 * algorithms do not comply with the requirements specified in
 	 * {@link Annotation#hashCode()}.
+	 *
 	 * @param array the array to compute the hash code for
 	 */
 	private int hashCodeForArray(Object array) {

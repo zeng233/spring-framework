@@ -31,6 +31,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.MethodIntrospector;
@@ -41,6 +42,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.method.HandlerMethod;
+import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.HandlerMapping;
 
 /**
@@ -58,6 +60,7 @@ import org.springframework.web.servlet.HandlerMapping;
  * needed to match the handler method to incoming request.
  */
 public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMapping implements InitializingBean {
+	private static Logger mylog = Logger.getLogger(AbstractHandlerMethodMapping.class);
 
 	/**
 	 * Bean name prefix for target beans behind scoped proxies. Used to exclude those
@@ -175,6 +178,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 				BeanFactoryUtils.beanNamesForTypeIncludingAncestors(getApplicationContext(), Object.class) :
 				getApplicationContext().getBeanNamesForType(Object.class));
 
+		mylog.debug("遍历bean，开始映射Method");
 		for (String beanName : beanNames) {
 			if (!beanName.startsWith(SCOPED_TARGET_NAME_PREFIX)) {
 				Class<?> beanType = null;
@@ -215,6 +219,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 				new MethodIntrospector.MetadataLookup<T>() {
 					@Override
 					public T inspect(Method method) {
+						//RequestMappingHandlerMapping实现该方法
 						return getMappingForMethod(method, userType);
 					}
 				});
@@ -223,6 +228,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 			logger.debug(methods.size() + " request handler methods found on " + userType + ": " + methods);
 		}
 		for (Map.Entry<Method, T> entry : methods.entrySet()) {
+			//key为method，value为RequestMappingInfo
 			registerHandlerMethod(handler, entry.getKey(), entry.getValue());
 		}
 	}

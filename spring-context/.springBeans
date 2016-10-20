@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beansProjectDescription>
 	<version>1</version>
-	<pluginVersion><![CDATA[2.6.0.201103160035-RELEASE]]></pluginVersion>
+	<pluginVersion><![CDATA[3.7.1.201510041102-RELEASE]]></pluginVersion>
 	<configSuffixes>
 		<configSuffix><![CDATA[xml]]></configSuffix>
 	</configSuffixes>
 	<enableImports><![CDATA[false]]></enableImports>
 	<configs>
-		<config>src/test/java/org/springframework/context/annotation/configuration/ImportXmlConfig-context.xml</config>
-		<config>src/test/java/org/springframework/context/annotation/configuration/SecondLevelSubConfig-context.xml</config>
-		<config>src/test/java/org/springframework/context/annotation/configuration/ImportXmlWithAopNamespace-context.xml</config>
-		<config>src/test/java/org/springframework/context/annotation/Spr6602Tests-context.xml</config>
+		<config>src/test/resources/mytest/AnnotationBeanTest.xml</config>
+		<config>src/test/resources/mytest/CustomerEditorBeanTest.xml</config>
+		<config>src/test/resources/mytest/DateFormatBeanTest.xml</config>
 	</configs>
+	<autoconfigs>
+	</autoconfigs>
 	<configSets>
 	</configSets>
 </beansProjectDescription>

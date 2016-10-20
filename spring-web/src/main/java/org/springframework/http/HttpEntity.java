@@ -131,7 +131,7 @@ public class HttpEntity<T> {
 		if (this == other) {
 			return true;
 		}
-		if (other == null || other.getClass() != getClass()) {
+		if (other == null || !other.getClass().equals(getClass())) {
 			return false;
 		}
 		HttpEntity<?> otherEntity = (HttpEntity<?>) other;

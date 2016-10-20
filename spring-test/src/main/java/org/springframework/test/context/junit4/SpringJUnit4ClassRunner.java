@@ -18,7 +18,6 @@ package org.springframework.test.context.junit4;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -76,7 +75,7 @@ import org.springframework.util.ReflectionUtils;
  * <p>If you would like to use the Spring TestContext Framework with a runner
  * other than this one, use {@link SpringClassRule} and {@link SpringMethodRule}.
  *
- * <p><strong>NOTE:</strong> As of Spring Framework 4.3, this class requires JUnit 4.12 or higher.
+ * <p><strong>NOTE:</strong> As of Spring Framework 4.1, this class requires JUnit 4.9 or higher.
  *
  * @author Sam Brannen
  * @author Juergen Hoeller
@@ -93,19 +92,26 @@ public class SpringJUnit4ClassRunner extends BlockJUnit4ClassRunner {
 
 	private static final Method withRulesMethod;
 
+	// Used by RunAfterTestClassCallbacks and RunAfterTestMethodCallbacks
+	private static final String MULTIPLE_FAILURE_EXCEPTION_CLASS_NAME = "org.junit.runners.model.MultipleFailureException";
+
 	static {
-		if (!ClassUtils.isPresent("org.junit.internal.Throwables", SpringJUnit4ClassRunner.class.getClassLoader())) {
-			throw new IllegalStateException("SpringJUnit4ClassRunner requires JUnit 4.12 or higher.");
+		boolean junit4dot9Present = ClassUtils.isPresent(MULTIPLE_FAILURE_EXCEPTION_CLASS_NAME,
+			SpringJUnit4ClassRunner.class.getClassLoader());
+		if (!junit4dot9Present) {
+			throw new IllegalStateException(String.format(
+				"Failed to find class [%s]: SpringJUnit4ClassRunner requires JUnit 4.9 or higher.",
+				MULTIPLE_FAILURE_EXCEPTION_CLASS_NAME));
 		}
 
 		withRulesMethod = ReflectionUtils.findMethod(SpringJUnit4ClassRunner.class, "withRules",
 				FrameworkMethod.class, Object.class, Statement.class);
 		if (withRulesMethod == null) {
-			throw new IllegalStateException("SpringJUnit4ClassRunner requires JUnit 4.12 or higher.");
+			throw new IllegalStateException(
+				"Failed to find withRules() method: SpringJUnit4ClassRunner requires JUnit 4.9 or higher.");
 		}
 		ReflectionUtils.makeAccessible(withRulesMethod);
 	}
-
 
 	private final TestContextManager testContextManager;
 
@@ -370,7 +376,8 @@ public class SpringJUnit4ClassRunner extends BlockJUnit4ClassRunner {
 			statement = new SpringFailOnTimeout(next, springTimeout);
 		}
 		else if (junitTimeout > 0) {
-			statement = FailOnTimeout.builder().withTimeout(junitTimeout, TimeUnit.MILLISECONDS).build(next);
+			// TODO Use FailOnTimeout.builder() once JUnit 4.12 is the minimum supported version.
+			statement = new FailOnTimeout(next, junitTimeout);
 		}
 		else {
 			statement = next;

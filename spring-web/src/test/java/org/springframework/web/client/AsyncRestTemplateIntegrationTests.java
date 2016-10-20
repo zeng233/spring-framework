@@ -16,11 +16,8 @@
 
 package org.springframework.web.client;
 
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.Charset;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -28,7 +25,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import org.springframework.core.io.ClassPathResource;
@@ -36,28 +32,16 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.AsyncClientHttpRequestExecution;
-import org.springframework.http.client.AsyncClientHttpRequestInterceptor;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsAsyncClientHttpRequestFactory;
-import org.springframework.http.client.support.HttpRequestWrapper;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.concurrent.ListenableFuture;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * @author Arjen Poutsma
@@ -65,14 +49,14 @@ import static org.junit.Assert.fail;
  */
 public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCase {
 
-	private final AsyncRestTemplate template = new AsyncRestTemplate(
-			new HttpComponentsAsyncClientHttpRequestFactory());
+	private final AsyncRestTemplate template = new AsyncRestTemplate(new HttpComponentsAsyncClientHttpRequestFactory());
 
 
 	@Test
 	public void getEntity() throws Exception {
-		Future<ResponseEntity<String>> future = template.getForEntity(baseUrl + "/{method}", String.class, "get");
-		ResponseEntity<String> entity = future.get();
+		Future<ResponseEntity<String>> futureEntity =
+				template.getForEntity(baseUrl + "/{method}", String.class, "get");
+		ResponseEntity<String> entity = futureEntity.get();
 		assertEquals("Invalid content", helloWorld, entity.getBody());
 		assertFalse("No headers", entity.getHeaders().isEmpty());
 		assertEquals("Invalid content-type", textContentType, entity.getHeaders().getContentType());
@@ -81,9 +65,10 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 
 	@Test
 	public void multipleFutureGets() throws Exception {
-		Future<ResponseEntity<String>> future = template.getForEntity(baseUrl + "/{method}", String.class, "get");
-		future.get();
-		future.get();
+		Future<ResponseEntity<String>> futureEntity =
+				template.getForEntity(baseUrl + "/{method}", String.class, "get");
+		futureEntity.get();
+		futureEntity.get();
 	}
 
 	@Test
@@ -103,7 +88,9 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 				fail(ex.getMessage());
 			}
 		});
-		waitTillDone(futureEntity);
+		// wait till done
+		while (!futureEntity.isDone()) {
+		}
 	}
 
 	@Test
@@ -116,7 +103,9 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 			assertEquals("Invalid content-type", textContentType, entity.getHeaders().getContentType());
 			assertEquals("Invalid status code", HttpStatus.OK, entity.getStatusCode());
 		}, ex -> fail(ex.getMessage()));
-		waitTillDone(futureEntity);
+		// wait till done
+		while (!futureEntity.isDone()) {
+		}
 	}
 
 	@Test
@@ -171,7 +160,8 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 				fail(ex.getMessage());
 			}
 		});
-		waitTillDone(headersFuture);
+		while (!headersFuture.isDone()) {
+		}
 	}
 
 	@Test
@@ -179,14 +169,15 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 		ListenableFuture<HttpHeaders> headersFuture = template.headForHeaders(baseUrl + "/get");
 		headersFuture.addCallback(result -> assertTrue("No Content-Type header",
 				result.containsKey("Content-Type")), ex -> fail(ex.getMessage()));
-		waitTillDone(headersFuture);
+		while (!headersFuture.isDone()) {
+		}
 	}
 
 	@Test
 	public void postForLocation() throws Exception  {
 		HttpHeaders entityHeaders = new HttpHeaders();
 		entityHeaders.setContentType(new MediaType("text", "plain", Charset.forName("ISO-8859-15")));
-		HttpEntity<String> entity = new HttpEntity<>(helloWorld, entityHeaders);
+		HttpEntity<String> entity = new HttpEntity<String>(helloWorld, entityHeaders);
 		Future<URI> locationFuture = template.postForLocation(baseUrl + "/{method}", entity, "post");
 		URI location = locationFuture.get();
 		assertEquals("Invalid location", new URI(baseUrl + "/post/1"), location);
@@ -196,7 +187,7 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 	public void postForLocationCallback() throws Exception  {
 		HttpHeaders entityHeaders = new HttpHeaders();
 		entityHeaders.setContentType(new MediaType("text", "plain", Charset.forName("ISO-8859-15")));
-		HttpEntity<String> entity = new HttpEntity<>(helloWorld, entityHeaders);
+		HttpEntity<String> entity = new HttpEntity<String>(helloWorld, entityHeaders);
 		final URI expected = new URI(baseUrl + "/post/1");
 		ListenableFuture<URI> locationFuture = template.postForLocation(baseUrl + "/{method}", entity, "post");
 		locationFuture.addCallback(new ListenableFutureCallback<URI>() {
@@ -209,19 +200,21 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 				fail(ex.getMessage());
 			}
 		});
-		waitTillDone(locationFuture);
+		while (!locationFuture.isDone()) {
+		}
 	}
 
 	@Test
 	public void postForLocationCallbackWithLambdas() throws Exception  {
 		HttpHeaders entityHeaders = new HttpHeaders();
 		entityHeaders.setContentType(new MediaType("text", "plain", Charset.forName("ISO-8859-15")));
-		HttpEntity<String> entity = new HttpEntity<>(helloWorld, entityHeaders);
+		HttpEntity<String> entity = new HttpEntity<String>(helloWorld, entityHeaders);
 		final URI expected = new URI(baseUrl + "/post/1");
 		ListenableFuture<URI> locationFuture = template.postForLocation(baseUrl + "/{method}", entity, "post");
 		locationFuture.addCallback(result -> assertEquals("Invalid location", expected, result),
 				ex -> fail(ex.getMessage()));
-		waitTillDone(locationFuture);
+		while (!locationFuture.isDone()) {
+		}
 	}
 
 	@Test
@@ -248,7 +241,8 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 				fail(ex.getMessage());
 			}
 		});
-		waitTillDone(responseEntityFuture);
+		while (!responseEntityFuture.isDone()) {
+		}
 	}
 
 	@Test
@@ -256,10 +250,10 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 		HttpEntity<String> requestEntity = new HttpEntity<>(helloWorld);
 		ListenableFuture<ResponseEntity<String>> responseEntityFuture =
 				template.postForEntity(baseUrl + "/{method}", requestEntity, String.class, "post");
-		responseEntityFuture.addCallback(
-				result -> assertEquals("Invalid content", helloWorld, result.getBody()),
+		responseEntityFuture.addCallback(result -> assertEquals("Invalid content", helloWorld, result.getBody()),
 				ex -> fail(ex.getMessage()));
-		waitTillDone(responseEntityFuture);
+		while (!responseEntityFuture.isDone()) {
+		}
 	}
 
 	@Test
@@ -283,7 +277,8 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 				fail(ex.getMessage());
 			}
 		});
-		waitTillDone(responseEntityFuture);
+		while (!responseEntityFuture.isDone()) {
+		}
 	}
 
 	@Test
@@ -305,14 +300,16 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 				fail(ex.getMessage());
 			}
 		});
-		waitTillDone(deletedFuture);
+		while (!deletedFuture.isDone()) {
+		}
 	}
 
 	@Test
 	public void deleteCallbackWithLambdas() throws Exception  {
 		ListenableFuture<?> deletedFuture = template.delete(new URI(baseUrl + "/delete"));
-		deletedFuture.addCallback(Assert::assertNull, ex -> fail(ex.getMessage()));
-		waitTillDone(deletedFuture);
+		deletedFuture.addCallback(result -> assertNull(result), ex -> fail(ex.getMessage()));
+		while (!deletedFuture.isDone()) {
+		}
 	}
 
 	@Test
@@ -380,7 +377,8 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 				assertNotNull(ex.getResponseBodyAsString());
 			}
 		});
-		waitTillDone(future);
+		while (!future.isDone()) {
+		}
 	}
 
 	@Test
@@ -393,7 +391,8 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 				assertNotNull(hcex.getStatusText());
 				assertNotNull(hcex.getResponseBodyAsString());
 		});
-		waitTillDone(future);
+		while (!future.isDone()) {
+		}
 	}
 
 	@Test
@@ -430,7 +429,8 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 				assertNotNull(hsex.getResponseBodyAsString());
 			}
 		});
-		waitTillDone(future);
+		while (!future.isDone()) {
+		}
 	}
 
 	@Test
@@ -443,7 +443,8 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 				assertNotNull(hsex.getStatusText());
 				assertNotNull(hsex.getResponseBodyAsString());
 		});
-		waitTillDone(future);
+		while (!future.isDone()) {
+		}
 	}
 
 	@Test
@@ -468,7 +469,8 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 				fail(ex.getMessage());
 			}
 		});
-		waitTillDone(allowedFuture);
+		while (!allowedFuture.isDone()) {
+		}
 	}
 
 	@Test
@@ -477,7 +479,8 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 		allowedFuture.addCallback(result -> assertEquals("Invalid response",
 				EnumSet.of(HttpMethod.GET, HttpMethod.OPTIONS, HttpMethod.HEAD,HttpMethod.TRACE), result),
 				ex -> fail(ex.getMessage()));
-		waitTillDone(allowedFuture);
+		while (!allowedFuture.isDone()) {
+		}
 	}
 
 	@Test
@@ -510,7 +513,8 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 				fail(ex.getMessage());
 			}
 		});
-		waitTillDone(responseFuture);
+		while (!responseFuture.isDone()) {
+		}
 	}
 
 	@Test
@@ -523,7 +527,8 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 				template.exchange(baseUrl + "/{method}", HttpMethod.GET, requestEntity, String.class, "get");
 		responseFuture.addCallback(result -> assertEquals("Invalid content", helloWorld,
 				result.getBody()), ex -> fail(ex.getMessage()));
-		waitTillDone(responseFuture);
+		while (!responseFuture.isDone()) {
+		}
 	}
 
 	@Test
@@ -531,7 +536,7 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 		HttpHeaders requestHeaders = new HttpHeaders();
 		requestHeaders.set("MyHeader", "MyValue");
 		requestHeaders.setContentType(MediaType.TEXT_PLAIN);
-		HttpEntity<String> requestEntity = new HttpEntity<>(helloWorld, requestHeaders);
+		HttpEntity<String> requestEntity = new HttpEntity<String>(helloWorld, requestHeaders);
 		Future<ResponseEntity<Void>> resultFuture =
 				template.exchange(baseUrl + "/{method}", HttpMethod.POST, requestEntity, Void.class, "post");
 		ResponseEntity<Void> result = resultFuture.get();
@@ -545,7 +550,7 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 		HttpHeaders requestHeaders = new HttpHeaders();
 		requestHeaders.set("MyHeader", "MyValue");
 		requestHeaders.setContentType(MediaType.TEXT_PLAIN);
-		HttpEntity<String> requestEntity = new HttpEntity<>(helloWorld, requestHeaders);
+		HttpEntity<String> requestEntity = new HttpEntity<String>(helloWorld, requestHeaders);
 		ListenableFuture<ResponseEntity<Void>> resultFuture =
 				template.exchange(baseUrl + "/{method}", HttpMethod.POST, requestEntity, Void.class, "post");
 		final URI expected =new URI(baseUrl + "/post/1");
@@ -560,7 +565,8 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 				fail(ex.getMessage());
 			}
 		});
-		waitTillDone(resultFuture);
+		while (!resultFuture.isDone()) {
+		}
 	}
 
 	@Test
@@ -568,7 +574,7 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 		HttpHeaders requestHeaders = new HttpHeaders();
 		requestHeaders.set("MyHeader", "MyValue");
 		requestHeaders.setContentType(MediaType.TEXT_PLAIN);
-		HttpEntity<String> requestEntity = new HttpEntity<>(helloWorld, requestHeaders);
+		HttpEntity<String> requestEntity = new HttpEntity<String>(helloWorld, requestHeaders);
 		ListenableFuture<ResponseEntity<Void>> resultFuture =
 				template.exchange(baseUrl + "/{method}", HttpMethod.POST, requestEntity, Void.class, "post");
 		final URI expected =new URI(baseUrl + "/post/1");
@@ -576,12 +582,13 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 			assertEquals("Invalid location", expected, result.getHeaders().getLocation());
 			assertFalse(result.hasBody());
 			}, ex -> fail(ex.getMessage()));
-		waitTillDone(resultFuture);
+		while (!resultFuture.isDone()) {
+		}
 	}
 
 	@Test
 	public void multipart() throws Exception {
-		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
+		MultiValueMap<String, Object> parts = new LinkedMultiValueMap<String, Object>();
 		parts.add("name 1", "value 1");
 		parts.add("name 2", "value 2+1");
 		parts.add("name 2", "value 2+2");
@@ -593,74 +600,4 @@ public class AsyncRestTemplateIntegrationTests extends AbstractJettyServerTestCa
 		future.get();
 	}
 
-	@Test
-	public void getAndInterceptResponse() throws Exception {
-		RequestInterceptor interceptor = new RequestInterceptor();
-		template.setInterceptors(Collections.singletonList(interceptor));
-		ListenableFuture<ResponseEntity<String>> future = template.getForEntity("/get", String.class);
-
-		interceptor.latch.await(5, TimeUnit.SECONDS);
-		assertNotNull(interceptor.response);
-		assertEquals(HttpStatus.OK, interceptor.response.getStatusCode());
-		assertNull(interceptor.exception);
-		assertEquals(helloWorld, future.get().getBody());
-	}
-
-	@Test
-	public void getAndInterceptError() throws Exception {
-		RequestInterceptor interceptor = new RequestInterceptor();
-		template.setInterceptors(Collections.singletonList(interceptor));
-		template.getForEntity("/status/notfound", String.class);
-
-		interceptor.latch.await(5, TimeUnit.SECONDS);
-		assertNotNull(interceptor.response);
-		assertEquals(HttpStatus.NOT_FOUND, interceptor.response.getStatusCode());
-		assertNull(interceptor.exception);
-	}
-
-	@SuppressWarnings("StatementWithEmptyBody")
-	private void waitTillDone(ListenableFuture<?> future) {
-		while (!future.isDone()) {
-		}
-	}
-
-
-	private static class RequestInterceptor implements AsyncClientHttpRequestInterceptor {
-
-		private final CountDownLatch latch = new CountDownLatch(1);
-
-		private volatile ClientHttpResponse response;
-
-		private volatile Throwable exception;
-
-		@Override
-		public ListenableFuture<ClientHttpResponse> intercept(HttpRequest request, byte[] body,
-				AsyncClientHttpRequestExecution execution) throws IOException {
-
-			request = new HttpRequestWrapper(request) {
-
-				@Override
-				public URI getURI() {
-					try {
-						return new URI(baseUrl + super.getURI().toString());
-					}
-					catch (URISyntaxException ex) {
-						throw new IllegalStateException(ex);
-					}
-				}
-			};
-
-			ListenableFuture<ClientHttpResponse> future = execution.executeAsync(request, body);
-			future.addCallback(
-					resp -> {
-						response = resp;
-						this.latch.countDown();
-					},
-					ex -> {
-						exception = ex;
-						this.latch.countDown();
-					});
-			return future;
-		}
-	}
 }

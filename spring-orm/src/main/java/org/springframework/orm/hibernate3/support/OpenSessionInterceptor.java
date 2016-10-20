@@ -25,6 +25,8 @@ import org.hibernate.SessionFactory;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.orm.hibernate3.SessionFactoryUtils;
+import org.springframework.orm.hibernate3.SessionHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
@@ -47,9 +49,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * @see org.springframework.orm.hibernate3.HibernateTransactionManager
  * @see org.springframework.transaction.support.TransactionSynchronizationManager
  * @see org.hibernate.SessionFactory#getCurrentSession()
- * @deprecated as of Spring 4.3, in favor of Hibernate 4.x/5.x
  */
-@Deprecated
 public class OpenSessionInterceptor implements MethodInterceptor, InitializingBean {
 
 	private SessionFactory sessionFactory;
@@ -84,11 +84,11 @@ public class OpenSessionInterceptor implements MethodInterceptor, InitializingBe
 			// New Session to be bound for the current method's scope...
 			Session session = openSession();
 			try {
-				TransactionSynchronizationManager.bindResource(sf, new org.springframework.orm.hibernate3.SessionHolder(session));
+				TransactionSynchronizationManager.bindResource(sf, new SessionHolder(session));
 				return invocation.proceed();
 			}
 			finally {
-				org.springframework.orm.hibernate3.SessionFactoryUtils.closeSession(session);
+				SessionFactoryUtils.closeSession(session);
 				TransactionSynchronizationManager.unbindResource(sf);
 			}
 		}

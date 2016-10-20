@@ -23,10 +23,8 @@ import javax.sql.DataSource;
 
 import org.hibernate.Interceptor;
 import org.hibernate.SessionFactory;
-import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.model.naming.ImplicitNamingStrategy;
 import org.hibernate.boot.model.naming.PhysicalNamingStrategy;
-import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
 
@@ -40,9 +38,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternUtils;
-import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.type.filter.TypeFilter;
-import org.springframework.util.Assert;
 
 /**
  * {@link FactoryBean} that creates a Hibernate
@@ -97,11 +93,7 @@ public class LocalSessionFactoryBean extends HibernateExceptionTranslator
 
 	private String[] packagesToScan;
 
-	private AsyncTaskExecutor bootstrapExecutor;
-
-	private MetadataSources metadataSources;
-
-	private ResourcePatternResolver resourcePatternResolver;
+	private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
 	private Configuration configuration;
 
@@ -306,75 +298,15 @@ public class LocalSessionFactoryBean extends HibernateExceptionTranslator
 		this.packagesToScan = packagesToScan;
 	}
 
-	/**
-	 * Specify an asynchronous executor for background bootstrapping,
-	 * e.g. a {@link org.springframework.core.task.SimpleAsyncTaskExecutor}.
-	 * <p>{@code SessionFactory} initialization will then switch into background
-	 * bootstrap mode, with a {@code SessionFactory} proxy immediately returned for
-	 * injection purposes instead of waiting for Hibernate's bootstrapping to complete.
-	 * However, note that the first actual call to a {@code SessionFactory} method will
-	 * then block until Hibernate's bootstrapping completed, if not ready by then.
-	 * For maximum benefit, make sure to avoid early {@code SessionFactory} calls
-	 * in init methods of related beans, even for metadata introspection purposes.
-	 * @see LocalSessionFactoryBuilder#buildSessionFactory(AsyncTaskExecutor)
-	 * @since 4.3
-	 */
-	public void setBootstrapExecutor(AsyncTaskExecutor bootstrapExecutor) {
-		this.bootstrapExecutor = bootstrapExecutor;
-	}
-
-	/**
-	 * Specify a Hibernate {@link MetadataSources} service to use (e.g. reusing an
-	 * existing one), potentially populated with a custom Hibernate bootstrap
-	 * {@link org.hibernate.service.ServiceRegistry} as well.
-	 * @since 4.3
-	 */
-	public void setMetadataSources(MetadataSources metadataSources) {
-		Assert.notNull(metadataSources, "MetadataSources must not be null");
-		this.metadataSources = metadataSources;
-	}
-
-	/**
-	 * Determine the Hibernate {@link MetadataSources} to use.
-	 * <p>Can also be externally called to initialize and pre-populate a {@link MetadataSources}
-	 * instance which is then going to be used for {@link SessionFactory} building.
-	 * @return the MetadataSources to use (never {@code null})
-	 * @since 4.3
-	 * @see LocalSessionFactoryBuilder#LocalSessionFactoryBuilder(DataSource, ResourceLoader, MetadataSources)
-	 */
-	public MetadataSources getMetadataSources() {
-		if (this.metadataSources == null) {
-			this.metadataSources = new MetadataSources(new BootstrapServiceRegistryBuilder().build());
-		}
-		return this.metadataSources;
-	}
-
-	/**
-	 * Specify a Spring {@link ResourceLoader} to use for Hibernate metadata.
-	 * @param resourceLoader the ResourceLoader to use (never {@code null})
-	 */
 	@Override
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		this.resourcePatternResolver = ResourcePatternUtils.getResourcePatternResolver(resourceLoader);
 	}
 
-	/**
-	 * Determine the Spring {@link ResourceLoader} to use for Hibernate metadata.
-	 * @return the ResourceLoader to use (never {@code null})
-	 * @since 4.3
-	 */
-	public ResourceLoader getResourceLoader() {
-		if (this.resourcePatternResolver == null) {
-			this.resourcePatternResolver = new PathMatchingResourcePatternResolver();
-		}
-		return this.resourcePatternResolver;
-	}
-
 
 	@Override
 	public void afterPropertiesSet() throws IOException {
-		LocalSessionFactoryBuilder sfb = new LocalSessionFactoryBuilder(
-				this.dataSource, getResourceLoader(), getMetadataSources());
+		LocalSessionFactoryBuilder sfb = new LocalSessionFactoryBuilder(this.dataSource, this.resourcePatternResolver);
 
 		if (this.configLocations != null) {
 			for (Resource resource : this.configLocations) {
@@ -481,8 +413,7 @@ public class LocalSessionFactoryBean extends HibernateExceptionTranslator
 	 * @see LocalSessionFactoryBuilder#buildSessionFactory
 	 */
 	protected SessionFactory buildSessionFactory(LocalSessionFactoryBuilder sfb) {
-		return (this.bootstrapExecutor != null ? sfb.buildSessionFactory(this.bootstrapExecutor) :
-				sfb.buildSessionFactory());
+		return sfb.buildSessionFactory();
 	}
 
 	/**

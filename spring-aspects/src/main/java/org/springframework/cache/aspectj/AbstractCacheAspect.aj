@@ -67,22 +67,11 @@ public abstract aspect AbstractCacheAspect extends CacheAspectSupport implements
 
 		CacheOperationInvoker aspectJInvoker = new CacheOperationInvoker() {
 			public Object invoke() {
-				try {
-					return proceed(cachedObject);
-				}
-				catch (Throwable ex) {
-					throw new ThrowableWrapper(ex);
-				}
+				return proceed(cachedObject);
 			}
 		};
 
-		try {
-			return execute(aspectJInvoker, thisJoinPoint.getTarget(), method, thisJoinPoint.getArgs());
-		}
-		catch (CacheOperationInvoker.ThrowableWrapper th) {
-			AnyThrow.throwUnchecked(th.getOriginal());
-			return null; // never reached
-		}
+		return execute(aspectJInvoker, thisJoinPoint.getTarget(), method, thisJoinPoint.getArgs());
 	}
 
 	/**

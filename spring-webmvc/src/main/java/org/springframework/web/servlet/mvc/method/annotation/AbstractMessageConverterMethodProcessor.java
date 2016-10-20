@@ -211,6 +211,7 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
 		if (selectedMediaType != null) {
 			selectedMediaType = selectedMediaType.removeQualityValue();
 			for (HttpMessageConverter<?> messageConverter : this.messageConverters) {
+				//处理json或者xml类型
 				if (messageConverter instanceof GenericHttpMessageConverter) {
 					if (((GenericHttpMessageConverter<T>) messageConverter).canWrite(returnValueType,
 							returnValueClass, selectedMediaType)) {

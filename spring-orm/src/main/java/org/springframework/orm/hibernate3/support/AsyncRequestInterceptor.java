@@ -22,6 +22,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hibernate.SessionFactory;
 
+import org.springframework.orm.hibernate3.SessionFactoryUtils;
+import org.springframework.orm.hibernate3.SessionHolder;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.async.CallableProcessingInterceptorAdapter;
@@ -38,21 +40,19 @@ import org.springframework.web.context.request.async.DeferredResultProcessingInt
  *
  * @author Rossen Stoyanchev
  * @since 3.2.5
- * @deprecated as of Spring 4.3, in favor of Hibernate 4.x/5.x
  */
-@Deprecated
 class AsyncRequestInterceptor extends CallableProcessingInterceptorAdapter implements DeferredResultProcessingInterceptor {
 
 	private static final Log logger = LogFactory.getLog(AsyncRequestInterceptor.class);
 
 	private final SessionFactory sessionFactory;
 
-	private final org.springframework.orm.hibernate3.SessionHolder sessionHolder;
+	private final SessionHolder sessionHolder;
 
 	private volatile boolean timeoutInProgress;
 
 
-	public AsyncRequestInterceptor(SessionFactory sessionFactory, org.springframework.orm.hibernate3.SessionHolder sessionHolder) {
+	public AsyncRequestInterceptor(SessionFactory sessionFactory, SessionHolder sessionHolder) {
 		this.sessionFactory = sessionFactory;
 		this.sessionHolder = sessionHolder;
 	}
@@ -87,7 +87,7 @@ class AsyncRequestInterceptor extends CallableProcessingInterceptorAdapter imple
 	private void closeAfterTimeout() {
 		if (this.timeoutInProgress) {
 			logger.debug("Closing Hibernate Session after async request timeout");
-			org.springframework.orm.hibernate3.SessionFactoryUtils.closeSession(this.sessionHolder.getSession());
+			SessionFactoryUtils.closeSession(this.sessionHolder.getSession());
 		}
 	}
 

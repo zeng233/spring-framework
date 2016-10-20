@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2015 the original author or authors.
+ * Copyright 2002-2012 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,13 +29,11 @@ class TrueMethodMatcher implements MethodMatcher, Serializable {
 
 	public static final TrueMethodMatcher INSTANCE = new TrueMethodMatcher();
 
-
 	/**
 	 * Enforce Singleton pattern.
 	 */
 	private TrueMethodMatcher() {
 	}
-
 
 	@Override
 	public boolean isRuntime() {
@@ -48,15 +46,9 @@ class TrueMethodMatcher implements MethodMatcher, Serializable {
 	}
 
 	@Override
-	public boolean matches(Method method, Class<?> targetClass, Object... args) {
+	public boolean matches(Method method, Class<?> targetClass, Object[] args) {
 		// Should never be invoked as isRuntime returns false.
 		throw new UnsupportedOperationException();
-	}
-
-
-	@Override
-	public String toString() {
-		return "MethodMatcher.TRUE";
 	}
 
 	/**
@@ -66,6 +58,11 @@ class TrueMethodMatcher implements MethodMatcher, Serializable {
 	 */
 	private Object readResolve() {
 		return INSTANCE;
+	}
+
+	@Override
+	public String toString() {
+		return "MethodMatcher.TRUE";
 	}
 
 }

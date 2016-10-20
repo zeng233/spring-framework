@@ -257,7 +257,9 @@ public class ViewResolutionIntegrationTests {
 
 		@Bean
 		public FreeMarkerViewResolver freeMarkerViewResolver() {
-			return new FreeMarkerViewResolver("", ".ftl");
+			FreeMarkerViewResolver viewResolver = new FreeMarkerViewResolver();
+			viewResolver.setSuffix(".ftl");
+			return viewResolver;
 		}
 
 		@Bean

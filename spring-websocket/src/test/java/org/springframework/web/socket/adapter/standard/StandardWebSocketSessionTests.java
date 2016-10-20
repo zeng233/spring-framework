@@ -1,4 +1,4 @@
-/* Copyright 2002-2015 the original author or authors.
+/* Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.websocket.Session;
 
+import org.junit.Before;
 import org.junit.Test;
-
 import org.mockito.Mockito;
 
 import org.springframework.http.HttpHeaders;
@@ -36,13 +36,19 @@ import static org.mockito.BDDMockito.*;
  */
 public class StandardWebSocketSessionTests {
 
-	private final HttpHeaders headers = new HttpHeaders();
+	private HttpHeaders headers;
 
-	private final Map<String, Object> attributes = new HashMap<>();
+	private Map<String,Object> attributes;
+
+
+	@Before
+	public void setup() {
+		this.headers = new HttpHeaders();
+		this.attributes = new HashMap<>();
+	}
 
 
 	@Test
-	@SuppressWarnings("resource")
 	public void getPrincipalWithConstructorArg() {
 		TestPrincipal user = new TestPrincipal("joe");
 		StandardWebSocketSession session = new StandardWebSocketSession(this.headers, this.attributes, null, null, user);
@@ -51,8 +57,8 @@ public class StandardWebSocketSessionTests {
 	}
 
 	@Test
-	@SuppressWarnings("resource")
 	public void getPrincipalWithNativeSession() {
+
 		TestPrincipal user = new TestPrincipal("joe");
 
 		Session nativeSession = Mockito.mock(Session.class);
@@ -65,8 +71,8 @@ public class StandardWebSocketSessionTests {
 	}
 
 	@Test
-	@SuppressWarnings("resource")
 	public void getPrincipalNone() {
+
 		Session nativeSession = Mockito.mock(Session.class);
 		given(nativeSession.getUserPrincipal()).willReturn(null);
 
@@ -80,8 +86,8 @@ public class StandardWebSocketSessionTests {
 	}
 
 	@Test
-	@SuppressWarnings("resource")
 	public void getAcceptedProtocol() {
+
 		String protocol = "foo";
 
 		Session nativeSession = Mockito.mock(Session.class);

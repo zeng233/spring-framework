@@ -19,6 +19,7 @@ package org.springframework.web.servlet;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -26,7 +27,7 @@ import javax.servlet.http.HttpServlet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.log4j.Logger;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.MutablePropertyValues;
@@ -80,6 +81,7 @@ import org.springframework.web.context.support.StandardServletEnvironment;
 @SuppressWarnings("serial")
 public abstract class HttpServletBean extends HttpServlet
 		implements EnvironmentCapable, EnvironmentAware {
+	private static Logger mylog = Logger.getLogger(HttpServletBean.class);
 
 	/** Logger available to subclasses */
 	protected final Log logger = LogFactory.getLog(getClass());
@@ -120,11 +122,15 @@ public abstract class HttpServletBean extends HttpServlet
 
 		// Set bean properties from init parameters.
 		try {
+			mylog.debug("init：初始化ServletContextResourceLoader");
 			PropertyValues pvs = new ServletConfigPropertyValues(getServletConfig(), this.requiredProperties);
+			mylog.debug("init：实例化BeanWrapperImpl");
 			BeanWrapper bw = PropertyAccessorFactory.forBeanPropertyAccess(this);
 			ResourceLoader resourceLoader = new ServletContextResourceLoader(getServletContext());
+			mylog.debug("init：注册Editor转换器");
 			bw.registerCustomEditor(Resource.class, new ResourceEditor(resourceLoader, getEnvironment()));
 			initBeanWrapper(bw);
+			mylog.debug("设置ServletConfigPropertyValues的属性");
 			bw.setPropertyValues(pvs, true);
 		}
 		catch (BeansException ex) {
@@ -201,6 +207,7 @@ public abstract class HttpServletBean extends HttpServlet
 	 */
 	@Override
 	public ConfigurableEnvironment getEnvironment() {
+		mylog.debug("创建environment");
 		if (this.environment == null) {
 			this.environment = this.createEnvironment();
 		}

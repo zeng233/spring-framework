@@ -18,6 +18,7 @@ package org.springframework.context.support;
 
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
@@ -62,6 +63,8 @@ import org.springframework.context.ApplicationContextException;
  * @see org.springframework.context.annotation.AnnotationConfigApplicationContext
  */
 public abstract class AbstractRefreshableApplicationContext extends AbstractApplicationContext {
+	
+	private static final Logger mylog = Logger.getLogger(AbstractRefreshableApplicationContext.class);
 
 	private Boolean allowBeanDefinitionOverriding;
 
@@ -123,9 +126,11 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 			closeBeanFactory();
 		}
 		try {
+			mylog.debug("创建DefaultListableBeanFactory对象");
 			DefaultListableBeanFactory beanFactory = createBeanFactory();
 			beanFactory.setSerializationId(getId());
 			customizeBeanFactory(beanFactory);
+			mylog.debug("初始化xml或者annotation的BeanDefinitionReader，把默认的bean加载到BeanFactory");
 			loadBeanDefinitions(beanFactory);
 			synchronized (this.beanFactoryMonitor) {
 				this.beanFactory = beanFactory;

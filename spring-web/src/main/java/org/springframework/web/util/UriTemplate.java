@@ -197,7 +197,6 @@ public class UriTemplate implements Serializable {
 				if (c == '{') {
 					level++;
 					if (level == 1) {
-						// start of URI variable
 						pattern.append(quote(builder));
 						builder = new StringBuilder();
 						continue;
@@ -206,7 +205,6 @@ public class UriTemplate implements Serializable {
 				else if (c == '}') {
 					level--;
 					if (level == 0) {
-						// end of URI variable
 						String variable = builder.toString();
 						int idx = variable.indexOf(':');
 						if (idx == -1) {
@@ -229,10 +227,13 @@ public class UriTemplate implements Serializable {
 						continue;
 					}
 				}
+				if (i + 1 == uriTemplate.length()) {
+					if (c != '/') {
+						builder.append(c);
+					}
+					pattern.append(quote(builder));
+				}
 				builder.append(c);
-			}
-			if (builder.length() > 0) {
-				pattern.append(quote(builder));
 			}
 			return new TemplateInfo(variableNames, Pattern.compile(pattern.toString()));
 		}

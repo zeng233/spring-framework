@@ -22,6 +22,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import org.springframework.beans.BeansException;
@@ -58,7 +59,12 @@ import static org.junit.Assert.*;
  * @see org.springframework.web.context.support.Spr8510Tests
  */
 public class ContextLoaderTests {
+	public static final Logger mylog = Logger.getLogger(ContextLoaderTests.class);
 
+	/**
+	 * 配置文件applicationContext.xml中，${myDir}不存在这个路径，先注释掉
+	 * <value>${myDir}/myover*.properties</value>
+	 */
 	@Test
 	public void testContextLoaderListenerWithDefaultContext() {
 		MockServletContext sc = new MockServletContext("");
@@ -67,6 +73,7 @@ public class ContextLoaderTests {
 				"/org/springframework/web/context/WEB-INF/context-addition.xml");
 		ServletContextListener listener = new ContextLoaderListener();
 		ServletContextEvent event = new ServletContextEvent(sc);
+		mylog.debug("=============初始化context开始===============");
 		listener.contextInitialized(event);
 		WebApplicationContext context = (WebApplicationContext) sc.getAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE);
 		assertTrue("Correct WebApplicationContext exposed in ServletContext", context instanceof XmlWebApplicationContext);

@@ -17,6 +17,7 @@
 package org.springframework.beans.factory.support;
 
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 

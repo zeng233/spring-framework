@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2015 the original author or authors.
+ * Copyright 2002-2014 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,19 +34,20 @@ public class ResourceUrlProviderExposingInterceptor extends HandlerInterceptorAd
 	/**
 	 * Name of the request attribute that holds the {@link ResourceUrlProvider}.
 	 */
-	public static final String RESOURCE_URL_PROVIDER_ATTR = ResourceUrlProvider.class.getName();
+	public static final String RESOURCE_URL_PROVIDER_ATTR = ResourceUrlProvider.class.getName().toString();
+
 
 	private final ResourceUrlProvider resourceUrlProvider;
 
 
 	public ResourceUrlProviderExposingInterceptor(ResourceUrlProvider resourceUrlProvider) {
-		Assert.notNull(resourceUrlProvider, "ResourceUrlProvider is required");
+		Assert.notNull(resourceUrlProvider, "'resourceUrlProvider' is required");
 		this.resourceUrlProvider = resourceUrlProvider;
 	}
 
 	@Override
-	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-			throws Exception {
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
+			Object handler) throws Exception {
 
 		request.setAttribute(RESOURCE_URL_PROVIDER_ATTR, this.resourceUrlProvider);
 		return true;

@@ -94,7 +94,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 
 
 	/** Logger available to subclasses; static to optimize serialization */
-	protected static final Log logger = LogFactory.getLog(CglibAopProxy.class);
+	protected final static Log logger = LogFactory.getLog(CglibAopProxy.class);
 
 	/** Keeps track of the Classes that we have validated for final methods */
 	private static final Map<Class<?>, Boolean> validatedClasses = new WeakHashMap<Class<?>, Boolean>();
@@ -922,7 +922,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 			if (aa == null || ba == null) {
 				return (aa == ba);
 			}
-			return (aa.getClass() == ba.getClass());
+			return aa.getClass().equals(ba.getClass());
 		}
 
 		private boolean equalsPointcuts(Advisor a, Advisor b) {

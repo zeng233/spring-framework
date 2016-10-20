@@ -97,7 +97,13 @@ public class RunAfterTestMethodCallbacks extends Statement {
 			errors.add(ex);
 		}
 
-		MultipleFailureException.assertEmpty(errors);
+		if (errors.isEmpty()) {
+			return;
+		}
+		if (errors.size() == 1) {
+			throw errors.get(0);
+		}
+		throw new MultipleFailureException(errors);
 	}
 
 }
