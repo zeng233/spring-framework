@@ -64,7 +64,8 @@ public abstract class MethodIntrospector {
 
 		for (Class<?> currentHandlerType : handlerTypes) {
 			final Class<?> targetClass = (specificHandlerType != null ? specificHandlerType : currentHandlerType);
-
+			
+			//包含子类与父类的方法，如果有相同的方法名，会执行两次
 			ReflectionUtils.doWithMethods(currentHandlerType, new ReflectionUtils.MethodCallback() {
 				@Override
 				public void doWith(Method method) {

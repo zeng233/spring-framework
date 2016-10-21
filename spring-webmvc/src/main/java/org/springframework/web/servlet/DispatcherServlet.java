@@ -967,6 +967,7 @@ public class DispatcherServlet extends FrameworkServlet {
 
 				// Actually invoke the handler.
 				mylog.debug("service：HandlerAdapter处理请求");
+				//这时HandlerExecutionChain的handler对象为url映射的HandlerMethod
 				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
 
 				if (asyncManager.isConcurrentHandlingStarted()) {
@@ -974,6 +975,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				}
 
 				applyDefaultViewName(processedRequest, mv);
+				mylog.debug("执行拦截器的applyPostHandle方法");
 				//请求执行完后拦截器再处理
 				mappedHandler.applyPostHandle(processedRequest, response, mv);
 			}
@@ -1132,6 +1134,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				logger.trace(
 						"Testing handler map [" + hm + "] in DispatcherServlet with name '" + getServletName() + "'");
 			}
+			//根据request中的url找到handleMethod，并传入HandlerExecutionChain对象
 			HandlerExecutionChain handler = hm.getHandler(request);
 			if (handler != null) {
 				return handler;

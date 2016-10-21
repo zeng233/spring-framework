@@ -526,7 +526,9 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 		public void register(T mapping, Object handler, Method method) {
 			this.readWriteLock.writeLock().lock();
 			try {
+				//传入bean与方法，创建HandlerMethod
 				HandlerMethod handlerMethod = createHandlerMethod(handler, method);
+				//HandlerMethod重写了equals方法，如果从缓存mappingLookup中取出handlerMethod与当前handlerMethod的bean相同并且method相同，那这个映射就重复了
 				assertUniqueMethodMapping(handlerMethod, mapping);
 
 				if (logger.isInfoEnabled()) {

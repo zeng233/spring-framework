@@ -595,10 +595,12 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		resolvers.add(new ExpressionValueMethodArgumentResolver(getBeanFactory()));
 
 		// Type-based argument resolution
+		//解析request、response、session参数初始化
 		resolvers.add(new ServletRequestMethodArgumentResolver());
 		resolvers.add(new ServletResponseMethodArgumentResolver());
 		resolvers.add(new HttpEntityMethodProcessor(getMessageConverters(), this.requestResponseBodyAdvice));
 		resolvers.add(new RedirectAttributesMethodArgumentResolver());
+		//解析Model参数类型初始化
 		resolvers.add(new ModelMethodProcessor());
 		resolvers.add(new MapMethodProcessor());
 		resolvers.add(new ErrorsMethodArgumentResolver());
@@ -715,6 +717,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	protected ModelAndView handleInternal(HttpServletRequest request,
 			HttpServletResponse response, HandlerMethod handlerMethod) throws Exception {
 
+		//校验http支持的method以及session
 		checkRequest(request);
 
 		if (getSessionAttributesHandler(handlerMethod).hasSessionAttributes()) {
@@ -779,8 +782,9 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 
 		ServletWebRequest webRequest = new ServletWebRequest(request, response);
 		
-		//initData处理
+		//initData处理，带有@InitBinder注解的方法
 		WebDataBinderFactory binderFactory = getDataBinderFactory(handlerMethod);
+		//只有@ModelAttribute注解的方法
 		ModelFactory modelFactory = getModelFactory(handlerMethod, binderFactory);
 
 		//Controller调用方法
