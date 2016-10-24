@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -105,6 +104,8 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 		Object attribute = (mavContainer.containsAttribute(name) ?
 				mavContainer.getModel().get(name) : createAttribute(name, parameter, binderFactory, webRequest));
 
+		//RequestMappingHandlerAdapter实例化ServletInvocableHandlerMethod已设置为ServletRequestDataBinderFactory
+		//返回值为WebRequestDataBinder
 		WebDataBinder binder = binderFactory.createBinder(webRequest, attribute, name);
 		if (binder.getTarget() != null) {
 			bindRequestParameters(binder, webRequest);

@@ -25,6 +25,7 @@ import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 
+import org.apache.log4j.Logger;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.convert.Property;
 import org.springframework.core.convert.TypeDescriptor;
@@ -61,6 +62,7 @@ import org.springframework.util.Assert;
  * @see PropertyEditorRegistrySupport
  */
 public class BeanWrapperImpl extends AbstractNestablePropertyAccessor implements BeanWrapper {
+	private static Logger mylog = Logger.getLogger(BeanWrapperImpl.class);
 
 	/**
 	 * Cached introspections results for this object, to prevent encountering
@@ -81,6 +83,7 @@ public class BeanWrapperImpl extends AbstractNestablePropertyAccessor implements
 	 */
 	public BeanWrapperImpl() {
 		this(true);
+		mylog.debug("初始化BeanWrapperImpl，设置registerDefaultEditors为true，初始化TypeConverterDelegate，把本身作为参数传入");
 	}
 
 	/**

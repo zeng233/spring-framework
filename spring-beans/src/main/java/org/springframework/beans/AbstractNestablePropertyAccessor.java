@@ -32,7 +32,7 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.log4j.Logger;
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.convert.ConversionException;
@@ -69,6 +69,7 @@ import org.springframework.util.StringUtils;
  * @see PropertyEditorRegistrySupport
  */
 public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyAccessor {
+	private static Logger mylog = Logger.getLogger(AbstractNestablePropertyAccessor.class);
 
 	/**
 	 * We'll create a lot of these objects, so we don't want a new logger every time.
@@ -250,6 +251,8 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	public void setPropertyValue(String propertyName, Object value) throws BeansException {
 		AbstractNestablePropertyAccessor nestedPa;
 		try {
+			//是否有嵌套属性
+			mylog.debug("判断是否是内嵌的Bean，如果是内嵌bean，解析嵌套的bean属性名称");
 			nestedPa = getPropertyAccessorForPropertyPath(propertyName);
 		}
 		catch (NotReadablePropertyException ex) {
@@ -288,7 +291,8 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	protected void setPropertyValue(PropertyTokenHolder tokens, PropertyValue pv) throws BeansException {
 		String propertyName = tokens.canonicalName;
 		String actualName = tokens.actualName;
-
+		
+		mylog.debug("一般的bean keys为空");
 		if (tokens.keys != null) {
 			// Apply indexes and map keys: fetch value for all keys but the last one.
 			PropertyTokenHolder getterTokens = new PropertyTokenHolder();
@@ -410,6 +414,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 		}
 
 		else {
+			mylog.debug("一般bean处理");
 			PropertyHandler ph = getLocalPropertyHandler(actualName);
 			if (ph == null || !ph.isWritable()) {
 				if (pv.isOptional()) {
@@ -446,6 +451,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 								}
 							}
 						}
+						mylog.debug("设置方法参数值，开始转换");
 						valueToApply = convertForProperty(
 								propertyName, oldValue, originalValue, ph.toTypeDescriptor());
 					}
@@ -573,6 +579,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	private Object convertIfNecessary(String propertyName, Object oldValue, Object newValue, Class<?> requiredType,
 			TypeDescriptor td) throws TypeMismatchException {
 		try {
+			mylog.debug("由typeConverterDelegate执行convertIfNecessary");
 			return this.typeConverterDelegate.convertIfNecessary(propertyName, oldValue, newValue, requiredType, td);
 		}
 		catch (ConverterNotFoundException ex) {

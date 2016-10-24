@@ -20,6 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
+import org.apache.log4j.Logger;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.MethodParameter;
@@ -47,6 +48,7 @@ import org.springframework.web.method.HandlerMethod;
  * @since 3.1
  */
 public class InvocableHandlerMethod extends HandlerMethod {
+	private static Logger mylog = Logger.getLogger(InvocableHandlerMethod.class);
 
 	private WebDataBinderFactory dataBinderFactory;
 
@@ -125,7 +127,8 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	 */
 	public Object invokeForRequest(NativeWebRequest request, ModelAndViewContainer mavContainer,
 			Object... providedArgs) throws Exception {
-
+		
+		mylog.debug("获取解析类处理后的方法参数");
 		Object[] args = getMethodArgumentValues(request, mavContainer, providedArgs);
 		if (logger.isTraceEnabled()) {
 			StringBuilder sb = new StringBuilder("Invoking [");
@@ -147,11 +150,14 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	private Object[] getMethodArgumentValues(NativeWebRequest request, ModelAndViewContainer mavContainer,
 			Object... providedArgs) throws Exception {
 
+		//从HanderMapping初始化的HandlerMethod中获取方法参数
 		MethodParameter[] parameters = getMethodParameters();
 		Object[] args = new Object[parameters.length];
+		mylog.debug("遍历方法的参数，从缓存argumentResolvers（初始化时已设置）获取参数类型对应的resolver解析参数");
 		for (int i = 0; i < parameters.length; i++) {
 			MethodParameter parameter = parameters[i];
 			parameter.initParameterNameDiscovery(this.parameterNameDiscoverer);
+			//解析参数属于哪种类型，并设置参数的Class对象到MethodParameter
 			GenericTypeResolver.resolveParameterType(parameter, getBean().getClass());
 			args[i] = resolveProvidedArgument(parameter, providedArgs);
 			if (args[i] != null) {

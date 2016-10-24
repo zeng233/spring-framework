@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.concurrent.Callable;
 
+import org.apache.log4j.Logger;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.ResolvableType;
 import org.springframework.http.HttpStatus;
@@ -53,6 +54,7 @@ import org.springframework.web.util.NestedServletException;
  * @since 3.1
  */
 public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
+	private static Logger mylog = Logger.getLogger(ServletInvocableHandlerMethod.class);
 
 	private static final Method CALLABLE_METHOD = ClassUtils.getMethod(Callable.class, "call");
 
@@ -106,10 +108,12 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 	 */
 	public void invokeAndHandle(ServletWebRequest webRequest,
 			ModelAndViewContainer mavContainer, Object... providedArgs) throws Exception {
-
+		mylog.debug("处理请求参数（包括绑定、验证、转换）");
+		//处理请求并返回结果
 		Object returnValue = invokeForRequest(webRequest, mavContainer, providedArgs);
 		setResponseStatus(webRequest);
 
+		//返回值为空表示已处理
 		if (returnValue == null) {
 			if (isRequestNotModified(webRequest) || hasResponseStatus() || mavContainer.isRequestHandled()) {
 				mavContainer.setRequestHandled(true);
@@ -123,6 +127,7 @@ public class ServletInvocableHandlerMethod extends InvocableHandlerMethod {
 
 		mavContainer.setRequestHandled(false);
 		try {
+			//对有返回值的处理
 			this.returnValueHandlers.handleReturnValue(
 					returnValue, getReturnValueType(returnValue), mavContainer, webRequest);
 		}

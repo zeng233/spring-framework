@@ -27,7 +27,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.log4j.Logger;
 import org.springframework.core.CollectionFactory;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.convert.ConversionFailedException;
@@ -51,6 +51,7 @@ import org.springframework.util.StringUtils;
  * @see SimpleTypeConverter
  */
 class TypeConverterDelegate {
+	private static final Logger mylog = Logger.getLogger(TypeConverterDelegate.class);
 
 	private static final Log logger = LogFactory.getLog(TypeConverterDelegate.class);
 
@@ -165,6 +166,7 @@ class TypeConverterDelegate {
 		ConversionFailedException conversionAttemptEx = null;
 
 		// No custom editor but custom ConversionService specified?
+		mylog.debug("获取初始化时的ConversionService");
 		ConversionService conversionService = this.propertyEditorRegistry.getConversionService();
 		if (editor == null && conversionService != null && newValue != null && typeDescriptor != null) {
 			TypeDescriptor sourceTypeDesc = TypeDescriptor.forObject(newValue);
@@ -189,6 +191,8 @@ class TypeConverterDelegate {
 					convertedValue = StringUtils.commaDelimitedListToStringArray((String) convertedValue);
 				}
 			}
+			
+			mylog.debug("如果没有自定义editor，初始化BeanWrapperImpl中的各种默认转换器");
 			if (editor == null) {
 				editor = findDefaultEditor(requiredType);
 			}

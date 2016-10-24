@@ -141,8 +141,8 @@ public class RequestParamMethodArgumentResolver extends AbstractNamedValueMethod
 			else if (MultipartFile.class == paramType || "javax.servlet.http.Part".equals(paramType.getName())) {
 				return true;
 			}
-			else if (this.useDefaultResolution) {
-				return BeanUtils.isSimpleProperty(paramType);
+			else if (this.useDefaultResolution) {//解析基本类型
+				return BeanUtils.isSimpleProperty(paramType);//只是a primitive, a String or other CharSequence, a Number, a Date等类型，参考方法注释
 			}
 			else {
 				return false;
@@ -200,6 +200,7 @@ public class RequestParamMethodArgumentResolver extends AbstractNamedValueMethod
 				}
 			}
 			if (arg == null) {
+				//如果是自己定义的bean，直接用原始的servlet方法getParameterValues获取全部的值
 				String[] paramValues = webRequest.getParameterValues(name);
 				if (paramValues != null) {
 					arg = (paramValues.length == 1 ? paramValues[0] : paramValues);

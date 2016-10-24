@@ -102,8 +102,10 @@ public abstract class AbstractNamedValueMethodArgumentResolver implements Handle
 		}
 
 		if (binderFactory != null) {
+			//默认target为null，属性getTypeConverter默认类型转换器就为SimpleTypeConverter
 			WebDataBinder binder = binderFactory.createBinder(webRequest, null, namedValueInfo.name);
 			try {
+				//转换请求中的数据
 				arg = binder.convertIfNecessary(arg, paramType, parameter);
 			}
 			catch (ConversionNotSupportedException ex) {

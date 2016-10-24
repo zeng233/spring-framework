@@ -51,6 +51,7 @@ public class DefaultDataBinderFactory implements WebDataBinderFactory {
 			throws Exception {
 
 		WebDataBinder dataBinder = createBinderInstance(target, objectName, webRequest);
+		//RequestMappingHandlerAdapter初始化webBindingInitializer默认为ConfigurableWebBindingInitializer，作为构造函数传入ServletRequestDataBinderFactory
 		if (this.initializer != null) {
 			this.initializer.initBinder(dataBinder, webRequest);
 		}

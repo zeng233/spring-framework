@@ -59,6 +59,7 @@ public abstract class AbstractPropertyBindingResult extends AbstractBindingResul
 		Assert.notNull(conversionService, "ConversionService must not be null");
 		this.conversionService = conversionService;
 		if (getTarget() != null) {
+			//设置BeanWrapper
 			getPropertyAccessor().setConversionService(conversionService);
 		}
 	}

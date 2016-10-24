@@ -25,11 +25,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.xml.transform.Source;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
@@ -116,6 +118,7 @@ import org.springframework.web.util.WebUtils;
  */
 public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		implements BeanFactoryAware, InitializingBean {
+	private static Logger mylog = Logger.getLogger(RequestMappingHandlerAdapter.class);
 
 	private static final boolean completionStagePresent = ClassUtils.isPresent("java.util.concurrent.CompletionStage",
 			RequestMappingHandlerAdapter.class.getClassLoader());
@@ -613,7 +616,9 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		}
 
 		// Catch-all
+		//RequestParamMethodArgumentResolver构造函数设置useDefaultResolution为true，表示一般的参数类型（文件参数、基本类型等）解析
 		resolvers.add(new RequestParamMethodArgumentResolver(getBeanFactory(), true));
+		//解析复杂的请求bean（各种嵌套类型）
 		resolvers.add(new ServletModelAttributeMethodProcessor(true));
 
 		return resolvers;
@@ -716,7 +721,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	@Override
 	protected ModelAndView handleInternal(HttpServletRequest request,
 			HttpServletResponse response, HandlerMethod handlerMethod) throws Exception {
-
+		mylog.debug("执行handleInternal，请求对应的方法");
 		//校验http支持的method以及session
 		checkRequest(request);
 
@@ -737,7 +742,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 				}
 			}
 		}
-
+		mylog.debug("调用handlerMethod");
 		return invokeHandlerMethod(request, response, handlerMethod);
 	}
 
@@ -782,13 +787,15 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 
 		ServletWebRequest webRequest = new ServletWebRequest(request, response);
 		
-		//initData处理，带有@InitBinder注解的方法
+		//initData处理，带有@InitBinder注解的方法，请求数据绑定，webBindingInitializer等各种属性在RequestMappingHandlerAdapter初始化时已设置，
+		//默认为ConfigurableWebBindingInitializer
 		WebDataBinderFactory binderFactory = getDataBinderFactory(handlerMethod);
 		//只有@ModelAttribute注解的方法
 		ModelFactory modelFactory = getModelFactory(handlerMethod, binderFactory);
 
 		//Controller调用方法
 		ServletInvocableHandlerMethod invocableMethod = createInvocableHandlerMethod(handlerMethod);
+		mylog.debug("设置InvocableHandlerMethod的argumentResolvers参数，argumentResolvers各种解析类由afterPropertiesSet初始化方法设置");
 		invocableMethod.setHandlerMethodArgumentResolvers(this.argumentResolvers);
 		invocableMethod.setHandlerMethodReturnValueHandlers(this.returnValueHandlers);
 		invocableMethod.setDataBinderFactory(binderFactory);
@@ -819,6 +826,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			invocableMethod = invocableMethod.wrapConcurrentResult(result);
 		}
 		
+		mylog.debug("应用Controller的method执行类ServletInvocableHandlerMethod执行方法");
 		//处理调用方法，包含ResponseBody注解的处理
 		invocableMethod.invokeAndHandle(webRequest, mavContainer);
 		if (asyncManager.isConcurrentHandlingStarted()) {
