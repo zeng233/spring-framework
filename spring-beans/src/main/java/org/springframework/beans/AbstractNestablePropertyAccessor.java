@@ -352,6 +352,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 				}
 			}
 			else if (propValue instanceof List) {
+				mylog.debug("如果属性类型是List，将转换的值传入List");
 				PropertyHandler ph = getPropertyHandler(actualName);
 				Class<?> requiredType = ph.getCollectionType(tokens.keys.length);
 				List<Object> list = (List<Object>) propValue;
@@ -937,6 +938,7 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	private PropertyTokenHolder getPropertyNameTokens(String propertyName) {
 		PropertyTokenHolder tokens = new PropertyTokenHolder();
 		String actualName = null;
+		mylog.debug("keys存储索引值，长度为2表示最多为二维数组");
 		List<String> keys = new ArrayList<String>(2);
 		int searchIndex = 0;
 		while (searchIndex != -1) {
@@ -1036,11 +1038,11 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 
 
 	protected static class PropertyTokenHolder {
-
+		//集合属性规范后的属性如ages[0]
 		public String canonicalName;
-
+		//实际的属性名称
 		public String actualName;
-
+		//数组或者集合的索引值
 		public String[] keys;
 	}
 

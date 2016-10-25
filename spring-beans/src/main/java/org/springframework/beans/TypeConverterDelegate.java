@@ -192,10 +192,11 @@ class TypeConverterDelegate {
 				}
 			}
 			
-			mylog.debug("如果没有自定义editor，初始化BeanWrapperImpl中的各种默认转换器");
+			mylog.debug("如果没有自定义editor，从BeanWrapperImpl默认转换器中找到对应的类型转换器");
 			if (editor == null) {
 				editor = findDefaultEditor(requiredType);
 			}
+			//把找到的转换器作为参数传入方法进行转换
 			convertedValue = doConvertValue(oldValue, convertedValue, requiredType, editor);
 		}
 
@@ -396,6 +397,7 @@ class TypeConverterDelegate {
 	private Object doConvertValue(Object oldValue, Object newValue, Class<?> requiredType, PropertyEditor editor) {
 		Object convertedValue = newValue;
 
+		mylog.debug("如果转换值不是String类型就执行editor.setValue方法转换");
 		if (editor != null && !(convertedValue instanceof String)) {
 			// Not a String -> use PropertyEditor's setValue.
 			// With standard PropertyEditors, this will return the very same object;
@@ -438,6 +440,7 @@ class TypeConverterDelegate {
 					logger.trace("Converting String to [" + requiredType + "] using property editor [" + editor + "]");
 				}
 				String newTextValue = (String) convertedValue;
+				mylog.debug("如果是String类型，就用setsetAsText方法转换新值");
 				return doConvertTextValue(oldValue, newTextValue, editor);
 			}
 			else if (String.class == requiredType) {

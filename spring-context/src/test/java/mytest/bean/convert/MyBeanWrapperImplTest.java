@@ -16,6 +16,10 @@
 
 package mytest.bean.convert;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.junit.Test;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
@@ -37,18 +41,35 @@ public class MyBeanWrapperImplTest {
 	public void testSimpleAttrConvert() {
 		MyBean target = new MyBean();
 		BeanWrapper accessor = createAccessor(target);
-		//如果原始值与属性类型可以匹配，就不用转换器，BeanWrapperImpl的默认转换器也不会执行
-		accessor.setPropertyValue("age", 23);
-//		accessor.setPropertyValue("age", "23");
+		// 如果原始值与属性类型可以匹配，就不用转换器，BeanWrapperImpl的默认转换器也不会执行
+		// accessor.setPropertyValue("age", 23);
+		accessor.setPropertyValue("age", "23");
 		assertTrue("Set age to bean", target.getAge() == 23);
 	}
-	
+
 	@Test
 	public void testStringAttr() {
 		MyBean target = new MyBean();
 		BeanWrapper accessor = createAccessor(target);
 		accessor.setPropertyValue("name", "hello");
 		assertTrue("Set name to bean", target.getName().equals("hello"));
+	}
+
+	@Test
+	public void testListConvert() {
+		MyBean target = new MyBean();
+		target.setAges(new ArrayList<Integer>());
+		BeanWrapper accessor = createAccessor(target);
+		accessor.setPropertyValue("ages[0]", "1");
+		assertTrue(target.getAges().get(0) == 1);
+	}
+
+	@Test
+	public void testDateConvert() {
+		MyBean target = new MyBean();
+		BeanWrapper accessor = createAccessor(target);
+		accessor.setPropertyValue("createDate", "2016");
+		System.out.println(target.getCreateDate());
 	}
 }
 
@@ -57,6 +78,10 @@ class MyBean {
 	String name;
 
 	int age;
+
+	List<Integer> ages;
+
+	Date createDate;
 
 	public String getName() {
 		return name;
@@ -72,6 +97,22 @@ class MyBean {
 
 	public void setAge(int age) {
 		this.age = age;
+	}
+
+	public List<Integer> getAges() {
+		return ages;
+	}
+
+	public void setAges(List<Integer> ages) {
+		this.ages = ages;
+	}
+
+	public Date getCreateDate() {
+		return createDate;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
 	}
 
 }
