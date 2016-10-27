@@ -1238,6 +1238,7 @@ public class DispatcherServlet extends FrameworkServlet {
 
 		View view;
 		if (mv.isReference()) {
+			//获取解析器并解析视图
 			// We need to resolve the view name.
 			view = resolveViewName(mv.getViewName(), mv.getModelInternal(), locale, request);
 			if (view == null) {
@@ -1246,6 +1247,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 		}
 		else {
+			//类似于POI视图，直接在controller里面设置视图到ModelAndView里面就不用解析器解析
 			// No need to lookup: the ModelAndView object contains the actual View object.
 			view = mv.getView();
 			if (view == null) {
