@@ -10,6 +10,7 @@
 		<config>src/test/resources/mytest/AnnotationBeanTest.xml</config>
 		<config>src/test/resources/mytest/CustomerEditorBeanTest.xml</config>
 		<config>src/test/resources/mytest/DateFormatBeanTest.xml</config>
+		<config>src/test/resources/mytest/aop/ConfigTest.xml</config>
 	</configs>
 	<autoconfigs>
 	</autoconfigs>
