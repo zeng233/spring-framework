@@ -14,28 +14,24 @@
  * limitations under the License.
  */
 
-package mytest.aop.config;
+package mytest.aop.aspectj;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.parsing.ComponentDefinition;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.tests.beans.CollectingReaderEventListener;
 
 /**
- * 参考：AopNamespaceHandlerEventTests、AopNamespaceHandlerTests
  * 
- * @author zenghua233
+ * @author Administrator
  * @since 4.2.1
  */
-public class ConfigTest {
-	private static final Resource CONTEXT =  new ClassPathResource("mytest/aop/ConfigTest.xml");
-	
-	private CollectingReaderEventListener eventListener = new CollectingReaderEventListener();
-	
+public class SystemArchitectureTest {
+
+	private static final Resource CONTEXT = new ClassPathResource("mytest/aop/SystemArchitectureTest.xml");
+
 	private XmlBeanDefinitionReader reader;
 
 	private DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
@@ -43,17 +39,11 @@ public class ConfigTest {
 	@Before
 	public void setUp() throws Exception {
 		this.reader = new XmlBeanDefinitionReader(this.beanFactory);
-		this.reader.setEventListener(this.eventListener);
 	}
-
+	
 	@Test
-	public void testAspectEvent() throws Exception {
+	public void testBeforeAdvice() throws Exception {
 		this.reader.loadBeanDefinitions(CONTEXT);
-		ComponentDefinition[] componentDefinitions = this.eventListener.getComponentDefinitions();
-//		assertEquals("Incorrect number of events fired", 5, componentDefinitions.length);
-//
-//		assertTrue("No holder with nested components", componentDefinitions[0] instanceof CompositeComponentDefinition);
-//		CompositeComponentDefinition compositeDef = (CompositeComponentDefinition) componentDefinitions[0];
-//		assertEquals("aop:config", compositeDef.getName());
+//		System.out.println(beanFactory.getBean("testDao"));
 	}
 }
