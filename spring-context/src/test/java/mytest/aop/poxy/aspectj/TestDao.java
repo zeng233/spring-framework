@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-package mytest.aop.spoxy;
-
-import java.lang.reflect.Method;
-
-import org.springframework.aop.MethodBeforeAdvice;
+package mytest.aop.poxy.aspectj;
 
 
 /**
@@ -26,12 +22,9 @@ import org.springframework.aop.MethodBeforeAdvice;
  * @author Administrator
  * @since 4.2.1
  */
-public class SimpleMethodBeforeAdvice implements MethodBeforeAdvice {
-
-	@Override
-	public void before(Method method, Object[] args, Object target) throws Throwable {
-		System.out.println("this is before advice");
-//		method.invoke(target, args);
+public class TestDao {
+	
+	public void dao() {
+		System.out.println(this.getClass().getSimpleName());
 	}
-
 }

@@ -14,30 +14,21 @@
  * limitations under the License.
  */
 
-package mytest.aop.spoxy;
+package mytest.aop.poxy.aspectj;
 
-import org.springframework.aop.framework.AopContext;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 
 /**
- * 
  * 
  * @author Administrator
  * @since 4.2.1
  */
-public class SimplePojo implements Pojo {
+@Aspect
+public class BeforeExample {
 
-	// @Override
-	// public void foo() {
-	// this.bar();
-	// }
-
-	@Override
-	public void foo() {
-		// this works, but... gah!
-		((Pojo) AopContext.currentProxy()).bar();
-	}
-
-	public void bar() {
-		System.out.println("bar() executed");
+	@Before("mytest.aop.aspectj.SystemArchitecture.dataAccessOperation()")
+	public void doAccessCheck() {
+		System.out.println(this.getClass().getSimpleName());
 	}
 }

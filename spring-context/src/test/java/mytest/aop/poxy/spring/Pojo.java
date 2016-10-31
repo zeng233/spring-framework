@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package mytest.aop.aspectj;
+package mytest.aop.poxy.spring;
 
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 
 /**
  * 
  * @author Administrator
  * @since 4.2.1
  */
-@Aspect
-public class BeforeExample {
+public interface Pojo {
+	
+	public void foo();
 
-	@Before("mytest.aop.aspectj.SystemArchitecture.dataAccessOperation()")
-	public void doAccessCheck() {
-		System.out.println(this.getClass().getSimpleName());
-	}
+	public void bar();
 }

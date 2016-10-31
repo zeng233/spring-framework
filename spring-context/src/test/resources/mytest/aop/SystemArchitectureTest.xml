@@ -19,5 +19,5 @@
 		</tx:attributes>
 	</tx:advice>
 	
-	<bean class="mytest.aop.aspectj.TestDao"/>
+	<bean class="mytest.aop.poxy.aspectj"/>
 </beans>

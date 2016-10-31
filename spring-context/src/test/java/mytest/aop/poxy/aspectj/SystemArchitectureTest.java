@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package mytest.aop.aspectj;
+package mytest.aop.poxy.aspectj;
 
 import org.junit.Before;
 import org.junit.Test;

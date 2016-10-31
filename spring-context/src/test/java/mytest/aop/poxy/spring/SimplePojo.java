@@ -14,17 +14,30 @@
  * limitations under the License.
  */
 
-package mytest.aop.aspectj;
+package mytest.aop.poxy.spring;
 
+import org.springframework.aop.framework.AopContext;
 
 /**
+ * 
  * 
  * @author Administrator
  * @since 4.2.1
  */
-public class TestDao {
-	
-	public void dao() {
-		System.out.println(this.getClass().getSimpleName());
+public class SimplePojo implements Pojo {
+
+	// @Override
+	// public void foo() {
+	// this.bar();
+	// }
+
+	@Override
+	public void foo() {
+		// this works, but... gah!
+		((Pojo) AopContext.currentProxy()).bar();
+	}
+
+	public void bar() {
+		System.out.println("bar() executed");
 	}
 }

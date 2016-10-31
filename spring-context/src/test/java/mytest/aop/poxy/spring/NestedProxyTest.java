@@ -14,17 +14,29 @@
  * limitations under the License.
  */
 
-package mytest.aop.spoxy;
+package mytest.aop.poxy.spring;
 
+import org.junit.Test;
+import org.springframework.aop.framework.ProxyFactory;
 
 /**
+ * 参考：Proxying mechanisms
  * 
  * @author Administrator
  * @since 4.2.1
  */
-public interface Pojo {
+public class NestedProxyTest {
 	
-	public void foo();
-
-	public void bar();
+	@Test
+	public void testSimple() {
+		ProxyFactory factory = new ProxyFactory(new SimplePojo());
+		factory.setInterfaces(Pojo.class);
+		factory.addAdvice(new SimpleMethodBeforeAdvice());
+		//Spring针对内嵌方法中，使用this调用目标函数，实际没有走代理对象，使用的本地对象
+		//要使内部嵌套调用函数使用代理，这里要设置true，放到ThreadLocal中去
+		factory.setExposeProxy(true);
+		
+		Pojo pojo = (Pojo) factory.getProxy();
+		pojo.foo();
+	}
 }
