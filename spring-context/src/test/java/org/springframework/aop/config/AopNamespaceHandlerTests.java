@@ -146,6 +146,7 @@ class CountingAspectJAdvice {
 	}
 
 	public void myAroundAdvice(ProceedingJoinPoint pjp) throws Throwable {
+		System.out.println("around");
 		this.aroundCount++;
 		pjp.proceed();
 	}

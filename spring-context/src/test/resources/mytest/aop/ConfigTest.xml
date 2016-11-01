@@ -6,6 +6,14 @@
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
 	<aop:config>
-	
+		<aop:pointcut expression="execution(* mytest.aop.config.*.*(..))" id="pc"/>
+		
+		<aop:aspect ref="myAspect">
+			<aop:around method="around" pointcut-ref="pc"/>
+		</aop:aspect>
 	</aop:config>
+	
+	<bean id="myAspect" class="mytest.aop.config.MyAspect"/>
+	
+	<bean id="myTestBean" class="mytest.aop.config.MyTestBean"/>
 </beans>

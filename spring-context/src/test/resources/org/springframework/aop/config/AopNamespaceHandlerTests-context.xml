@@ -25,6 +25,7 @@
 
 	<bean id="testBean" class="org.springframework.tests.sample.beans.TestBean"/>
 
+	<!-- AopNamespaceHandlerTests的内部类 -->
 	<bean id="countingAdvice" class="org.springframework.aop.config.CountingAspectJAdvice"/>
 
 </beans>

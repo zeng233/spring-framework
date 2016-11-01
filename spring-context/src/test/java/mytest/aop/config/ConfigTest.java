@@ -18,9 +18,12 @@ package mytest.aop.config;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.parsing.ComponentDefinition;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.tests.beans.CollectingReaderEventListener;
@@ -34,26 +37,32 @@ import org.springframework.tests.beans.CollectingReaderEventListener;
 public class ConfigTest {
 	private static final Resource CONTEXT =  new ClassPathResource("mytest/aop/ConfigTest.xml");
 	
-	private CollectingReaderEventListener eventListener = new CollectingReaderEventListener();
-	
 	private XmlBeanDefinitionReader reader;
 
 	private DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
 	
 	@Before
 	public void setUp() throws Exception {
+		//只解析传入的xml，默认包的handler是不会处理的
 		this.reader = new XmlBeanDefinitionReader(this.beanFactory);
-		this.reader.setEventListener(this.eventListener);
+		this.reader.loadBeanDefinitions(CONTEXT);
 	}
 
 	@Test
-	public void testAspectEvent() throws Exception {
-		this.reader.loadBeanDefinitions(CONTEXT);
-		ComponentDefinition[] componentDefinitions = this.eventListener.getComponentDefinitions();
-//		assertEquals("Incorrect number of events fired", 5, componentDefinitions.length);
-//
-//		assertTrue("No holder with nested components", componentDefinitions[0] instanceof CompositeComponentDefinition);
-//		CompositeComponentDefinition compositeDef = (CompositeComponentDefinition) componentDefinitions[0];
-//		assertEquals("aop:config", compositeDef.getName());
+	public void testAspectConfig() throws Exception {
+		MyAspect myAspect = beanFactory.getBean("myAspect", MyAspect.class);
+		System.out.println(myAspect);
+	}
+	
+	@Test
+	public void testAround() {
+//		MyTestBean myTestBean = beanFactory.getBean(MyTestBean.class);
+		ApplicationContext context = new ClassPathXmlApplicationContext("mytest/aop/ConfigTest.xml");
+		MyTestBean myTestBean = context.getBean(MyTestBean.class);
+		
+		//如何创建代理对象的 TODO（为什么XmlBeanDefinitionReader方式不行呢）
+		System.out.println(AopUtils.isAopProxy(myTestBean));
+		
+		myTestBean.print();
 	}
 }
