@@ -422,6 +422,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		Object result = existingBean;
 		for (BeanPostProcessor beanProcessor : getBeanPostProcessors()) {
+			//处理bean，如果配置了<aop:config>就使用spring创建代理类AspectJAwareAdvisorAutoProxyCreator处理
 			result = beanProcessor.postProcessAfterInitialization(result, beanName);
 			if (result == null) {
 				return result;
@@ -474,6 +475,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
 			if (bean != null) {
+				mylog.debug("返回代理对象");
 				return bean;
 			}
 		}
@@ -551,7 +553,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		try {
 			mylog.debug("=============封装bean============");
 			populateBean(beanName, mbd, instanceWrapper);
+			mylog.debug("populateBean完成，初始化bean还需要其他操作不");
 			if (exposedObject != null) {
+				//特殊化处理bean（如创建代理类）
 				exposedObject = initializeBean(beanName, exposedObject, mbd);
 			}
 		}
@@ -1567,6 +1571,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @see #applyBeanPostProcessorsAfterInitialization
 	 */
 	protected Object initializeBean(final String beanName, final Object bean, RootBeanDefinition mbd) {
+		mylog.debug("执行initializeBean，bean是否有其他操作（如代理对象）");
 		if (System.getSecurityManager() != null) {
 			AccessController.doPrivileged(new PrivilegedAction<Object>() {
 				@Override
@@ -1595,6 +1600,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		if (mbd == null || !mbd.isSynthetic()) {
+			mylog.debug("bean是混合对象，执行applyBeanPostProcessorsAfterInitialization");
 			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
 		}
 		return wrappedBean;

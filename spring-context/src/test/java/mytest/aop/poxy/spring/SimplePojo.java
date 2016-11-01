@@ -26,10 +26,10 @@ import org.springframework.aop.framework.AopContext;
  */
 public class SimplePojo implements Pojo {
 
-	// @Override
-	// public void foo() {
-	// this.bar();
-	// }
+	@Override
+	public void simple() {
+		System.out.println("this is simple method");
+	}
 
 	@Override
 	public void foo() {

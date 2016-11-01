@@ -46,6 +46,7 @@ public class ConfigTest {
 		//只解析传入的xml，默认包的handler是不会处理的
 		this.reader = new XmlBeanDefinitionReader(this.beanFactory);
 		this.reader.loadBeanDefinitions(CONTEXT);
+		System.out.println("before加载完成");
 	}
 
 	@Test
@@ -58,6 +59,8 @@ public class ConfigTest {
 	public void testAround() {
 //		MyTestBean myTestBean = beanFactory.getBean(MyTestBean.class);
 		ApplicationContext context = new ClassPathXmlApplicationContext("mytest/aop/ConfigTest.xml");
+		System.out.println();
+		
 		MyTestBean myTestBean = context.getBean(MyTestBean.class);
 		
 		//如何创建代理对象的 TODO（为什么XmlBeanDefinitionReader方式不行呢）

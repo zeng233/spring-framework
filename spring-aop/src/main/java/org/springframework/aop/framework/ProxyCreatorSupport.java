@@ -19,6 +19,7 @@ package org.springframework.aop.framework;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.util.Assert;
 
 /**
@@ -31,6 +32,7 @@ import org.springframework.util.Assert;
  */
 @SuppressWarnings("serial")
 public class ProxyCreatorSupport extends AdvisedSupport {
+	private static Logger mylog = Logger.getLogger(ProxyCreatorSupport.class);
 
 	private AopProxyFactory aopProxyFactory;
 
@@ -45,6 +47,7 @@ public class ProxyCreatorSupport extends AdvisedSupport {
 	 */
 	public ProxyCreatorSupport() {
 		this.aopProxyFactory = new DefaultAopProxyFactory();
+		mylog.debug("初始化ProxyFactory等子类就 创建DefaultAopProxyFactory");
 	}
 
 	/**
@@ -102,6 +105,7 @@ public class ProxyCreatorSupport extends AdvisedSupport {
 		if (!this.active) {
 			activate();
 		}
+		mylog.debug("获取DefaultAopProxyFactory，并调用createAopProxy");
 		return getAopProxyFactory().createAopProxy(this);
 	}
 

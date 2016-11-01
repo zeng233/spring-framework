@@ -513,6 +513,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			// Tell the subclass to refresh the internal bean factory.
 			mylog.debug("2、解析bean，并注册到DefaultListableBeanFactory，最后返回该对象");
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
+			System.out.println("解析配置文件，初始化bean完成");
 			
 			// Prepare the bean factory for use in this context.
 			mylog.debug("3、初始化DefaultListableBeanFactory设置");

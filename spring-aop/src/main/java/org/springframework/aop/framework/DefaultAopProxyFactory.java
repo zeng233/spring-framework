@@ -19,6 +19,7 @@ package org.springframework.aop.framework;
 import java.io.Serializable;
 import java.lang.reflect.Proxy;
 
+import org.apache.log4j.Logger;
 import org.springframework.aop.SpringProxy;
 
 /**
@@ -45,6 +46,7 @@ import org.springframework.aop.SpringProxy;
  */
 @SuppressWarnings("serial")
 public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
+	private static Logger mylog = Logger.getLogger(DefaultAopProxyFactory.class);
 
 	@Override
 	public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {
@@ -60,6 +62,7 @@ public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 			return new ObjenesisCglibAopProxy(config);
 		}
 		else {
+			mylog.debug("创建JdkDynamicAopProxy");
 			return new JdkDynamicAopProxy(config);
 		}
 	}
