@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.aopalliance.aop.Advice;
-
+import org.apache.log4j.Logger;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.DynamicIntroductionAdvice;
 import org.springframework.aop.IntroductionAdvisor;
@@ -59,6 +59,7 @@ import org.springframework.util.CollectionUtils;
  * @see org.springframework.aop.framework.AopProxy
  */
 public class AdvisedSupport extends ProxyConfig implements Advised {
+	private static Logger mylog = Logger.getLogger(AdvisedSupport.class);
 
 	/** use serialVersionUID from Spring 2.0 for interoperability */
 	private static final long serialVersionUID = 2651364800145442165L;
@@ -413,6 +414,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 			throw new AopConfigException("DynamicIntroductionAdvice may only be added as part of IntroductionAdvisor");
 		}
 		else {
+			mylog.debug("方法级别的advice封装成DefaultPointcutAdvisor，在DefaultAdvisorChainFactory中会判断映射方法级别的拦截器并执行");
 			addAdvisor(pos, new DefaultPointcutAdvisor(advice));
 		}
 	}
@@ -486,6 +488,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 		MethodCacheKey cacheKey = new MethodCacheKey(method);
 		List<Object> cached = this.methodCache.get(cacheKey);
 		if (cached == null) {
+			mylog.debug("从DefaultAdvisorChainFactory中获取拦截器以及advice");
 			cached = this.advisorChainFactory.getInterceptorsAndDynamicInterceptionAdvice(
 					this, method, targetClass);
 			this.methodCache.put(cacheKey, cached);

@@ -105,7 +105,7 @@ public class ProxyCreatorSupport extends AdvisedSupport {
 		if (!this.active) {
 			activate();
 		}
-		mylog.debug("获取DefaultAopProxyFactory，并调用createAopProxy");
+		mylog.debug("获取DefaultAopProxyFactory，并调用createAopProxy，并传入当前ProxyCreatorSupport对象为dynamic proxy的配置");
 		return getAopProxyFactory().createAopProxy(this);
 	}
 

@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.aopalliance.intercept.Interceptor;
 import org.aopalliance.intercept.MethodInterceptor;
-
+import org.apache.log4j.Logger;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.IntroductionAdvisor;
 import org.springframework.aop.MethodMatcher;
@@ -45,6 +45,7 @@ import org.springframework.aop.support.MethodMatchers;
  */
 @SuppressWarnings("serial")
 public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializable {
+	private static Logger mylog = Logger.getLogger(DefaultAdvisorChainFactory.class);
 
 	@Override
 	public List<Object> getInterceptorsAndDynamicInterceptionAdvice(
@@ -55,8 +56,10 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 		List<Object> interceptorList = new ArrayList<Object>(config.getAdvisors().length);
 		Class<?> actualClass = (targetClass != null ? targetClass : method.getDeclaringClass());
 		boolean hasIntroductions = hasMatchingIntroductions(config, actualClass);
+		//单例模式
 		AdvisorAdapterRegistry registry = GlobalAdvisorAdapterRegistry.getInstance();
 
+		mylog.debug("遍历代理配置（AdvisedSupport）中的advisors，添加对应的interceptor");
 		for (Advisor advisor : config.getAdvisors()) {
 			if (advisor instanceof PointcutAdvisor) {
 				// Add it conditionally.

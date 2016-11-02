@@ -49,4 +49,16 @@ public class NestedProxyTest {
 		Pojo pojo = (Pojo) factory.getProxy();
 		pojo.foo();
 	}
+	
+	//TODO
+	@Test
+	public void testCglib() {
+		ProxyFactory factory = new ProxyFactory(new SimplePojo());
+		factory.setTargetClass(SimplePojo.class);
+		factory.setProxyTargetClass(true);
+		factory.addAdvice(new SimpleMethodBeforeAdvice());
+		
+		SimplePojo pojo = (SimplePojo) factory.getProxy();
+		pojo.simple();
+	}
 }

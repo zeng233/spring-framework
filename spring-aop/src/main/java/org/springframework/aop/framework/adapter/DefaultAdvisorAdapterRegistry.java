@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInterceptor;
-
+import org.apache.log4j.Logger;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
 
@@ -39,6 +39,7 @@ import org.springframework.aop.support.DefaultPointcutAdvisor;
  */
 @SuppressWarnings("serial")
 public class DefaultAdvisorAdapterRegistry implements AdvisorAdapterRegistry, Serializable {
+	private static Logger mylog = Logger.getLogger(DefaultAdvisorAdapterRegistry.class);
 
 	private final List<AdvisorAdapter> adapters = new ArrayList<AdvisorAdapter>(3);
 
@@ -50,6 +51,7 @@ public class DefaultAdvisorAdapterRegistry implements AdvisorAdapterRegistry, Se
 		registerAdvisorAdapter(new MethodBeforeAdviceAdapter());
 		registerAdvisorAdapter(new AfterReturningAdviceAdapter());
 		registerAdvisorAdapter(new ThrowsAdviceAdapter());
+		mylog.debug("初始化before、after、throw三种advice的adapter");
 	}
 
 
@@ -82,6 +84,8 @@ public class DefaultAdvisorAdapterRegistry implements AdvisorAdapterRegistry, Se
 		if (advice instanceof MethodInterceptor) {
 			interceptors.add((MethodInterceptor) advice);
 		}
+		
+		mylog.debug("遍历初始化的3中adapter找到对应的interceptor");
 		for (AdvisorAdapter adapter : this.adapters) {
 			if (adapter.supportsAdvice(advice)) {
 				interceptors.add(adapter.getInterceptor(advisor));
