@@ -50,6 +50,8 @@ public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 
 	@Override
 	public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {
+		mylog.debug("创建JdkDynamicAopProxy还是ObjenesisCglibAopProxy");
+		//检查是不是接口，或者是不是强制设置ProxyTargetClass为true，是就使用Cglib代理
 		if (config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config)) {
 			Class<?> targetClass = config.getTargetClass();
 			if (targetClass == null) {
@@ -59,10 +61,10 @@ public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
 			if (targetClass.isInterface() || Proxy.isProxyClass(targetClass)) {
 				return new JdkDynamicAopProxy(config);
 			}
+			mylog.debug("初始化ObjenesisCglibAopProxy");
 			return new ObjenesisCglibAopProxy(config);
 		}
 		else {
-			mylog.debug("创建JdkDynamicAopProxy");
 			return new JdkDynamicAopProxy(config);
 		}
 	}

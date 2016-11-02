@@ -46,7 +46,8 @@ public class ConfigTest {
 		//只解析传入的xml，默认包的handler是不会处理的
 		this.reader = new XmlBeanDefinitionReader(this.beanFactory);
 		this.reader.loadBeanDefinitions(CONTEXT);
-		System.out.println("before加载完成");
+		System.out.println("ConfigTest-before加载完成");
+		System.out.println();
 	}
 
 	@Test
@@ -59,11 +60,13 @@ public class ConfigTest {
 	public void testAround() {
 //		MyTestBean myTestBean = beanFactory.getBean(MyTestBean.class);
 		ApplicationContext context = new ClassPathXmlApplicationContext("mytest/aop/ConfigTest.xml");
+		System.out.println("ConfigTest-ApplicationContext初始化配置文件完成");
 		System.out.println();
 		
 		MyTestBean myTestBean = context.getBean(MyTestBean.class);
 		
-		//如何创建代理对象的 TODO（为什么XmlBeanDefinitionReader方式不行呢）
+		//如何创建代理对象的 TODO（为什么XmlBeanDefinitionReader方式不行呢），
+		//真正触发代理是在AbstractApplicationContext的finishBeanFactoryInitialization
 		System.out.println(AopUtils.isAopProxy(myTestBean));
 		
 		myTestBean.print();

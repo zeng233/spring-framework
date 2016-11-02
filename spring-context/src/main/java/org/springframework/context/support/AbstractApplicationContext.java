@@ -513,7 +513,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			// Tell the subclass to refresh the internal bean factory.
 			mylog.debug("2、解析bean，并注册到DefaultListableBeanFactory，最后返回该对象");
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
-			System.out.println("解析配置文件，初始化bean完成");
+			System.out.println("AbstractApplicationContext-解析配置文件，初始化bean完成");
+			System.out.println();
 			
 			// Prepare the bean factory for use in this context.
 			mylog.debug("3、初始化DefaultListableBeanFactory设置");
@@ -553,7 +554,11 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 				// Instantiate all remaining (non-lazy-init) singletons.
 				mylog.debug("11、finishBeanFactoryInitialization");
+				System.out.println();
+				System.out.println("实例化有依赖的bean开始");
 				finishBeanFactoryInitialization(beanFactory);
+				System.out.println("实例化依赖bean完成");
+				System.out.println();
 
 				// Last step: publish corresponding event.
 				mylog.debug("12、启动bean的生命周期");

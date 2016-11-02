@@ -414,7 +414,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 			throw new AopConfigException("DynamicIntroductionAdvice may only be added as part of IntroductionAdvisor");
 		}
 		else {
-			mylog.debug("方法级别的advice封装成DefaultPointcutAdvisor，在DefaultAdvisorChainFactory中会判断映射方法级别的拦截器并执行");
+			mylog.debug("BeforeAdvice、ThrowsAdvice等Advice类型封装成DefaultPointcutAdvisor，在DefaultAdvisorChainFactory中会判断映射方法级别的拦截器并执行");
 			addAdvisor(pos, new DefaultPointcutAdvisor(advice));
 		}
 	}

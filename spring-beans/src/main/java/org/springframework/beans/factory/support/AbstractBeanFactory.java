@@ -237,8 +237,8 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	protected <T> T doGetBean(
 			final String name, final Class<T> requiredType, final Object[] args, boolean typeCheckOnly)
 			throws BeansException {
-		mylog.debug("获取bean开始");
 		final String beanName = transformedBeanName(name);
+		mylog.debug("获取bean（" + beanName + "）开始");
 		Object bean;
 
 		// Eagerly check singleton cache for manually registered singletons.

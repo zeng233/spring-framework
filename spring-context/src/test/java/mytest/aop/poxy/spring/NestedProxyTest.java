@@ -50,12 +50,13 @@ public class NestedProxyTest {
 		pojo.foo();
 	}
 	
-	//TODO
 	@Test
 	public void testCglib() {
-		ProxyFactory factory = new ProxyFactory(new SimplePojo());
-		factory.setTargetClass(SimplePojo.class);
-		factory.setProxyTargetClass(true);
+		ProxyFactory factory = new ProxyFactory();
+		//默认为SingletonTargetSource
+		factory.setTarget(new SimplePojo());
+		//强制使用cglib代理
+//		factory.setProxyTargetClass(true);
 		factory.addAdvice(new SimpleMethodBeforeAdvice());
 		
 		SimplePojo pojo = (SimplePojo) factory.getProxy();

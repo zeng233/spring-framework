@@ -29,7 +29,7 @@ import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.log4j.Logger;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.AopInvocationException;
 import org.springframework.aop.PointcutAdvisor;
@@ -82,6 +82,7 @@ import org.springframework.util.ObjectUtils;
  */
 @SuppressWarnings("serial")
 class CglibAopProxy implements AopProxy, Serializable {
+	private static Logger mylog = Logger.getLogger(CglibAopProxy.class);
 
 	// Constants for CGLIB callback array indices
 	private static final int AOP_PROXY = 0;
@@ -194,12 +195,16 @@ class CglibAopProxy implements AopProxy, Serializable {
 			for (int x = 0; x < types.length; x++) {
 				types[x] = callbacks[x].getClass();
 			}
+			
+			mylog.debug("enhancer设置ProxyCallbackFilter过滤器，并传入getConfigurationOnlyCopy一个copy的AdvisedSupport进去");
 			// fixedInterceptorMap only populated at this point, after getCallbacks call above
 			enhancer.setCallbackFilter(new ProxyCallbackFilter(
 					this.advised.getConfigurationOnlyCopy(), this.fixedInterceptorMap, this.fixedInterceptorOffset));
 			enhancer.setCallbackTypes(types);
 
 			// Generate the proxy class and create a proxy instance.
+			mylog.debug("cglib创建对象");
+			System.out.println("CglibAopProxy======cglib开始创建对象");
 			return createProxyClassAndInstance(enhancer, callbacks);
 		}
 		catch (CodeGenerationException ex) {
@@ -283,6 +288,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 		boolean isFrozen = this.advised.isFrozen();
 		boolean isStatic = this.advised.getTargetSource().isStatic();
 
+		mylog.debug("创建DynamicAdvisedInterceptor，cglib动态调用");
 		// Choose an "aop" interceptor (used for AOP calls).
 		Callback aopInterceptor = new DynamicAdvisedInterceptor(this.advised);
 
@@ -651,6 +657,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 					retVal = methodProxy.invoke(target, argsToUse);
 				}
 				else {
+					mylog.debug("CglibMethodInvocation.proceed()执行advice及代理对象的方法");
 					// We need to create a method invocation...
 					retVal = new CglibMethodInvocation(proxy, target, method, args, targetClass, chain, methodProxy).proceed();
 				}
