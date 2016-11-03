@@ -472,6 +472,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		try {
+			System.out.println("=======每个bean初始化之前的操作");
+			mylog.debug("每个bean初始化之前的操作");
 			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
 			if (bean != null) {
@@ -965,13 +967,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	protected Object resolveBeforeInstantiation(String beanName, RootBeanDefinition mbd) {
 		Object bean = null;
+		//InstantiationAwareBeanPostProcessor类型的BeanPostProcessor会在第六步注册时，会将次beforeInstantiationResolved设置为true
+		//参考PostProcessorRegistrationDelegate.registerBeanPostProcessors()，由AbstractBeanFactory.addBeanPostProcessor()设置
 		if (!Boolean.FALSE.equals(mbd.beforeInstantiationResolved)) {
+			//参考mbd.setSynthetic()，设置true表示不是实际项目中应用的bean，是内部的bean
 			// Make sure bean class is actually resolved at this point.
 			if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
+				mylog.debug("判断是bean需要特殊处理不");
 				Class<?> targetType = determineTargetType(beanName, mbd);
 				if (targetType != null) {
 					bean = applyBeanPostProcessorsBeforeInstantiation(targetType, beanName);
 					if (bean != null) {
+						System.out.println("AbstractAutowireCapableBeanFactory.applyBeanPostProcessorsAfterInitialization处理初始化类");
+						mylog.debug("applyBeanPostProcessorsAfterInitialization处理初始化类");
 						bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
 					}
 				}
@@ -999,6 +1007,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		for (BeanPostProcessor bp : getBeanPostProcessors()) {
 			if (bp instanceof InstantiationAwareBeanPostProcessor) {
 				InstantiationAwareBeanPostProcessor ibp = (InstantiationAwareBeanPostProcessor) bp;
+				//执行代理之前，排除Advice、Advise等接口
 				Object result = ibp.postProcessBeforeInstantiation(beanClass, beanName);
 				if (result != null) {
 					return result;

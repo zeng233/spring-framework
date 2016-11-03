@@ -18,14 +18,10 @@ package mytest.aop.config;
 
 
 /**
- * 测试cglib代理去掉接口
  * 
- * @author Administrator
+ * @author zenghua233
  * @since 4.2.1
  */
-public class MyTestBean {
-	
-//	@Override
-	public void print() {
-	}
+public interface ITestBean {
+	void print();
 }

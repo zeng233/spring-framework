@@ -62,12 +62,15 @@ public class ConfigTest {
 		ApplicationContext context = new ClassPathXmlApplicationContext("mytest/aop/ConfigTest.xml");
 		System.out.println("ConfigTest-ApplicationContext初始化配置文件完成");
 		
+		//如果MyTestBean实现了接口，获取的对象是代理对象，不是原对象，这里就会抛异常
 		MyTestBean myTestBean = context.getBean(MyTestBean.class);
+		MyAspect myAspect = context.getBean(MyAspect.class);
 		
 		//如何创建代理对象的 TODO（为什么XmlBeanDefinitionReader方式不行呢），
 		//真正触发代理是在AbstractApplicationContext的finishBeanFactoryInitialization
-		System.out.println("ConfigTest-是否是代理类:" + AopUtils.isAopProxy(myTestBean));
+//		System.out.println("ConfigTest-是否是代理类:" + AopUtils.isAopProxy(myTestBean));
 		
-		myTestBean.print();
+//		myTestBean.print();
+		
 	}
 }

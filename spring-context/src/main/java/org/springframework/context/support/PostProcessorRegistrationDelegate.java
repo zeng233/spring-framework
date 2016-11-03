@@ -228,15 +228,20 @@ class PostProcessorRegistrationDelegate {
 
 		// Next, register the BeanPostProcessors that implement Ordered.
 		List<BeanPostProcessor> orderedPostProcessors = new ArrayList<BeanPostProcessor>();
+		System.out.println("开始处理内部BeanPostProcessor");
 		mylog.debug("处理内部的BeanPostProcessor");
 		for (String ppName : orderedPostProcessorNames) {
+			System.out.println("获取BeanPostProcessor：" + ppName);
 			BeanPostProcessor pp = beanFactory.getBean(ppName, BeanPostProcessor.class);
 			orderedPostProcessors.add(pp);
 			if (pp instanceof MergedBeanDefinitionPostProcessor) {
 				internalPostProcessors.add(pp);
 			}
 		}
+		System.out.println("结束处理BeanPostProcessor");
+		mylog.debug("BeanPostProcessor结束处理");
 		sortPostProcessors(beanFactory, orderedPostProcessors);
+		mylog.debug("由AbstractBeanFactory.addBeanPostProcessor注册，并判断是否有hasInstantiationAwareBeanPostProcessors");
 		registerBeanPostProcessors(beanFactory, orderedPostProcessors);
 
 		// Now, register all regular BeanPostProcessors.

@@ -25,7 +25,7 @@ package mytest.aop.config;
 public class MyAspect {
 	public int count = 0;
 
-	public void around() {
+	public void aroundAdvice() {
 		System.out.println(count++);
 	}
 }

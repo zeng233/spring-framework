@@ -5,19 +5,21 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
+	<bean id="myAdvice" class="mytest.aop.config.MyAdvice"/>
+	<bean id="myAspect" class="mytest.aop.config.MyAspect"/>
+	
+	<bean id="myTestBean" class="mytest.aop.config.MyTestBean"/>
+
 	<aop:config>
 		<aop:pointcut expression="execution(* mytest.aop.config.*.*(..))" id="pc"/>
 		
 		<aop:advisor advice-ref="myAdvice" pointcut-ref="pc"/>
 		
 		<aop:aspect ref="myAspect">
-			<aop:around method="around" pointcut-ref="pc"/>
+			<aop:around method="aroundAdvice" pointcut-ref="pc"/>
 		</aop:aspect>
 	</aop:config>
 	
-	<bean id="myAspect" class="mytest.aop.config.MyAspect"/>
 	
-	<bean id="myAdvice" class="mytest.aop.config.MyAdvice"/>
 	
-	<bean id="myTestBean" class="mytest.aop.config.MyTestBean"/>
 </beans>

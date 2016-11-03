@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package mytest.aop.config;
+package mytest.aop.tx;
 
 
 /**
- * 测试cglib代理去掉接口
  * 
- * @author Administrator
+ * @author zenghua233
  * @since 4.2.1
  */
-public class MyTestBean {
-	
-//	@Override
-	public void print() {
-	}
+public class TxAdviceTest {
+
 }
