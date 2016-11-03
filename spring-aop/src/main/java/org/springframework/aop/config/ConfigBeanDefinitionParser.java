@@ -112,10 +112,14 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 				parsePointcut(elt, parserContext);
 			}
 			else if (ADVISOR.equals(localName)) {
+				System.out.println("ConfigBeanDefinitionParser.parse()-开始解析内部的advisor标签");
 				parseAdvisor(elt, parserContext);
+				System.out.println("ConfigBeanDefinitionParser.parse()-开始解析内部的advisor标签");
 			}
 			else if (ASPECT.equals(localName)) {
+				System.out.println("ConfigBeanDefinitionParser.parse()-开始解析内部的aspect标签");
 				parseAspect(elt, parserContext);
+				System.out.println("ConfigBeanDefinitionParser.parse()-aspect标签解析完成");
 			}
 		}
 
@@ -234,6 +238,7 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 					beanDefinitions.add(advisorDefinition);
 				}
 			}
+			mylog.debug("解析aspect标签内部的advice结束");
 
 			AspectComponentDefinition aspectComponentDefinition = createAspectComponentDefinition(
 					aspectElement, aspectId, beanDefinitions, beanReferences, parserContext);
@@ -370,7 +375,7 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 			RootBeanDefinition methodDef, RootBeanDefinition aspectFactoryDef,
 			List<BeanDefinition> beanDefinitions, List<BeanReference> beanReferences) {
 
-		mylog.debug("初始化RootBeanDefinition，并获取Advice的各种Class对象");
+		mylog.debug("各种Advice的Class对象（AspectJMethodBeforeAdvice、AspectJAfterAdvice等到）初始化到RootBeanDefinition");
 		RootBeanDefinition adviceDefinition = new RootBeanDefinition(getAdviceClass(adviceElement, parserContext));
 		adviceDefinition.setSource(parserContext.extractSource(adviceElement));
 

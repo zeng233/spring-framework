@@ -61,13 +61,12 @@ public class ConfigTest {
 //		MyTestBean myTestBean = beanFactory.getBean(MyTestBean.class);
 		ApplicationContext context = new ClassPathXmlApplicationContext("mytest/aop/ConfigTest.xml");
 		System.out.println("ConfigTest-ApplicationContext初始化配置文件完成");
-		System.out.println();
 		
 		MyTestBean myTestBean = context.getBean(MyTestBean.class);
 		
 		//如何创建代理对象的 TODO（为什么XmlBeanDefinitionReader方式不行呢），
 		//真正触发代理是在AbstractApplicationContext的finishBeanFactoryInitialization
-		System.out.println(AopUtils.isAopProxy(myTestBean));
+		System.out.println("ConfigTest-是否是代理类:" + AopUtils.isAopProxy(myTestBean));
 		
 		myTestBean.print();
 	}
