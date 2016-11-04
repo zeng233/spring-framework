@@ -114,7 +114,7 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 			else if (ADVISOR.equals(localName)) {
 				System.out.println("ConfigBeanDefinitionParser.parse()-开始解析内部的advisor标签");
 				parseAdvisor(elt, parserContext);
-				System.out.println("ConfigBeanDefinitionParser.parse()-开始解析内部的advisor标签");
+				System.out.println("ConfigBeanDefinitionParser.parse()-结束解析内部的advisor标签");
 			}
 			else if (ASPECT.equals(localName)) {
 				System.out.println("ConfigBeanDefinitionParser.parse()-开始解析内部的aspect标签");

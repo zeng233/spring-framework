@@ -17,7 +17,7 @@
 package org.springframework.beans.factory.xml;
 
 import org.w3c.dom.Element;
-
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
@@ -48,6 +48,7 @@ import org.springframework.util.StringUtils;
  * @since 2.0
  */
 public abstract class AbstractBeanDefinitionParser implements BeanDefinitionParser {
+	private static final Logger mylog = Logger.getLogger(AbstractBeanDefinitionParser.class);
 
 	/** Constant for the "id" attribute */
 	public static final String ID_ATTRIBUTE = "id";
@@ -59,6 +60,7 @@ public abstract class AbstractBeanDefinitionParser implements BeanDefinitionPars
 	@Override
 	public final BeanDefinition parse(Element element, ParserContext parserContext) {
 		AbstractBeanDefinition definition = parseInternal(element, parserContext);
+		mylog.debug("获取标签本生代表的类：" + definition);
 		if (definition != null && !parserContext.isNested()) {
 			try {
 				String id = resolveId(element, definition, parserContext);

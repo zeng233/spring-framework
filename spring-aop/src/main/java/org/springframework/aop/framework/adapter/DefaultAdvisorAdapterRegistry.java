@@ -85,7 +85,7 @@ public class DefaultAdvisorAdapterRegistry implements AdvisorAdapterRegistry, Se
 			interceptors.add((MethodInterceptor) advice);
 		}
 		
-		mylog.debug("遍历初始化的3中adapter找到对应的interceptor");
+		mylog.debug("遍历初始化三种adapter（MethodBeforeAdviceAdapter等）找到对应的interceptor");
 		for (AdvisorAdapter adapter : this.adapters) {
 			if (adapter.supportsAdvice(advice)) {
 				interceptors.add(adapter.getInterceptor(advisor));

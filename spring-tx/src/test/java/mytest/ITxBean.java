@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package mytest.aop.tx;
+package mytest;
 
 
 /**
@@ -22,6 +22,11 @@ package mytest.aop.tx;
  * @author zenghua233
  * @since 4.2.1
  */
-public class TxAdviceTest {
-
+public interface ITxBean {
+	
+	void exceptional(Exception e) throws Exception;
+	
+	void setFoo();
+	
+	String getFoo();
 }

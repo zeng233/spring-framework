@@ -19,8 +19,7 @@ package org.springframework.transaction.config;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.w3c.dom.Element;
-
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.ManagedMap;
@@ -34,6 +33,7 @@ import org.springframework.transaction.interceptor.RuleBasedTransactionAttribute
 import org.springframework.transaction.interceptor.TransactionInterceptor;
 import org.springframework.util.StringUtils;
 import org.springframework.util.xml.DomUtils;
+import org.w3c.dom.Element;
 
 /**
  * {@link org.springframework.beans.factory.xml.BeanDefinitionParser
@@ -46,6 +46,7 @@ import org.springframework.util.xml.DomUtils;
  * @since 2.0
  */
 class TxAdviceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
+	private static Logger mylog = Logger.getLogger(TxAdviceBeanDefinitionParser.class);
 
 	private static final String METHOD_ELEMENT = "method";
 
@@ -68,6 +69,7 @@ class TxAdviceBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
 	@Override
 	protected Class<?> getBeanClass(Element element) {
+		mylog.debug("获取事务拦截器类TransactionInterceptor");
 		return TransactionInterceptor.class;
 	}
 
