@@ -246,7 +246,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 			if (this.advisedBeans.containsKey(cacheKey)) {
 				return null;
 			}
-			System.out.println("=====排除Advice、Advise、Aspect切面相关的类====");
+			System.out.println("=====排除AopInfrastructureBean、Advice、Advise、Aspect切面相关的类====");
 			mylog.debug("排除Advice、Advise、Aspect切面相关的类");
 			if (isInfrastructureClass(beanClass) || shouldSkip(beanClass, beanName)) {
 				this.advisedBeans.put(cacheKey, Boolean.FALSE);

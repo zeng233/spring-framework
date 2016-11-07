@@ -19,6 +19,7 @@ package mytest;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.aop.support.AopUtils;
+import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.tests.transaction.CallCountingTransactionManager;
@@ -44,6 +45,9 @@ public class TxAdviceTest {
 		System.out.println(context.getBean("myTxAdvice"));
 		System.out.println(myBean);
 		System.out.println(AopUtils.isAopProxy(myBean));
+		AutowiredAnnotationBeanPostProcessor process = (AutowiredAnnotationBeanPostProcessor) context.getBean("org.springframework.context.annotation.internalAutowiredAnnotationProcessor");
+		System.out.println(process);
+		System.out.println(AopUtils.isAopProxy(process));
 	}
 	
 	@Test
