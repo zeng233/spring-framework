@@ -748,6 +748,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		// While this may not be part of the regular factory bootstrap, it does otherwise work fine.
 		List<String> beanNames = new ArrayList<String>(this.beanDefinitionNames);
 
+		System.out.println();
+		System.out.println("初始化bean依赖");
+		mylog.debug("初始化bean依赖");
 		// Trigger initialization of all non-lazy singleton beans...
 		for (String beanName : beanNames) {
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
@@ -773,9 +776,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				}
 				else {
 					mylog.debug("===========预创建单例bean开始");
-					System.out.println("DefaultListableBeanFactory.preInstantiateSingletons()==getBean开始获取单例的" + beanName + "-bean（组装bean依赖）");
+					System.out.println("DefaultListableBeanFactory.preInstantiateSingletons()==getBean开始:获取单例的" + beanName + "-bean（组装bean依赖）");
 					getBean(beanName);
 					System.out.println("DefaultListableBeanFactory.preInstantiateSingletons()==getBean结束");
+					mylog.debug("getBean结束");
 				}
 			}
 		}

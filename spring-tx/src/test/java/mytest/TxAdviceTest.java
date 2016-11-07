@@ -42,6 +42,7 @@ public class TxAdviceTest {
 	@Test
 	public void testConfig() {
 		ITxBean myBean = (ITxBean) context.getBean("myTxBean");
+		//获取TransactionInterceptor
 		System.out.println(context.getBean("myTxAdvice"));
 		System.out.println(myBean);
 		System.out.println(AopUtils.isAopProxy(myBean));
@@ -57,6 +58,8 @@ public class TxAdviceTest {
 		CallCountingTransactionManager ptm = (CallCountingTransactionManager) context.getBean("transactionManager");
 		System.out.println(ptm.begun);
 		//代理对象执行方法，调用JdkDynamicAopProxy.invoke()方法（实现了InvocationHandler接口）
+		//代理对象执行时，DefaultAdvisorChainFactory.getInterceptorsAndDynamicInterceptionAdvice使用ClassFilter过滤表达式
+		//AspectJExpressionPointcut也是ClassFilter的一个子类
 		myBean.getFoo();
 		System.out.println(ptm.begun);
 		System.out.println(ptm.commits);

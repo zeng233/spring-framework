@@ -59,7 +59,7 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 		//单例模式
 		AdvisorAdapterRegistry registry = GlobalAdvisorAdapterRegistry.getInstance();
 
-		mylog.debug("遍历代理配置（AdvisedSupport）中的advisors，添加对应的interceptor");
+		mylog.debug("遍历代理配置（AdvisedSupport）中的advisors，添加对应的interceptor（包括AspectJExpressionPointcut表达式过滤要执行的类或者方法）");
 		for (Advisor advisor : config.getAdvisors()) {
 			if (advisor instanceof PointcutAdvisor) {
 				// Add it conditionally.

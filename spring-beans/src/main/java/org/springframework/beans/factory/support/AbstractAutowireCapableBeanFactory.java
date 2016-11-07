@@ -472,7 +472,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 
 		try {
-			System.out.println("=======每个bean初始化之前的操作");
+			System.out.println("=======每个bean初始化之前的操作：" + beanName);
 			mylog.debug("每个bean初始化之前的操作");
 			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
