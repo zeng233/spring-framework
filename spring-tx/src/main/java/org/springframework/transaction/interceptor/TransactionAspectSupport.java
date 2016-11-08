@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
@@ -66,6 +66,7 @@ import org.springframework.util.StringUtils;
  * @see #setTransactionAttributeSource
  */
 public abstract class TransactionAspectSupport implements BeanFactoryAware, InitializingBean {
+	private static Logger mylog = Logger.getLogger(TransactionAspectSupport.class);
 
 	/**
 	 * Key to use to store the default transaction manager.
@@ -268,6 +269,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 
 		// If the transaction attribute is null, the method is non-transactional.
 		final TransactionAttribute txAttr = getTransactionAttributeSource().getTransactionAttribute(method, targetClass);
+		mylog.debug("实例PlatformTransactionManager");
 		final PlatformTransactionManager tm = determineTransactionManager(txAttr);
 		final String joinpointIdentification = methodIdentification(method, targetClass);
 
@@ -424,6 +426,7 @@ public abstract class TransactionAspectSupport implements BeanFactoryAware, Init
 		TransactionStatus status = null;
 		if (txAttr != null) {
 			if (tm != null) {
+				mylog.debug("如果事务属性、PlatformTransactionManager不为空，获取事务对象");
 				status = tm.getTransaction(txAttr);
 			}
 			else {

@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.log4j.Logger;
 import org.springframework.core.Constants;
 import org.springframework.transaction.IllegalTransactionStateException;
 import org.springframework.transaction.InvalidTimeoutException;
@@ -80,6 +80,7 @@ import org.springframework.transaction.UnexpectedRollbackException;
  */
 @SuppressWarnings("serial")
 public abstract class AbstractPlatformTransactionManager implements PlatformTransactionManager, Serializable {
+	private static Logger mylog = Logger.getLogger(AbstractPlatformTransactionManager.class);
 
 	/**
 	 * Always activate transaction synchronization, even for "empty" transactions
@@ -334,6 +335,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 	 */
 	@Override
 	public final TransactionStatus getTransaction(TransactionDefinition definition) throws TransactionException {
+		mylog.debug("获取事物对象");
 		Object transaction = doGetTransaction();
 
 		// Cache debug flag to avoid repeated checks.
@@ -370,6 +372,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 				boolean newSynchronization = (getTransactionSynchronization() != SYNCHRONIZATION_NEVER);
 				DefaultTransactionStatus status = newTransactionStatus(
 						definition, transaction, true, newSynchronization, debugEnabled, suspendedResources);
+				mylog.debug("PlatformTransactionManager.doBegin开启事务");
 				doBegin(transaction, definition);
 				prepareSynchronization(status, definition);
 				return status;

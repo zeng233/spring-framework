@@ -9,11 +9,11 @@
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 				
-	<!-- <context:component-scan base-package="mytest"/> -->
+	<!-- <context:component-scan base-package="mytest.tx"/> -->
 	<context:annotation-config/>
 	
 	<aop:config>
-		<aop:advisor pointcut="execution(* mytest.ITxBean.*(..))" advice-ref="myTxAdvice"/>
+		<aop:advisor pointcut="execution(* mytest.tx.ITxBean.*(..))" advice-ref="myTxAdvice"/>
 	</aop:config>
 	
 	<tx:advice id="myTxAdvice" transaction-manager="transactionManager">
@@ -25,5 +25,5 @@
 	</tx:advice>
 	
 	<bean id="transactionManager" class="org.springframework.tests.transaction.CallCountingTransactionManager"/>
-	<bean id="myTxBean" class="mytest.MyTxBean"/>
+	<bean id="myTxBean" class="mytest.tx.MyTxBean"/>
 </beans>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package mytest;
+package mytest.tx;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +34,7 @@ public class TxAdviceTest {
 	
 	@Before
 	public void before() {
-		context = new ClassPathXmlApplicationContext("mytest/TxAdviceTest.xml");
+		context = new ClassPathXmlApplicationContext("mytest/tx/TxAdviceTest.xml");
 		System.out.println("===========ClassPathXmlApplicationContext初始化完成==========");
 		System.out.println();
 	}

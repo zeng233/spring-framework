@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package mytest;
+package mytest.tx;
 
 
 /**
@@ -22,24 +22,11 @@ package mytest;
  * @author zenghua233
  * @since 4.2.1
  */
-public class MyTxBean implements ITxBean {
-
-	@Override
-	public void exceptional(Exception e) throws Exception {
-		if (e != null) {
-			throw e;
-		}
-	}
-
-	@Override
-	public void setFoo() {
-		System.out.println("setFoo()");
-	}
-
-	@Override
-	public String getFoo() {
-		return "getFoo()";
-	}
-
-
+public interface ITxBean {
+	
+	void exceptional(Exception e) throws Exception;
+	
+	void setFoo();
+	
+	String getFoo();
 }
