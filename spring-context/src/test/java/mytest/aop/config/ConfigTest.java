@@ -18,15 +18,12 @@ package mytest.aop.config;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.aop.support.AopUtils;
-import org.springframework.beans.factory.parsing.ComponentDefinition;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.tests.beans.CollectingReaderEventListener;
 
 /**
  * 参考：AopNamespaceHandlerEventTests、AopNamespaceHandlerTests
@@ -60,7 +57,7 @@ public class ConfigTest {
 	public void testAround() {
 //		MyTestBean myTestBean = beanFactory.getBean(MyTestBean.class);
 		ApplicationContext context = new ClassPathXmlApplicationContext("mytest/aop/ConfigTest.xml");
-		System.out.println("ConfigTest-ApplicationContext初始化配置文件完成");
+		System.out.println("********************************************");
 		
 		//如果MyTestBean实现了接口，获取的对象是代理对象，不是原对象，这里就会抛异常
 		MyTestBean myTestBean = context.getBean(MyTestBean.class);
@@ -70,7 +67,7 @@ public class ConfigTest {
 		//真正触发代理是在AbstractApplicationContext的finishBeanFactoryInitialization
 //		System.out.println("ConfigTest-是否是代理类:" + AopUtils.isAopProxy(myTestBean));
 		
-//		myTestBean.print();
+		myTestBean.print();
 		
 	}
 }

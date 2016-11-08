@@ -375,7 +375,7 @@ class ConfigBeanDefinitionParser implements BeanDefinitionParser {
 			RootBeanDefinition methodDef, RootBeanDefinition aspectFactoryDef,
 			List<BeanDefinition> beanDefinitions, List<BeanReference> beanReferences) {
 
-		mylog.debug("各种Advice的Class对象（AspectJMethodBeforeAdvice、AspectJAfterAdvice等到）初始化到RootBeanDefinition");
+		mylog.debug("各种Advice的Class对象（AspectJMethodBeforeAdvice、AspectJAfterAdvice、AspectJAroundAdvice等到）初始化到RootBeanDefinition");
 		RootBeanDefinition adviceDefinition = new RootBeanDefinition(getAdviceClass(adviceElement, parserContext));
 		adviceDefinition.setSource(parserContext.extractSource(adviceElement));
 

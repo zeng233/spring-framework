@@ -10,7 +10,7 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
 				
 	<!-- <context:component-scan base-package="mytest"/> -->
-	<context:annotation-config/>
+	<!-- <context:annotation-config/> -->
 	
 	<aop:config>
 		<aop:advisor pointcut="execution(* mytest.tx.ITxBean.*(..))" advice-ref="myTxAdvice"/>

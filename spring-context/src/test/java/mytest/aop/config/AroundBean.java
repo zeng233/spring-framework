@@ -16,19 +16,17 @@
 
 package mytest.aop.config;
 
-import org.aspectj.lang.ProceedingJoinPoint;
 
 /**
  * 
- * @author Administrator
+ * @author zenghua233
  * @since 4.2.1
  */
-public class MyAspect {
-	public int count = 0;
+public class AroundBean implements ITestBean {
 
-	public void aroundAdvice(ProceedingJoinPoint pjp) throws Throwable {
-		System.out.println("MyAspect: around before");
-		pjp.proceed();
-		System.out.println("MyAspect: around after");
+	@Override
+	public void print() {
+		System.out.println("AroundBean's print");
 	}
+
 }

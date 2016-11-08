@@ -18,6 +18,7 @@ package org.springframework.aop.aspectj;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.PointcutAdvisor;
 import org.springframework.aop.interceptor.ExposeInvocationInterceptor;
@@ -30,6 +31,7 @@ import org.springframework.aop.interceptor.ExposeInvocationInterceptor;
  * @since 2.0
  */
 public abstract class AspectJProxyUtils {
+	private static Logger mylog = Logger.getLogger(AspectJProxyUtils.class);
 
 	/**
 	 * Add special advisors if necessary to work with a proxy chain that contains AspectJ advisors.
@@ -51,6 +53,7 @@ public abstract class AspectJProxyUtils {
 				}
 			}
 			if (foundAspectJAdvice && !advisors.contains(ExposeInvocationInterceptor.ADVISOR)) {
+				mylog.debug("添加ExposeInvocationInterceptor.ADVISOR到advisors");
 				advisors.add(0, ExposeInvocationInterceptor.ADVISOR);
 				return true;
 			}

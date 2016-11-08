@@ -44,6 +44,7 @@ public class NestedProxyTest {
 		factory.addAdvice(new SimpleMethodBeforeAdvice());
 		//Spring针对内嵌方法中，使用this调用目标函数，实际没有走代理对象，使用的本地对象
 		//要使内部嵌套调用函数使用代理，这里要设置true，放到ThreadLocal中去
+		//如果ClasspathXmlApplicationContext由ExposeInvocationInterceptor设置
 		factory.setExposeProxy(true);
 		
 		Pojo pojo = (Pojo) factory.getProxy();

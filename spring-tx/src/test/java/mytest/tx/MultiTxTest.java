@@ -16,6 +16,7 @@
 
 package mytest.tx;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -48,18 +49,19 @@ public class MultiTxTest {
 		CallCountingTransactionManager ptm = (CallCountingTransactionManager) context.getBean("transactionManager");
 				
 		ExecutorService executor = Executors.newFixedThreadPool(100000000);
+		CountDownLatch latch = new CountDownLatch(100);
 		
-		
-		for(int i = 0; i < 1000; i++) {
+		for(int i = 0; i < 100; i++) {
 			executor.execute(new Runnable() {
 				@Override
 				public void run() {
 					myBean.getFoo();
+					latch.countDown();
 				}
 			});
 		}
 		
-		Thread.sleep(3000);
+		latch.await();
 		System.out.println(ptm.commits);
 	}
 }

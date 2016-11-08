@@ -18,6 +18,7 @@ package org.springframework.aop.framework.autoproxy;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.support.AopUtils;
@@ -46,6 +47,7 @@ import org.springframework.core.annotation.AnnotationAwareOrderComparator;
  */
 @SuppressWarnings("serial")
 public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyCreator {
+	private static Logger mylog = Logger.getLogger(AbstractAdvisorAutoProxyCreator.class);
 
 	private BeanFactoryAdvisorRetrievalHelper advisorRetrievalHelper;
 
@@ -84,6 +86,7 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 * @see #extendAdvisors
 	 */
 	protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName) {
+		mylog.debug("获取说有的容器中所有的Advisor子类");
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
 		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
 		extendAdvisors(eligibleAdvisors);
