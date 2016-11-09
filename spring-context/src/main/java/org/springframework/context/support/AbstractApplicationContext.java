@@ -555,9 +555,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// Instantiate all remaining (non-lazy-init) singletons.
 				mylog.debug("11、finishBeanFactoryInitialization");
 				System.out.println();
-				System.out.println("实例化有依赖的bean开始");
+				System.out.println("=====实例化有依赖的bean开始=====");
 				finishBeanFactoryInitialization(beanFactory);
-				System.out.println("实例化依赖bean完成");
+				System.out.println("=====实例化依赖bean完成=====");
 				System.out.println();
 
 				// Last step: publish corresponding event.

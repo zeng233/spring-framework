@@ -553,7 +553,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Initialize the bean instance.
 		Object exposedObject = bean;
 		try {
-			mylog.debug("=============封装bean============");
+			mylog.debug("=============封装bean：" + beanName + "============");
 			populateBean(beanName, mbd, instanceWrapper);
 			mylog.debug("populateBean完成，初始化bean还需要其他操作不");
 			if (exposedObject != null) {

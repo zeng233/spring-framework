@@ -21,7 +21,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.log4j.Logger;
 import org.springframework.aop.Advisor;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.BeanCurrentlyInCreationException;
@@ -38,6 +38,7 @@ import org.springframework.util.Assert;
  * @see AbstractAdvisorAutoProxyCreator
  */
 public class BeanFactoryAdvisorRetrievalHelper {
+	private static final Logger mylog = Logger.getLogger(BeanFactoryAdvisorRetrievalHelper.class);
 
 	private static final Log logger = LogFactory.getLog(BeanFactoryAdvisorRetrievalHelper.class);
 
@@ -80,6 +81,8 @@ public class BeanFactoryAdvisorRetrievalHelper {
 		}
 
 		List<Advisor> advisors = new LinkedList<Advisor>();
+		System.out.println("@@@@@@@@@@遍历所有的advisorNames，并实例化成类，再添加到List去@@@@@@@@@@@");
+		mylog.debug("@@@@@@@@@@遍历所有的advisorNames，并实例化成类，再添加到List去@@@@@@@@@@@");
 		for (String name : advisorNames) {
 			if (isEligibleBean(name)) {
 				if (this.beanFactory.isCurrentlyInCreation(name)) {

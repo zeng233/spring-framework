@@ -776,10 +776,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				}
 				else {
 					mylog.debug("===========预创建单例bean开始");
-					System.out.println("DefaultListableBeanFactory.preInstantiateSingletons()==getBean开始:获取单例的" + beanName + "-bean（组装bean依赖）");
+					System.out.println("=======预创建单例bean开始：" + beanName + "========");
 					getBean(beanName);
-					System.out.println("DefaultListableBeanFactory.preInstantiateSingletons()==getBean结束");
-					mylog.debug("getBean结束");
+					System.out.println("=======预创建单例bean结束：" + beanName + "========");
+					mylog.debug("===========预创建单例bean结束");
 				}
 			}
 		}
