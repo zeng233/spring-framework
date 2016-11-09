@@ -5,6 +5,8 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
+	<bean id="foo" class="mytest.aop.FooImpl"/>
+	
 	<bean id="aroundBean" class="mytest.aop.config.AroundBean"/>
 	
 	<bean id="myAdvice" class="mytest.aop.config.MyAdvice"/>

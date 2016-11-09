@@ -476,6 +476,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			mylog.debug("每个bean初始化之前的操作");
 			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
+			mylog.debug("beanName：resolveBeforeInstantiation处理完成");
 			if (bean != null) {
 				mylog.debug("返回代理对象");
 				return bean;
@@ -559,6 +560,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			if (exposedObject != null) {
 				//特殊化处理bean（如创建代理类）
 				exposedObject = initializeBean(beanName, exposedObject, mbd);
+				System.out.println("*************initializeBean完成");
+				mylog.debug("initializeBean完成");
 			}
 		}
 		catch (Throwable ex) {
@@ -838,6 +841,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
 				if (bp instanceof SmartInstantiationAwareBeanPostProcessor) {
 					SmartInstantiationAwareBeanPostProcessor ibp = (SmartInstantiationAwareBeanPostProcessor) bp;
+					mylog.debug(bp + ".getEarlyBeanReference: 获取BeanPostProcessor包装类，如代理类");
 					exposedObject = ibp.getEarlyBeanReference(exposedObject, beanName);
 					if (exposedObject == null) {
 						return exposedObject;

@@ -247,7 +247,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 				return null;
 			}
 			System.out.println("=====排除AopInfrastructureBean、Advice、Advise、Aspect切面相关的类====");
-			mylog.debug("排除Advice、Advise、Aspect切面相关的类");
+			mylog.debug("排除Advisor、Advice、Advise、Aspect切面相关的类");
 			if (isInfrastructureClass(beanClass) || shouldSkip(beanClass, beanName)) {
 				this.advisedBeans.put(cacheKey, Boolean.FALSE);
 				return null;
@@ -339,6 +339,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		if (beanName != null && this.targetSourcedBeans.contains(beanName)) {
 			return bean;
 		}
+		//postProcessBeforeInstantiation方法已经将排除的bean放置到advisedBeans
 		if (Boolean.FALSE.equals(this.advisedBeans.get(cacheKey))) {
 			return bean;
 		}
@@ -349,6 +350,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 
 		//获取Alliance中实现的Interceptors
 		mylog.debug("获取所有的Advisors");
+		//一般bean如果不包含在PointCut表达式中，返回为null
 		// Create proxy if we have advice.
 		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
 		if (specificInterceptors != DO_NOT_PROXY) {
@@ -448,6 +450,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 			AutoProxyUtils.exposeTargetClass((ConfigurableListableBeanFactory) this.beanFactory, beanName, beanClass);
 		}
 
+		mylog.debug("创建ProxyFactory");
 		ProxyFactory proxyFactory = new ProxyFactory();
 		proxyFactory.copyFrom(this);
 

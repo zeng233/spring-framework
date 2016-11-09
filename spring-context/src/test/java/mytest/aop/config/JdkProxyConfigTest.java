@@ -22,6 +22,8 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import mytest.aop.IFoo;
+
 /**
  * 
  * @author zenghua233
@@ -39,7 +41,15 @@ public class JdkProxyConfigTest {
 	@Test
 	public void testAround() {
 		ITestBean aroundBean = (ITestBean) context.getBean("aroundBean");
-//		System.out.println(AopUtils.isAopProxy(aroundBean));
 		aroundBean.print();
+	}
+	
+	@Test
+	public void testProxy() {
+		ITestBean aroundBean = (ITestBean) context.getBean("aroundBean");
+		IFoo foo = (IFoo)context.getBean("foo");
+		
+		System.out.println("aroundBean：" + AopUtils.isAopProxy(aroundBean));
+		System.out.println("foo：" + AopUtils.isAopProxy(foo));
 	}
 }
