@@ -16,8 +16,7 @@
 
 package org.springframework.transaction.config;
 
-import org.w3c.dom.Element;
-
+import org.apache.log4j.Logger;
 import org.springframework.aop.config.AopNamespaceUtils;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -29,6 +28,7 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.transaction.event.TransactionalEventListenerFactory;
 import org.springframework.transaction.interceptor.BeanFactoryTransactionAttributeSourceAdvisor;
 import org.springframework.transaction.interceptor.TransactionInterceptor;
+import org.w3c.dom.Element;
 
 /**
  * {@link org.springframework.beans.factory.xml.BeanDefinitionParser
@@ -49,6 +49,7 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
  * @since 2.0
  */
 class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
+	private static Logger mylog = Logger.getLogger(AnnotationDrivenBeanDefinitionParser.class);
 
 	/**
 	 * Parses the {@code <tx:annotation-driven/>} tag. Will
@@ -101,12 +102,14 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 	private static class AopAutoProxyConfigurer {
 
 		public static void configureAutoProxyCreator(Element element, ParserContext parserContext) {
+			mylog.debug("注册创建代理的类InfrastructureAdvisorAutoProxyCreator");
 			AopNamespaceUtils.registerAutoProxyCreatorIfNecessary(parserContext, element);
 
 			String txAdvisorBeanName = TransactionManagementConfigUtils.TRANSACTION_ADVISOR_BEAN_NAME;
 			if (!parserContext.getRegistry().containsBeanDefinition(txAdvisorBeanName)) {
 				Object eleSource = parserContext.extractSource(element);
 
+				mylog.debug("注册解析@Transaction注解的类");
 				// Create the TransactionAttributeSource definition.
 				RootBeanDefinition sourceDef = new RootBeanDefinition(
 						"org.springframework.transaction.annotation.AnnotationTransactionAttributeSource");
@@ -114,6 +117,7 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 				sourceDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 				String sourceName = parserContext.getReaderContext().registerWithGeneratedName(sourceDef);
 
+				mylog.debug("注册TransactionInterceptor");
 				// Create the TransactionInterceptor definition.
 				RootBeanDefinition interceptorDef = new RootBeanDefinition(TransactionInterceptor.class);
 				interceptorDef.setSource(eleSource);
@@ -122,6 +126,7 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 				interceptorDef.getPropertyValues().add("transactionAttributeSource", new RuntimeBeanReference(sourceName));
 				String interceptorName = parserContext.getReaderContext().registerWithGeneratedName(interceptorDef);
 
+				mylog.debug("注册BeanFactoryTransactionAttributeSourceAdvisor");
 				// Create the TransactionAttributeSourceAdvisor definition.
 				RootBeanDefinition advisorDef = new RootBeanDefinition(BeanFactoryTransactionAttributeSourceAdvisor.class);
 				advisorDef.setSource(eleSource);

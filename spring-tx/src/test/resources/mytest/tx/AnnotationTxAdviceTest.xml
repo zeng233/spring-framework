@@ -8,8 +8,14 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
-				
+		
+	<bean id="myAdvice" class="mytest.tx.MyAdvice"/>
+	<aop:config>
+		<aop:advisor pointcut="execution(* mytest.tx.ITxBean.*(..))" advice-ref="myAdvice"/>
+	</aop:config>
+	
 	<tx:annotation-driven transaction-manager="txManager"/>
+	
 	<bean id="txManager" class="org.springframework.tests.transaction.CallCountingTransactionManager"/>
 	
 	<bean id="annoTxBean" class="mytest.tx.AnnotationTxBean"/>

@@ -37,6 +37,10 @@ private ApplicationContext context;
 		System.out.println();
 	}
 	
+	/**
+	 * 同事包含AspectJAwareAdvisorAutoProxyCreator、InfrastructureAdvisorAutoProxyCreator（事务）这两个创建代理对象只有前者有效
+	 * TODO
+	 */
 	@Test
 	public void testGet() {
 		//获取到的是JDK的代理对象

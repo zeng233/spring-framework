@@ -41,6 +41,7 @@ import static org.junit.Assert.*;
  */
 public class XmlBeanDefinitionReaderTests {
 
+	//读取xml的类只能是BeanDefinitionDocumentReader
 	@Test
 	public void setParserClassSunnyDay() {
 		SimpleBeanDefinitionRegistry registry = new SimpleBeanDefinitionRegistry();
@@ -58,7 +59,14 @@ public class XmlBeanDefinitionReaderTests {
 		SimpleBeanDefinitionRegistry registry = new SimpleBeanDefinitionRegistry();
 		new XmlBeanDefinitionReader(registry).setDocumentReaderClass(String.class);
 	}
+	
 
+	//校验当xml文件打开的时候，抛出异常
+	//参考方法XmlBeanDefinitionReader.loadBeanDefinitions()
+	//doLoadBeanDefinitions()
+	//doLoadDocument()
+	//getValidationModeForResource()
+	//detectValidationMode()
 	@Test(expected = BeanDefinitionStoreException.class)
 	public void withOpenInputStream() {
 		SimpleBeanDefinitionRegistry registry = new SimpleBeanDefinitionRegistry();
