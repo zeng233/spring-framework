@@ -92,6 +92,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		this.readerContext = readerContext;
 		logger.debug("Loading bean definitions");
 		Element root = doc.getDocumentElement();
+		System.out.println("开始解析xml标签");
 		mylog.debug("开始解析xml标签");
 		doRegisterBeanDefinitions(root);
 	}
@@ -167,6 +168,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 				if (node instanceof Element) {
 					Element ele = (Element) node;
 					if (delegate.isDefaultNamespace(ele)) {
+						mylog.debug("解析非自定义标签");
 						parseDefaultElement(ele, delegate);
 					}
 					else {
@@ -313,8 +315,8 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 				getReaderContext().error("Failed to register bean definition with name '" +
 						bdHolder.getBeanName() + "'", ele, ex);
 			}
+			//触发注册监听器
 			// Send registration event.
-//			log.debug("注册bean之后，触发监听器");
 			getReaderContext().fireComponentRegistered(new BeanComponentDefinition(bdHolder));
 		}
 	}

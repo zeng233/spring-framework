@@ -16,6 +16,10 @@
 
 package mytest.bean.advancedBean;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * 
@@ -23,5 +27,21 @@ package mytest.bean.advancedBean;
  * @since 4.2.1
  */
 public class AdvancedBeanTest {
-
+	private ApplicationContext context;
+	
+	@Before
+	public void before() {
+		context = new ClassPathXmlApplicationContext("mytest/AdvancedBeanTest.xml");
+	}
+	
+	@Test
+	public void testInit() {
+		Apple apple = context.getBean("apple", Apple.class);
+		System.out.println(apple);
+	}
+	
+	@Test
+	public void testInherit() {
+		
+	}
 }

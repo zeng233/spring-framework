@@ -16,40 +16,12 @@
 
 package mytest.bean.advancedBean;
 
+
 /**
  * 
  * @author zenghua233
  * @since 4.2.1
  */
-public class Apple {
+public class ChildBean {
 
-	private int id;
-
-	private String color;
-	
-	public Apple() {}
-	
-	public Apple(String color) {
-		this.color = color;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public String getColor() {
-		return color;
-	}
-
-	public void setColor(String color) {
-		this.color = color;
-	}
-
-	public void init() {
-		System.out.println("this is Apple's init()");
-	}
 }

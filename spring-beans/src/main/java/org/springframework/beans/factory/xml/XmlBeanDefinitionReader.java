@@ -395,6 +395,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 		try {
 			mylog.debug("把resource文件解析成document");
 			Document doc = doLoadDocument(inputSource, resource);
+			mylog.debug("把创建的Document对象作为参数，传入到registerBeanDefinitions");
 			return registerBeanDefinitions(doc, resource);
 		}
 		catch (BeanDefinitionStoreException ex) {
