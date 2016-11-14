@@ -160,7 +160,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 */
 	public AbstractAutowireCapableBeanFactory() {
 		super();
-		mylog.debug("添加bean生命周期几个类BeanNameAware、BeanClassLoaderAware、BeanFactoryAware");
+		mylog.debug("依赖bean要排除BeanNameAware、BeanClassLoaderAware、BeanFactoryAware");
 		ignoreDependencyInterface(BeanNameAware.class);
 		ignoreDependencyInterface(BeanFactoryAware.class);
 		ignoreDependencyInterface(BeanClassLoaderAware.class);
@@ -554,7 +554,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// Initialize the bean instance.
 		Object exposedObject = bean;
 		try {
-			mylog.debug("=============封装bean：" + beanName + "============");
+			mylog.debug("=============封装bean（有依赖的bean）：" + beanName + "============");
 			populateBean(beanName, mbd, instanceWrapper);
 			mylog.debug("populateBean完成，初始化bean还需要其他操作不");
 			if (exposedObject != null) {

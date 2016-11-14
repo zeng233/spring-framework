@@ -297,6 +297,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 							throw new BeanCreationException(mbd.getResourceDescription(), beanName,
 									"Circular depends-on relationship between '" + beanName + "' and '" + dependsOnBean + "'");
 						}
+						//内嵌依赖bean
 						registerDependentBean(dependsOnBean, beanName);
 						getBean(dependsOnBean);
 					}
@@ -1228,6 +1229,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 						mbd = ((RootBeanDefinition) bd).cloneBeanDefinition();
 					}
 					else {
+						//最终的bean设置为RootBeanDefinition
 						mbd = new RootBeanDefinition(bd);
 					}
 				}
@@ -1260,7 +1262,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				}
 
 				// Set default singleton scope, if not configured before.
-				mylog.debug("设置bean的Scope是单例还是原型");
+				mylog.debug("如果bean的没有Scope属性，默认设置为singleton");
 				if (!StringUtils.hasLength(mbd.getScope())) {
 					mbd.setScope(RootBeanDefinition.SCOPE_SINGLETON);
 				}

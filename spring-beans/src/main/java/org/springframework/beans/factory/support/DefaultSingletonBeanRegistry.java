@@ -205,6 +205,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @param beanName the name of the bean
 	 * @param singletonFactory the ObjectFactory to lazily create the singleton
 	 * with, if necessary
+	 * singletonFactory创建bean
 	 * @return the registered singleton object
 	 */
 	public Object getSingleton(String beanName, ObjectFactory<?> singletonFactory) {
@@ -253,6 +254,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					afterSingletonCreation(beanName);
 				}
 				if (newSingleton) {
+					//添加到singletonObjects缓存
 					addSingleton(beanName, singletonObject);
 				}
 			}

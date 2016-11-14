@@ -40,6 +40,9 @@ public class AdvancedBeanTest {
 		System.out.println(apple);
 	}
 	
+	/**
+	 * 参考ClassPathXmlApplicationContextTests.testAliasThatOverridesParent()
+	 */
 	@Test
 	public void testInherit() {
 		

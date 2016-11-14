@@ -276,6 +276,9 @@ public class ClassPathXmlApplicationContextTests {
 		ctx.close();
 	}
 
+	/**
+	 * 测试子类别名覆盖父类名字 TODO
+	 */
 	@Test
 	public void testAliasThatOverridesParent() {
 		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(FQ_SIMPLE_CONTEXT);
