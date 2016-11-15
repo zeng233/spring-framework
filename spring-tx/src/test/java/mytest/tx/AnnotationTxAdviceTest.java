@@ -39,7 +39,8 @@ private ApplicationContext context;
 	
 	/**
 	 * 同事包含AspectJAwareAdvisorAutoProxyCreator、InfrastructureAdvisorAutoProxyCreator（事务）这两个创建代理对象只有前者有效
-	 * TODO
+	 * 
+	 * 参考：http://jinnianshilongnian.iteye.com/blog/1901694
 	 */
 	@Test
 	public void testGet() {

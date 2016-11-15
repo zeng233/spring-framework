@@ -8,11 +8,15 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd" 
 		default-autowire="default">
 		
-	<!-- <bean id="simple" class="mytest.bean.simpleBean.SimpleBean"/>
+	<bean id="simple" class="mytest.bean.simpleBean.SimpleBean"/>
 
 	<bean id="prototypeBean" class="mytest.bean.simpleBean.PrototypeBean" scope="prototype"/>
-	 -->
+	
 	<bean class="mytest.bean.simpleBean.SimpleBean">
 		<property name="prototypeBean" ref="prototypeBean"/>
+	</bean>
+	
+	<bean id="circularBean" class="mytest.bean.simpleBean.PrototypeBean" scope="prototype">
+		<property name="simpleBean" ref="simple"/>
 	</bean>
 </beans>

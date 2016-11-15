@@ -42,6 +42,7 @@ public class AdvancedBeanTest {
 	
 	/**
 	 * 参考ClassPathXmlApplicationContextTests.testAliasThatOverridesParent()
+	 * 子容器和父类容器加入相同的bean和相同的id，测试结果怎么样？
 	 */
 	@Test
 	public void testInherit() {

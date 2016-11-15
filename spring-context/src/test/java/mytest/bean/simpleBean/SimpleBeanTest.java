@@ -64,4 +64,13 @@ public class SimpleBeanTest {
 		//原型重新设置后，与新的值对比
 		log.debug(oldIndex == p2.getIndex());
 	}
+	
+	/**
+	 * 参考6.4章节，Dependency resolution process
+	 * set方式注入可以，构造函数不能（源码跟踪下 TODO）
+	 */
+	@Test
+	public void testCircularBean() {
+		context.getBean("circularBean");
+	}
 }

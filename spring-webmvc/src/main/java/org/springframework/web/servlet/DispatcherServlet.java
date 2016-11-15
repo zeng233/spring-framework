@@ -475,6 +475,8 @@ public class DispatcherServlet extends FrameworkServlet {
 	}
 
 	/**
+	 * 由FrameworkServlet内部的ContextRefreshListener触发ApplicationEvent
+	 * 
 	 * Initialize the strategy objects that this servlet uses.
 	 * <p>May be overridden in subclasses in order to initialize further strategy objects.
 	 */

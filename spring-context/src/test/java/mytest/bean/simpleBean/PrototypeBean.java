@@ -27,6 +27,9 @@ public class PrototypeBean {
 
 	private String name;
 
+	// 测试循环依赖bean
+	private SimpleBean simpleBean;
+
 	public int getIndex() {
 		return index;
 	}
@@ -41,6 +44,14 @@ public class PrototypeBean {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public SimpleBean getSimpleBean() {
+		return simpleBean;
+	}
+
+	public void setSimpleBean(SimpleBean simpleBean) {
+		this.simpleBean = simpleBean;
 	}
 
 }

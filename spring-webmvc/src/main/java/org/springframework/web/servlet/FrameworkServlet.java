@@ -524,6 +524,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	 * @see #setContextConfigLocation
 	 */
 	protected WebApplicationContext initWebApplicationContext() {
+		mylog.debug("从ContextLoaderListener中获取父类的WebApplicationContext，参考ContextLoader.initWebApplicationContext");
 		WebApplicationContext rootContext =
 				WebApplicationContextUtils.getWebApplicationContext(getServletContext());
 		WebApplicationContext wac = null;
@@ -553,6 +554,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 			wac = findWebApplicationContext();
 		}
 		if (wac == null) {
+			mylog.debug("实例化DispatcherServlet的WebApplicationContext，父类为ContextLoaderListener初始化的容器");
 			// No context instance is defined for this servlet -> create a local one
 			wac = createWebApplicationContext(rootContext);
 		}
