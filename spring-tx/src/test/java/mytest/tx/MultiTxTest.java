@@ -48,10 +48,10 @@ public class MultiTxTest {
 		ITxBean myBean = (ITxBean) context.getBean("myTxBean");
 		CallCountingTransactionManager ptm = (CallCountingTransactionManager) context.getBean("transactionManager");
 				
-		ExecutorService executor = Executors.newFixedThreadPool(100000000);
-		CountDownLatch latch = new CountDownLatch(100);
+		ExecutorService executor = Executors.newFixedThreadPool(100);
+		CountDownLatch latch = new CountDownLatch(100000);
 		
-		for(int i = 0; i < 100; i++) {
+		for(int i = 0; i < 100000; i++) {
 			executor.execute(new Runnable() {
 				@Override
 				public void run() {

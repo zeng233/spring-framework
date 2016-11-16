@@ -18,8 +18,10 @@ package org.springframework.jdbc.datasource;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+
 import javax.sql.DataSource;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.transaction.TransactionDefinition;
@@ -101,6 +103,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 @SuppressWarnings("serial")
 public class DataSourceTransactionManager extends AbstractPlatformTransactionManager
 		implements ResourceTransactionManager, InitializingBean {
+	private static Logger mylog = Logger.getLogger(DataSourceTransactionManager.class);
 
 	private DataSource dataSource;
 
@@ -224,6 +227,7 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
 				}
 				con.setAutoCommit(false);
 			}
+			mylog.debug("设置setTransactionActive为true");
 			txObject.getConnectionHolder().setTransactionActive(true);
 
 			int timeout = determineTimeout(definition);

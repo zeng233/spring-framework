@@ -39,4 +39,8 @@ public class AnnotationTxBean implements ITxBean {
 		return null;
 	}
 
+	@Override
+	public void getNested() {
+	}
+
 }

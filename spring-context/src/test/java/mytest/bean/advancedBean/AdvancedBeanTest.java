@@ -19,6 +19,7 @@ package mytest.bean.advancedBean;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -42,10 +43,21 @@ public class AdvancedBeanTest {
 	
 	/**
 	 * 参考ClassPathXmlApplicationContextTests.testAliasThatOverridesParent()
-	 * 子容器和父类容器加入相同的bean和相同的id，测试结果怎么样？
 	 */
 	@Test
-	public void testInherit() {
+	public void testInheritBean() {
 		
+	}
+	
+	/**
+	 * 子类容器与父类容器的bean存储的缓存是隔离的，id可以一样，
+	 * 在WebApplicationContext容器事务失效问题，就是web容器扫描的包，已经把service、dao加载到子容器中了，
+	 * 但web容器中并没有配置事务（父级容器有事务配置），所以事务失效了
+	 */
+	@Test
+	public void testInheritContainer() {
+		ConfigurableApplicationContext childContext = new ClassPathXmlApplicationContext("mytest/AdvancedBeanTest-child.xml");
+		childContext.setParent(context);
+		childContext.getBean("apple");
 	}
 }

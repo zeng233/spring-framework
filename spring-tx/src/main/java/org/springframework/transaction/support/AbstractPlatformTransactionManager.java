@@ -335,7 +335,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 	 */
 	@Override
 	public final TransactionStatus getTransaction(TransactionDefinition definition) throws TransactionException {
-		mylog.debug("获取事物对象");
+		mylog.debug("获取事物对象，由AbstractPlatformTransactionManager子类去实现");
 		Object transaction = doGetTransaction();
 
 		// Cache debug flag to avoid repeated checks.
@@ -346,6 +346,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 			definition = new DefaultTransactionDefinition();
 		}
 
+		mylog.debug("不同的数据源，分布式事务，判断已存在的事务，对已存在的事务进行处理（PROPAGATION_REQUIRES_NEW、PROPAGATION_NESTED等的处理）");
 		if (isExistingTransaction(transaction)) {
 			// Existing transaction found -> check propagation behavior to find out how to behave.
 			return handleExistingTransaction(definition, transaction, debugEnabled);
@@ -374,6 +375,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 						definition, transaction, true, newSynchronization, debugEnabled, suspendedResources);
 				mylog.debug("PlatformTransactionManager.doBegin开启事务");
 				doBegin(transaction, definition);
+				mylog.debug("设置事务名称到ThreadLocal中");
 				prepareSynchronization(status, definition);
 				return status;
 			}

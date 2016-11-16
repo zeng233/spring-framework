@@ -55,4 +55,11 @@ private ApplicationContext context;
 		System.out.println("begun：" + ptm.begun);
 		System.out.println("commits：" + ptm.commits);
 	}
+	
+	/**
+	 * 两个都有事务，同一个类执行方法A，里面调用了B方法（required-new，开启新事务失效 ） TODO
+	 */
+	public void testTwoTranaction() {
+		
+	}
 }

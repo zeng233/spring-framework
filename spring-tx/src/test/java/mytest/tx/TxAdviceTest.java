@@ -64,4 +64,15 @@ public class TxAdviceTest {
 		System.out.println(ptm.begun);
 		System.out.println(ptm.commits);
 	}
+	
+	/**
+	 * 测试嵌套的新事务
+	 * 
+	 * 如果在同一个类中都加了事务，那调用这个类中的方法实际没有走代理对象的，所以即使是注解了开启新事务也无效
+	 */
+	@Test
+	public void testNestedNew() {
+		ITxBean myBean = (ITxBean) context.getBean("myTxBean");
+		myBean.getNested();
+	}
 }

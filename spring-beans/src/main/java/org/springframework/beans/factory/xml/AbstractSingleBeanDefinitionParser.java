@@ -17,7 +17,7 @@
 package org.springframework.beans.factory.xml;
 
 import org.w3c.dom.Element;
-
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 
@@ -44,6 +44,7 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
  * @see #doParse
  */
 public abstract class AbstractSingleBeanDefinitionParser extends AbstractBeanDefinitionParser {
+	private static final Logger mylog = Logger.getLogger(AbstractSingleBeanDefinitionParser.class);
 
 	/**
 	 * Creates a {@link BeanDefinitionBuilder} instance for the
@@ -82,6 +83,7 @@ public abstract class AbstractSingleBeanDefinitionParser extends AbstractBeanDef
 			// Default-lazy-init applies to custom bean definitions as well.
 			builder.setLazyInit(true);
 		}
+		mylog.debug("解析自定义标签" + element + "内部的子标签");
 		doParse(element, parserContext, builder);
 		return builder.getBeanDefinition();
 	}

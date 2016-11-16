@@ -23,6 +23,7 @@ package mytest.tx;
  * @since 4.2.1
  */
 public class MyTxBean implements ITxBean {
+	private ITxInfo txInfo;
 
 	@Override
 	public void exceptional(Exception e) throws Exception {
@@ -41,5 +42,16 @@ public class MyTxBean implements ITxBean {
 		return "getFoo()";
 	}
 
+	/**
+	 * 嵌套事务
+	 */
+	@Override
+	public void getNested() {
+		txInfo.setInfo("tx");
+		System.out.println("MyTxBean.getNested()");
+	}
 
+	public void setTxInfo(ITxInfo txInfo) {
+		this.txInfo = txInfo;
+	}
 }

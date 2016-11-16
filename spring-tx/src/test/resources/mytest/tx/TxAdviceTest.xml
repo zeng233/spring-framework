@@ -13,17 +13,21 @@
 	<context:annotation-config/>
 	
 	<aop:config>
-		<aop:advisor pointcut="execution(* mytest.tx.ITxBean.*(..))" advice-ref="myTxAdvice"/>
+		<aop:advisor pointcut="execution(* mytest.tx..*(..))" advice-ref="myTxAdvice"/>
 	</aop:config>
 	
 	<tx:advice id="myTxAdvice" transaction-manager="transactionManager">
 		<tx:attributes>
 			<tx:method name="get*" read-only="true"/>
-			<tx:method name="set*"/>
+			<tx:method name="set*" propagation="REQUIRES_NEW"/>
 			<tx:method name="exceptional"/>
 		</tx:attributes>
 	</tx:advice>
 	
 	<bean id="transactionManager" class="org.springframework.tests.transaction.CallCountingTransactionManager"/>
-	<bean id="myTxBean" class="mytest.tx.MyTxBean"/>
+	<bean id="myTxInfo" class="mytest.tx.MyTxInfo"/>
+	
+	<bean id="myTxBean" class="mytest.tx.MyTxBean">
+		<property name="txInfo" ref="myTxInfo"/>
+	</bean>
 </beans>

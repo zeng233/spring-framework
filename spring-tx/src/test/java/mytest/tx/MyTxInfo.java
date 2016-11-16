@@ -22,13 +22,11 @@ package mytest.tx;
  * @author zenghua233
  * @since 4.2.1
  */
-public interface ITxBean {
-	
-	void exceptional(Exception e) throws Exception;
-	
-	void setFoo();
-	
-	String getFoo();
-	
-	void getNested();
+public class MyTxInfo implements ITxInfo {
+
+	@Override
+	public void setInfo(String info) {
+		System.out.println("this is MyTxInfo.setInfo()");
+	}
+
 }
