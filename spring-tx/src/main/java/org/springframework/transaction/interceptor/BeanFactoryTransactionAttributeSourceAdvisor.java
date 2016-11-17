@@ -16,6 +16,7 @@
 
 package org.springframework.transaction.interceptor;
 
+import org.apache.log4j.Logger;
 import org.springframework.aop.ClassFilter;
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;
@@ -32,6 +33,7 @@ import org.springframework.aop.support.AbstractBeanFactoryPointcutAdvisor;
  */
 @SuppressWarnings("serial")
 public class BeanFactoryTransactionAttributeSourceAdvisor extends AbstractBeanFactoryPointcutAdvisor {
+	private static Logger mylog = Logger.getLogger(BeanFactoryTransactionAttributeSourceAdvisor.class);
 
 	private TransactionAttributeSource transactionAttributeSource;
 
@@ -63,6 +65,7 @@ public class BeanFactoryTransactionAttributeSourceAdvisor extends AbstractBeanFa
 
 	@Override
 	public Pointcut getPointcut() {
+		mylog.debug("获取TransactionAttributeSourcePointcut");
 		return this.pointcut;
 	}
 

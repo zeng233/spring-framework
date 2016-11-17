@@ -66,7 +66,9 @@ public class DefaultAdvisorChainFactory implements AdvisorChainFactory, Serializ
 				PointcutAdvisor pointcutAdvisor = (PointcutAdvisor) advisor;
 				if (config.isPreFiltered() || pointcutAdvisor.getPointcut().getClassFilter().matches(actualClass)) {
 					MethodInterceptor[] interceptors = registry.getInterceptors(advisor);
+					mylog.debug("根据pointcutAdvisor找到Pointcut里面的MethodMatcher");
 					MethodMatcher mm = pointcutAdvisor.getPointcut().getMethodMatcher();
+					mylog.debug("执行AOP表达式匹配的方法");
 					if (MethodMatchers.matches(mm, method, actualClass, hasIntroductions)) {
 						if (mm.isRuntime()) {
 							// Creating a new object instance in the getInterceptors() method

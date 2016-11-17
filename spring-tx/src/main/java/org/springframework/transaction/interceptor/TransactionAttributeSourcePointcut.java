@@ -19,6 +19,7 @@ package org.springframework.transaction.interceptor;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 
+import org.apache.log4j.Logger;
 import org.springframework.aop.support.StaticMethodMatcherPointcut;
 import org.springframework.util.ObjectUtils;
 
@@ -31,12 +32,14 @@ import org.springframework.util.ObjectUtils;
  */
 @SuppressWarnings("serial")
 abstract class TransactionAttributeSourcePointcut extends StaticMethodMatcherPointcut implements Serializable {
+	private static Logger mylog = Logger.getLogger(TransactionAttributeSourcePointcut.class);
 
 	@Override
 	public boolean matches(Method method, Class<?> targetClass) {
 		if (TransactionalProxy.class.isAssignableFrom(targetClass)) {
 			return false;
 		}
+		mylog.debug("获取TransactionAttributeSource");
 		TransactionAttributeSource tas = getTransactionAttributeSource();
 		return (tas == null || tas.getTransactionAttribute(method, targetClass) != null);
 	}

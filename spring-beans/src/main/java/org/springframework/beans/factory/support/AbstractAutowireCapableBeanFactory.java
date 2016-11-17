@@ -560,8 +560,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			if (exposedObject != null) {
 				//特殊化处理bean（如创建代理类）
 				exposedObject = initializeBean(beanName, exposedObject, mbd);
-				System.out.println("*************initializeBean完成");
-				mylog.debug("initializeBean完成");
+				System.out.println(beanName + "*************initializeBean完成");
+				System.out.println();
+				mylog.debug(beanName + "-initializeBean完成");
 			}
 		}
 		catch (Throwable ex) {

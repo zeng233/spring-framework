@@ -16,6 +16,7 @@
 
 package mytest.tx;
 
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -29,8 +30,10 @@ public class AnnotationTxBean implements ITxBean {
 	public void exceptional(Exception e) throws Exception {
 	}
 
+	@Transactional(propagation=Propagation.REQUIRES_NEW)
 	@Override
 	public void setFoo() {
+		System.out.println("this is setFoo");
 	}
 
 	@Transactional

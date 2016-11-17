@@ -43,7 +43,7 @@ private ApplicationContext context;
 	 * 参考：http://jinnianshilongnian.iteye.com/blog/1901694
 	 */
 	@Test
-	public void testGet() {
+	public void testReadOnly() {
 		//获取到的是JDK的代理对象
 		ITxBean myBean = (ITxBean) context.getBean("annoTxBean");
 		CallCountingTransactionManager ptm = (CallCountingTransactionManager) context.getBean("txManager");
@@ -54,6 +54,13 @@ private ApplicationContext context;
 		myBean.getFoo();
 		System.out.println("begun：" + ptm.begun);
 		System.out.println("commits：" + ptm.commits);
+	}
+	
+	@Test
+	public void testRequiresNew() {
+		//获取到的是JDK的代理对象
+		ITxBean myBean = (ITxBean) context.getBean("annoTxBean");
+		myBean.setFoo();
 	}
 	
 	/**

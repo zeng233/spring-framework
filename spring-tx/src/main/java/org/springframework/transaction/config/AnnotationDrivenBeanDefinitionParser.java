@@ -58,6 +58,7 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 	 */
 	@Override
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
+		mylog.debug("添加事务监听器");
 		registerTransactionalEventListenerFactory(parserContext);
 		String mode = element.getAttribute("mode");
 		if ("aspectj".equals(mode)) {
@@ -66,6 +67,7 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 		}
 		else {
 			// mode="proxy"
+			mylog.debug("<tx:annotation-driven>默认为proxy，使用AnnotationTransactionAttributeSource");
 			AopAutoProxyConfigurer.configureAutoProxyCreator(element, parserContext);
 		}
 		return null;
@@ -123,6 +125,7 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 				interceptorDef.setSource(eleSource);
 				interceptorDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 				registerTransactionManager(element, interceptorDef);
+				mylog.debug("TransactionInterceptor设置AnnotationTransactionAttributeSource");
 				interceptorDef.getPropertyValues().add("transactionAttributeSource", new RuntimeBeanReference(sourceName));
 				String interceptorName = parserContext.getReaderContext().registerWithGeneratedName(interceptorDef);
 
@@ -132,6 +135,7 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 				advisorDef.setSource(eleSource);
 				advisorDef.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 				advisorDef.getPropertyValues().add("transactionAttributeSource", new RuntimeBeanReference(sourceName));
+				mylog.debug("TxPointcutAdvisor添加advice（TransactionInterceptor）");
 				advisorDef.getPropertyValues().add("adviceBeanName", interceptorName);
 				if (element.hasAttribute("order")) {
 					advisorDef.getPropertyValues().add("order", element.getAttribute("order"));

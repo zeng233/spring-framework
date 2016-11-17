@@ -14,6 +14,7 @@
 		<aop:advisor pointcut="execution(* mytest.tx.ITxBean.*(..))" advice-ref="myAdvice"/>
 	</aop:config> -->
 	
+	<!-- 参考tx的schema，mode属性默认为proxy（jdk代理） -->
 	<tx:annotation-driven transaction-manager="txManager"/>
 	
 	<bean id="txManager" class="org.springframework.tests.transaction.CallCountingTransactionManager"/>

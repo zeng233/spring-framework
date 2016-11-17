@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.springframework.aop.Advisor;
 import org.springframework.aop.AopInvocationException;
 import org.springframework.aop.IntroductionAdvisor;
@@ -53,6 +54,7 @@ import org.springframework.util.ReflectionUtils;
  * @see org.springframework.aop.framework.AopProxyUtils
  */
 public abstract class AopUtils {
+	public final static Logger mylog = Logger.getLogger(AopUtils.class);
 
 	/**
 	 * Check whether the given object is a JDK dynamic proxy or a CGLIB proxy.
@@ -203,6 +205,7 @@ public abstract class AopUtils {
 
 		Set<Class<?>> classes = new LinkedHashSet<Class<?>>(ClassUtils.getAllInterfacesForClassAsSet(targetClass));
 		classes.add(targetClass);
+		mylog.debug("AOP找到匹配的方法");
 		for (Class<?> clazz : classes) {
 			Method[] methods = clazz.getMethods();
 			for (Method method : methods) {

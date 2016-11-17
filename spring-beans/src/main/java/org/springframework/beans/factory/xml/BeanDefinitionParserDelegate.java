@@ -1410,7 +1410,7 @@ public class BeanDefinitionParserDelegate {
 	public BeanDefinition parseCustomElement(Element ele, BeanDefinition containingBd) {
 		String namespaceUri = getNamespaceURI(ele);
 		mylog.debug("获取namespaceURI：" + namespaceUri);
-		mylog.debug("获取XmlReaderContext中的NamespaceHandlerResolver");
+		mylog.debug("获取XmlReaderContext中的DefaultNamespaceHandlerResolver");
 		NamespaceHandler handler = this.readerContext.getNamespaceHandlerResolver().resolve(namespaceUri);
 		if (handler == null) {
 			error("Unable to locate Spring NamespaceHandler for XML schema namespace [" + namespaceUri + "]", ele);

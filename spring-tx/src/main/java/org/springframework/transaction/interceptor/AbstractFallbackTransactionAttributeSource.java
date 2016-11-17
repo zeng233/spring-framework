@@ -23,7 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.log4j.Logger;
+import org.springframework.aop.framework.DefaultAdvisorChainFactory;
 import org.springframework.core.BridgeMethodResolver;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
@@ -49,6 +50,7 @@ import org.springframework.util.ObjectUtils;
  * @since 1.1
  */
 public abstract class AbstractFallbackTransactionAttributeSource implements TransactionAttributeSource {
+	public final Logger mylog = Logger.getLogger(this.getClass());
 
 	/**
 	 * Canonical value held in cache to indicate no transaction attribute was
@@ -82,6 +84,7 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 	 */
 	@Override
 	public TransactionAttribute getTransactionAttribute(Method method, Class<?> targetClass) {
+		mylog.debug("先从缓存中找该方法的事务");
 		// First, see if we have a cached value.
 		Object cacheKey = getCacheKey(method, targetClass);
 		Object cached = this.attributeCache.get(cacheKey);
@@ -96,6 +99,7 @@ public abstract class AbstractFallbackTransactionAttributeSource implements Tran
 			}
 		}
 		else {
+			mylog.debug("获取方法的事务属性");
 			// We need to work it out.
 			TransactionAttribute txAtt = computeTransactionAttribute(method, targetClass);
 			// Put it in the cache.
